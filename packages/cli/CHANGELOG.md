@@ -1,5 +1,15 @@
 # @open-slide/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- [#62](https://github.com/1weiho/open-slide/pull/62) [`ca1c99f`](https://github.com/1weiho/open-slide/commit/ca1c99f4fb532c2002da57e3815bfb173f33b6af) Thanks [@1weiho](https://github.com/1weiho)! - Prompt for slide UI language during `init` and write the chosen locale into `open-slide.config.ts`. Also adds `--locale <en|zh-TW|zh-CN|ja>`.
+
+### Patch Changes
+
+- [#64](https://github.com/1weiho/open-slide/pull/64) [`a65a51e`](https://github.com/1weiho/open-slide/commit/a65a51ec310c947706fe98f13782f2bce639b7dd) Thanks [@1weiho](https://github.com/1weiho)! - Align presenter window to design-system tokens and dark-mode palette.
+
 ## 1.0.4
 
 ### Patch Changes
