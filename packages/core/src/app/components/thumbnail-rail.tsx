@@ -390,7 +390,6 @@ function SortableThumb({
       }}
       className={cn(
         thumbButtonClass(active),
-        'cursor-grab active:cursor-grabbing',
         isDragging && 'z-10 opacity-60 shadow-edge ring-1 ring-brand',
       )}
       {...attributes}
