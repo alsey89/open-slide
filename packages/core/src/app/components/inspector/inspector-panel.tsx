@@ -33,6 +33,7 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { type AssetEntry, useAssets } from '@/lib/assets';
 import { findSlideSource } from '@/lib/inspector/fiber';
 import type { EditOp } from '@/lib/inspector/use-editor';
@@ -150,15 +151,18 @@ export function InspectorPanel() {
               &lt;{pinSelected.anchor.tagName.toLowerCase()}&gt;
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => setSelected(null)}
-            aria-label={t.inspector.deselect}
-          >
-            <X className="size-3.5" />
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <AgentWatchingBadge />
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setSelected(null)}
+              aria-label={t.inspector.deselect}
+            >
+              <X className="size-3.5" />
+            </Button>
+          </div>
         </>
       }
       footer={<CommentsSection selected={pinSelected} onAdd={add} />}
@@ -802,6 +806,31 @@ function AssetPickerDialog({
   );
 }
 
+function AgentWatchingBadge() {
+  const t = useLocale();
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="flex shrink-0 cursor-help items-center gap-1.5 rounded-[3px] border border-hairline bg-card px-1.5 py-px text-[10.5px] text-foreground/85 outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+          >
+            <span aria-hidden className="relative flex size-1.5 items-center justify-center">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            {t.inspector.agentWatching}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="end" className="max-w-[260px] leading-relaxed">
+          {t.inspector.agentWatchingTooltip}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function CommentsSection({
   selected,
   onAdd,
@@ -826,7 +855,7 @@ function CommentsSection({
   };
 
   return (
-    <Section title={t.inspector.noteForAgent}>
+    <Section title={t.inspector.leaveComment}>
       <div className="flex flex-col gap-2">
         <div className="comment-cue rounded-[6px]">
           <Textarea
@@ -838,16 +867,16 @@ function CommentsSection({
                 submit();
               }
             }}
-            placeholder={t.inspector.noteAgentPlaceholder}
+            placeholder={t.inspector.commentPlaceholder}
             className="min-h-16 resize-none text-[12px]"
           />
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className="font-mono text-[10.5px] text-muted-foreground/70">
-            {t.inspector.noteShortcutHint}
+            {t.inspector.commentShortcutHint}
           </span>
           <Button size="sm" variant="brand" disabled={submitting || !draft.trim()} onClick={submit}>
-            {t.inspector.addNote}
+            {t.inspector.addComment}
           </Button>
         </div>
       </div>

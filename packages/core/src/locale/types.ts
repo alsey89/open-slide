@@ -86,6 +86,8 @@ export type Locale = {
   slide: {
     home: string;
     backToHome: string;
+    agentConnected: string;
+    agentConnectedTooltip: string;
     download: string;
     exportAsHtml: string;
     exportAsPdf: string;
@@ -161,6 +163,8 @@ export type Locale = {
   inspector: {
     inspect: string;
     deselect: string;
+    agentWatching: string;
+    agentWatchingTooltip: string;
     contentSection: string;
     typographySection: string;
     colorSection: string;
@@ -198,10 +202,10 @@ export type Locale = {
     cropFitContain: string;
     cropApply: string;
     cropResetAria: string;
-    noteForAgent: string;
-    noteAgentPlaceholder: string;
-    noteShortcutHint: string;
-    addNote: string;
+    leaveComment: string;
+    commentPlaceholder: string;
+    commentShortcutHint: string;
+    addComment: string;
     /** templates: "{count} unsaved change" / "{count} unsaved changes" */
     unsavedChanges: Plural;
     /** templates: "{count} comment" / "{count} comments" */

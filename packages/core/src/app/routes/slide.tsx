@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFolders } from '@/lib/folders';
 import { format, useLocale } from '@/lib/use-locale';
 import { useWheelPageNavigation } from '@/lib/use-wheel-page-navigation';
@@ -78,6 +79,18 @@ export function Slide() {
   const rawIndex = Number(searchParams.get('p') ?? '1') - 1;
   const index = Number.isFinite(rawIndex) ? Math.max(0, Math.min(pageCount - 1, rawIndex)) : 0;
   const view = searchParams.get('view') === 'assets' ? 'assets' : 'slides';
+
+  useEffect(() => {
+    if (!import.meta.hot) return;
+    if (!slideId || !slide || pageCount === 0) return;
+    import.meta.hot.send('open-slide:current', {
+      slideId,
+      pageIndex: index,
+      totalPages: pageCount,
+      slideTitle: slide.meta?.title ?? slideId,
+      view,
+    });
+  }, [slideId, index, pageCount, slide, view]);
 
   const goTo = useCallback(
     (i: number) => {
@@ -316,6 +329,7 @@ export function Slide() {
   return (
     <HistoryProvider>
       <InspectorProvider slideId={slideId}>
+        <SelectionReporter />
         <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
           {/* Editorial toolbar — three zones, hairline separators, mono-folio center */}
           <header className="relative flex h-12 shrink-0 items-center justify-between border-b border-hairline bg-sidebar/85 px-2 backdrop-blur-md md:px-3">
@@ -349,6 +363,7 @@ export function Slide() {
                   </TabsList>
                 </Tabs>
               )}
+              {import.meta.env.DEV && <AgentConnectedBadge />}
             </div>
 
             {/* Centered title — the rail and mobile pill carry the page count. */}
@@ -531,6 +546,48 @@ export function Slide() {
       </InspectorProvider>
     </HistoryProvider>
   );
+}
+
+function AgentConnectedBadge() {
+  const t = useLocale();
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="ml-1 flex shrink-0 cursor-help items-center gap-1.5 rounded-[3px] border border-hairline bg-card px-1.5 py-0.5 text-[10.5px] text-foreground/85 outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+          >
+            <span aria-hidden className="relative flex size-1.5 items-center justify-center">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            {t.slide.agentConnected}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="start" className="max-w-[280px] leading-relaxed">
+          {t.slide.agentConnectedTooltip}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function SelectionReporter() {
+  const { selected } = useInspector();
+  useEffect(() => {
+    if (!import.meta.hot) return;
+    const selection = selected
+      ? {
+          line: selected.line,
+          column: selected.column,
+          tagName: selected.anchor.tagName.toLowerCase(),
+          text: (selected.anchor.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 120),
+        }
+      : null;
+    import.meta.hot.send('open-slide:current', { selection });
+  }, [selected]);
+  return null;
 }
 
 function SlideWheelNavigation({

@@ -36,3 +36,11 @@ marker travels with the element and is invisible at runtime.
 
 Run `/apply-comments` in your agent — see [apply-comments](/docs/tools/apply-comments)
 — and the agent rewrites exactly the flagged regions, then clears the markers.
+
+## Selection is visible to your agent
+
+The inspector publishes the currently picked element — source line/column,
+tag, and text snippet — to `node_modules/.open-slide/current.json` whenever
+you click. Ask your agent *"make this bigger"* and the
+[`/current-slide`](/docs/agents/skills#current-slide) skill reads that file
+to find the exact JSX node, no extra "which one?" round-trip.

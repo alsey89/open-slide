@@ -1,9 +1,9 @@
 ---
 title: Skills
-description: The four agent skills shipped with every open-slide workspace.
+description: The agent skills shipped with every open-slide workspace.
 ---
 
-A skill is a markdown file the agent reads on demand. open-slide ships four;
+A skill is a markdown file the agent reads on demand. open-slide ships five;
 your agent invokes them by typing `/<skill-name>` in chat.
 
 ## `/create-slide`
@@ -42,3 +42,15 @@ with the palette, type stack, layout vocabulary, and voice notes that future
 
 Use it once your decks start sharing a visual language — turn the implicit
 recipe into a file the agent can read.
+
+## `/current-slide`
+
+Resolves deictic references — *"this page"*, *"this heading"*, *"the slide
+I'm on"* — to a concrete slide id, page index, and (when set) the JSX
+element you've picked in the [inspector](/docs/tools/inspector). The dev
+server writes the state to `node_modules/.open-slide/current.json` on every
+navigation and selection change; this skill teaches the agent to read it
+before asking *which slide?*
+
+You don't usually invoke it directly. `slide-authoring` cross-references it,
+so any "fix this" prompt routes through it automatically.

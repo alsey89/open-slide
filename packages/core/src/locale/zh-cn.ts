@@ -81,6 +81,9 @@ export const zhCN: Locale = {
   },
 
   slide: {
+    agentConnected: 'Agent 已连接',
+    agentConnectedTooltip:
+      'Dev server 正在把你目前在哪张 slide、Inspector 选了哪个元素发布给 agent。直接到聊天说"这张 slide"或"这个元素"就行。Production build 不会出现。',
     home: '首页',
     backToHome: '返回首页',
     download: '下载',
@@ -192,10 +195,13 @@ export const zhCN: Locale = {
     cropFitContain: '完整显示',
     cropApply: '应用',
     cropResetAria: '重置裁剪',
-    noteForAgent: '给代理的备注',
-    noteAgentPlaceholder: '描述你希望代理执行的更改…',
-    noteShortcutHint: '⌘↵ 发送',
-    addNote: '添加备注',
+    agentWatching: 'Agent 正在关注',
+    agentWatchingTooltip:
+      'Agent 已经通过 dev server 看到你选的元素了，直接到聊天请它修改就行。想累积几个再一次问才需要在这里留 comments。',
+    leaveComment: '留个 comment',
+    commentPlaceholder: '描述你希望代理执行的更改…',
+    commentShortcutHint: '⌘↵ 添加',
+    addComment: '添加 comment',
     unsavedChanges: {
       one: '{count} 项未保存的更改',
       other: '{count} 项未保存的更改',

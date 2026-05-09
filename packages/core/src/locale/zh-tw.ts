@@ -81,6 +81,9 @@ export const zhTW: Locale = {
   },
 
   slide: {
+    agentConnected: 'Agent 已連線',
+    agentConnectedTooltip:
+      'Dev server 正在把你目前在哪張 slide、Inspector 選了哪個元素發布給 agent。直接到聊天說「這張 slide」或「這個元素」就行。Production build 不會出現。',
     home: '首頁',
     backToHome: '返回首頁',
     download: '下載',
@@ -192,10 +195,13 @@ export const zhTW: Locale = {
     cropFitContain: '完整顯示',
     cropApply: '套用',
     cropResetAria: '重設裁切',
-    noteForAgent: '給代理的備註',
-    noteAgentPlaceholder: '描述你希望代理進行的修改…',
-    noteShortcutHint: '⌘↵ 送出',
-    addNote: '新增備註',
+    agentWatching: 'Agent 正在關注',
+    agentWatchingTooltip:
+      'Agent 已經透過 dev server 看到你選的元素了，直接到聊天請它修改就行。想累積幾個再一次問才需要在這裡留 comments。',
+    leaveComment: '留個 comment',
+    commentPlaceholder: '描述你希望代理進行的修改…',
+    commentShortcutHint: '⌘↵ 新增',
+    addComment: '新增 comment',
     unsavedChanges: {
       one: '{count} 項未儲存的變更',
       other: '{count} 項未儲存的變更',
