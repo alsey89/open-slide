@@ -301,6 +301,7 @@ export const en: Locale = {
     toastDeleted: 'Deleted page {n}',
     toastDuplicateFailed: 'Could not duplicate page',
     toastDeleteFailed: 'Could not delete page',
+    resizeRail: 'Resize thumbnail rail',
   },
 
   pdfToast: {

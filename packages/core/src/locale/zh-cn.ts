@@ -301,6 +301,7 @@ export const zhCN: Locale = {
     toastDeleted: '已删除第 {n} 页',
     toastDuplicateFailed: '无法复制页面',
     toastDeleteFailed: '无法删除页面',
+    resizeRail: '调整缩略图栏宽度',
   },
 
   pdfToast: {

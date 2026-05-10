@@ -321,6 +321,7 @@ export type Locale = {
     toastDeleted: string;
     toastDuplicateFailed: string;
     toastDeleteFailed: string;
+    resizeRail: string;
   };
 
   pdfToast: {

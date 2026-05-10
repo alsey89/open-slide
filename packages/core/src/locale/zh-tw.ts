@@ -301,6 +301,7 @@ export const zhTW: Locale = {
     toastDeleted: '已刪除第 {n} 頁',
     toastDuplicateFailed: '無法複製頁面',
     toastDeleteFailed: '無法刪除頁面',
+    resizeRail: '調整縮圖欄寬度',
   },
 
   pdfToast: {

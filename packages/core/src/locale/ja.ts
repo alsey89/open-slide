@@ -305,6 +305,7 @@ export const ja: Locale = {
     toastDeleted: 'ページ {n} を削除しました',
     toastDuplicateFailed: 'ページを複製できませんでした',
     toastDeleteFailed: 'ページを削除できませんでした',
+    resizeRail: 'サムネイル幅を調整',
   },
 
   pdfToast: {

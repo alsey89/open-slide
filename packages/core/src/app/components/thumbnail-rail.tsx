@@ -47,9 +47,13 @@ type Props = {
   onReorder?: (from: number, to: number) => void;
   actions?: ThumbnailActions;
   orientation?: Orientation;
+  /** Vertical-only: total rail width in px. Thumbnails scale to fit. */
+  width?: number;
 };
 
-const VERTICAL_THUMB_WIDTH = 184;
+const DEFAULT_VERTICAL_THUMB_WIDTH = 184;
+const VERTICAL_RAIL_CHROME = 80;
+const MIN_VERTICAL_THUMB_WIDTH = 120;
 const HORIZONTAL_THUMB_HEIGHT = 64;
 
 export function ThumbnailRail({
@@ -60,6 +64,7 @@ export function ThumbnailRail({
   onReorder,
   actions,
   orientation = 'vertical',
+  width,
 }: Props) {
   const activeRef = useRef<HTMLButtonElement | null>(null);
   const t = useLocale();
@@ -138,7 +143,11 @@ export function ThumbnailRail({
     );
   }
 
-  const scale = VERTICAL_THUMB_WIDTH / CANVAS_WIDTH;
+  const thumbWidth =
+    width != null
+      ? Math.max(MIN_VERTICAL_THUMB_WIDTH, width - VERTICAL_RAIL_CHROME)
+      : DEFAULT_VERTICAL_THUMB_WIDTH;
+  const scale = thumbWidth / CANVAS_WIDTH;
   const height = CANVAS_HEIGHT * scale;
 
   const renderThumb = (PageComp: Page, i: number) => {
@@ -150,6 +159,7 @@ export function ThumbnailRail({
         page={PageComp}
         design={design}
         scale={scale}
+        thumbWidth={thumbWidth}
         height={height}
       />
     );
@@ -230,6 +240,7 @@ function ThumbContents({
   page: PageComp,
   design,
   scale,
+  thumbWidth,
   height,
 }: {
   index: number;
@@ -237,6 +248,7 @@ function ThumbContents({
   page: Page;
   design?: DesignSystem;
   scale: number;
+  thumbWidth: number;
   height: number;
 }) {
   return (
@@ -256,7 +268,7 @@ function ThumbContents({
             ? 'border-brand shadow-[0_0_0_1px_var(--brand)]'
             : 'border-hairline group-hover/thumb:border-foreground/25',
         )}
-        style={{ width: VERTICAL_THUMB_WIDTH, height }}
+        style={{ width: thumbWidth, height }}
       >
         <SlideCanvas scale={scale} center={false} flat freezeMotion design={design}>
           <PageComp />
