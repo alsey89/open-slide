@@ -88,6 +88,8 @@ export type Locale = {
     backToHome: string;
     agentConnected: string;
     agentConnectedTooltip: string;
+    agentDisconnected: string;
+    agentDisconnectedTooltip: string;
     download: string;
     exportAsHtml: string;
     exportAsPdf: string;
@@ -165,6 +167,8 @@ export type Locale = {
     deselect: string;
     agentWatching: string;
     agentWatchingTooltip: string;
+    agentNotWatching: string;
+    agentNotWatchingTooltip: string;
     contentSection: string;
     typographySection: string;
     colorSection: string;

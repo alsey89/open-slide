@@ -41,6 +41,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { type AssetEntry, uploadWithAutoRename, useAssets } from '@/lib/assets';
 import { findSlideSource } from '@/lib/inspector/fiber';
 import type { EditOp } from '@/lib/inspector/use-editor';
+import { useAgentSocketConnected } from '@/lib/use-agent-socket';
 import { format, useLocale } from '@/lib/use-locale';
 import { cn } from '@/lib/utils';
 import type { Locale } from '../../../locale/types';
@@ -913,6 +914,7 @@ function hasFiles(e: React.DragEvent): boolean {
 
 function AgentWatchingBadge() {
   const t = useLocale();
+  const connected = useAgentSocketConnected();
   return (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
@@ -922,14 +924,20 @@ function AgentWatchingBadge() {
             className="flex shrink-0 cursor-help items-center gap-1.5 rounded-[3px] border border-hairline bg-card px-1.5 py-px text-[10.5px] text-foreground/85 outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
           >
             <span aria-hidden className="relative flex size-1.5 items-center justify-center">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+              {connected ? (
+                <>
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </>
+              ) : (
+                <span className="relative inline-flex size-1.5 rounded-full bg-rose-500" />
+              )}
             </span>
-            {t.inspector.agentWatching}
+            {connected ? t.inspector.agentWatching : t.inspector.agentNotWatching}
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="end" className="max-w-[260px] leading-relaxed">
-          {t.inspector.agentWatchingTooltip}
+          {connected ? t.inspector.agentWatchingTooltip : t.inspector.agentNotWatchingTooltip}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

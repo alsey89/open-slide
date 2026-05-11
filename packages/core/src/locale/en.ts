@@ -86,6 +86,9 @@ export const en: Locale = {
     agentConnected: 'Agent connected',
     agentConnectedTooltip:
       'The dev server is publishing your current slide and inspector selection to your agent. Ask "this slide" or "this element" in chat and it will resolve. Disappears in production builds.',
+    agentDisconnected: 'Agent disconnected',
+    agentDisconnectedTooltip:
+      'Lost connection to the dev server, so your agent can no longer see the current slide or inspector selection. Restart the dev server to restore the connection.',
     download: 'Download',
     exportAsHtml: 'Export as HTML',
     exportAsPdf: 'Export as PDF',
@@ -162,6 +165,9 @@ export const en: Locale = {
     agentWatching: 'Agent is watching',
     agentWatchingTooltip:
       'Your agent already sees the selected element via the dev server — just ask it in chat. Leave comments here only when you want to queue a few before asking.',
+    agentNotWatching: 'Agent not watching',
+    agentNotWatchingTooltip:
+      'Lost connection to the dev server, so your agent can no longer see the selected element. Restart the dev server to restore the connection.',
     contentSection: 'Content',
     typographySection: 'Typography',
     colorSection: 'Color',

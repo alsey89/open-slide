@@ -26,6 +26,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFolders } from '@/lib/folders';
+import { useAgentSocketConnected } from '@/lib/use-agent-socket';
 import { format, useLocale } from '@/lib/use-locale';
 import { useWheelPageNavigation } from '@/lib/use-wheel-page-navigation';
 import { cn } from '@/lib/utils';
@@ -677,6 +678,7 @@ function ResizableRail(props: {
 
 function AgentConnectedBadge() {
   const t = useLocale();
+  const connected = useAgentSocketConnected();
   return (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
@@ -686,14 +688,20 @@ function AgentConnectedBadge() {
             className="ml-1 flex shrink-0 cursor-help items-center gap-1.5 rounded-[3px] border border-hairline bg-card px-1.5 py-0.5 text-[10.5px] text-foreground/85 outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
           >
             <span aria-hidden className="relative flex size-1.5 items-center justify-center">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+              {connected ? (
+                <>
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </>
+              ) : (
+                <span className="relative inline-flex size-1.5 rounded-full bg-rose-500" />
+              )}
             </span>
-            {t.slide.agentConnected}
+            {connected ? t.slide.agentConnected : t.slide.agentDisconnected}
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="start" className="max-w-[280px] leading-relaxed">
-          {t.slide.agentConnectedTooltip}
+          {connected ? t.slide.agentConnectedTooltip : t.slide.agentDisconnectedTooltip}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -84,6 +84,9 @@ export const zhTW: Locale = {
     agentConnected: 'Agent 已連線',
     agentConnectedTooltip:
       'Dev server 正在把你目前在哪張 slide、Inspector 選了哪個元素發布給 agent。直接到聊天說「這張 slide」或「這個元素」就行。Production build 不會出現。',
+    agentDisconnected: 'Agent 已斷線',
+    agentDisconnectedTooltip:
+      '已和 dev server 斷線，agent 沒辦法再看到你目前的 slide 或 Inspector 選擇。請重新啟動 dev server 來恢復連線。',
     home: '首頁',
     backToHome: '返回首頁',
     download: '下載',
@@ -198,6 +201,9 @@ export const zhTW: Locale = {
     agentWatching: 'Agent 正在關注',
     agentWatchingTooltip:
       'Agent 已經透過 dev server 看到你選的元素了，直接到聊天請它修改就行。想累積幾個再一次問才需要在這裡留 comments。',
+    agentNotWatching: 'Agent 沒在關注',
+    agentNotWatchingTooltip:
+      '已和 dev server 斷線，agent 看不到你選的元素了。請重新啟動 dev server 來恢復連線。',
     leaveComment: '留個 comment',
     commentPlaceholder: '描述你希望代理進行的修改…',
     commentShortcutHint: '⌘↵ 新增',
