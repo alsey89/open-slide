@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest a new capability for open-slide.
 title: "[Feature]: "
-labels: ["enhancement"]
+labels: ["request"]
 body:
   - type: textarea
     id: problem
