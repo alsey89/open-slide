@@ -344,8 +344,8 @@ export function Slide() {
         <SelectionReporter />
         <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
           {/* Editorial toolbar — three zones, hairline separators, mono-folio center */}
-          <header className="relative flex h-12 shrink-0 items-center justify-between border-b border-hairline bg-sidebar/85 px-2 backdrop-blur-md md:px-3">
-            <div className="flex items-center gap-1.5 md:gap-2">
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b border-hairline bg-sidebar/85 px-2 backdrop-blur-md md:px-3">
+            <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
               {showSlideBrowser && (
                 <Button asChild variant="ghost" size="icon-sm" title={t.slide.home}>
                   <Link to="/" aria-label={t.slide.backToHome}>
@@ -379,13 +379,13 @@ export function Slide() {
             </div>
 
             {/* Centered title — the rail and mobile pill carry the page count. */}
-            <div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center px-2">
-              <div className="pointer-events-auto min-w-0 max-w-[min(34rem,calc(100vw-22rem))]">
+            <div className="flex min-w-0 flex-1 justify-center px-2">
+              <div className="min-w-0 max-w-[34rem]">
                 <InlineTitleEditor title={title} onSubmit={(next) => renameSlide(slideId, next)} />
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               {view === 'slides' && (
                 <button
                   type="button"
