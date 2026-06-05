@@ -50,7 +50,7 @@ function resolved(id: string): string {
 async function findSlides(userCwd: string, slidesDir: string): Promise<string[]> {
   const abs = path.resolve(userCwd, slidesDir);
   if (!existsSync(abs)) return [];
-  const hits = await fg('*/index.{tsx,jsx,ts,js}', {
+  const hits = await fg('*/deck.json', {
     cwd: abs,
     absolute: true,
     onlyFiles: true,
@@ -63,49 +63,36 @@ function toId(absFile: string, slidesRoot: string): string {
   return rel.split(path.sep)[0];
 }
 
-const META_THEME_RE = /(?:^|[\s,{])theme\s*:\s*['"]([^'"]+)['"]/;
-const META_CREATED_AT_RE = /(?:^|[\s,{])createdAt\s*:\s*['"]([^'"]+)['"]/;
-
 type ExtractedMeta = { theme: string | null; createdAt: string | null };
 
-function extractMeta(src: string): ExtractedMeta {
-  const empty: ExtractedMeta = { theme: null, createdAt: null };
-  const metaStart = src.search(/export\s+const\s+meta\b/);
-  if (metaStart === -1) return empty;
-  const eqIdx = src.indexOf('=', metaStart);
-  if (eqIdx === -1) return empty;
-  const openBrace = src.indexOf('{', eqIdx);
-  if (openBrace === -1) return empty;
-  let depth = 0;
-  let closeBrace = -1;
-  for (let i = openBrace; i < src.length; i++) {
-    const ch = src[i];
-    if (ch === '{') depth++;
-    else if (ch === '}') {
-      depth--;
-      if (depth === 0) {
-        closeBrace = i;
-        break;
-      }
-    }
+function readDeckMetaFromJson(raw: string): ExtractedMeta {
+  try {
+    const parsed = JSON.parse(raw) as { meta?: { theme?: unknown; createdAt?: unknown } };
+    const meta = parsed?.meta ?? {};
+    return {
+      theme: typeof meta.theme === 'string' ? meta.theme : null,
+      createdAt: typeof meta.createdAt === 'string' ? meta.createdAt : null,
+    };
+  } catch {
+    return { theme: null, createdAt: null };
   }
-  if (closeBrace === -1) return empty;
-  const body = src.slice(openBrace + 1, closeBrace);
-  const themeMatch = body.match(META_THEME_RE);
-  const createdAtMatch = body.match(META_CREATED_AT_RE);
-  return {
-    theme: themeMatch ? themeMatch[1] : null,
-    createdAt: createdAtMatch ? createdAtMatch[1] : null,
-  };
 }
 
 async function readSlideMeta(abs: string): Promise<ExtractedMeta> {
   try {
-    const src = await fs.readFile(abs, 'utf8');
-    return extractMeta(src);
+    return readDeckMetaFromJson(await fs.readFile(abs, 'utf8'));
   } catch {
     return { theme: null, createdAt: null };
   }
+}
+
+function slideIdForEntry(p: string, slidesRoot: string): string | null {
+  const rel = path.relative(slidesRoot, p);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  const parts = rel.split(path.sep);
+  if (parts.length !== 2) return null;
+  if (parts[1] !== 'deck.json') return null;
+  return parts[0];
 }
 
 function parseCreatedAtMs(iso: string | null): number | null {
@@ -157,7 +144,7 @@ if (import.meta.hot) {
       const importExpr = isDev
         ? `import(/* @vite-ignore */ ${JSON.stringify(`${e.importPath}?t=`)} + slideImportTokens[${JSON.stringify(e.id)}])`
         : `import(${JSON.stringify(e.importPath)})`;
-      return `    case ${JSON.stringify(e.id)}: return ${importExpr};`;
+      return `    case ${JSON.stringify(e.id)}: return (await ${importExpr}).default;`;
     })
     .join('\n');
 
@@ -167,10 +154,10 @@ export const slideThemes = ${themesJson};
 export const slideCreatedAt = ${createdAtJson};
 ${devRuntime}
 
-export async function loadSlide(id) {
+export async function loadDeckJson(id) {
   switch (id) {
 ${cases}
-    default: throw new Error('Slide not found: ' + id);
+    default: throw new Error('Deck not found: ' + id);
   }
 }
 `;
@@ -183,14 +170,6 @@ export function openSlidePlugin(opts: OpenSlidePluginOptions): Plugin {
   const foldersManifestPath = path.join(slidesRoot, '.folders.json');
 
   let isDev = false;
-  const slideIdForEntry = (p: string): string | null => {
-    const rel = path.relative(slidesRoot, p);
-    if (rel.startsWith('..') || path.isAbsolute(rel)) return null;
-    const parts = rel.split(path.sep);
-    if (parts.length !== 2) return null;
-    if (!/^index\.(tsx|jsx|ts|js)$/.test(parts[1])) return null;
-    return parts[0];
-  };
   let slideChangeTimer: ReturnType<typeof setTimeout> | null = null;
   const pendingSlideChanges = new Set<string>();
   const queueSlideChanged = (server: ViteDevServer, id: string) => {
@@ -248,13 +227,13 @@ export function openSlidePlugin(opts: OpenSlidePluginOptions): Plugin {
       return null;
     },
     handleHotUpdate(ctx) {
-      const slideId = slideIdForEntry(ctx.file);
+      const slideId = slideIdForEntry(ctx.file, slidesRoot);
       if (!slideId) return;
       queueSlideChanged(ctx.server, slideId);
       return [];
     },
     configureServer(server) {
-      const isSlideEntry = (p: string) => slideIdForEntry(p) !== null;
+      const isSlideEntry = (p: string) => slideIdForEntry(p, slidesRoot) !== null;
 
       let reloadTimer: ReturnType<typeof setTimeout> | null = null;
       const reload = () => {
@@ -300,6 +279,8 @@ export function openSlidePlugin(opts: OpenSlidePluginOptions): Plugin {
     },
   };
 }
+
+export const __test = { toId, slideIdForEntry, readDeckMetaFromJson };
 
 export async function loadUserConfig(userCwd: string): Promise<OpenSlideConfig> {
   const file = path.join(userCwd, CONFIG_FILE);
