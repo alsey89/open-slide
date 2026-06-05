@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DesignSystem } from '../../../app/lib/design.ts';
 
 function ColorField({
@@ -47,29 +47,58 @@ export function DesignPanel({
   onChange: (next: DesignSystem) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(design);
+
+  useEffect(() => {
+    setDraft(design);
+  }, [design]);
+
+  const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (commitTimer.current) clearTimeout(commitTimer.current);
+    },
+    [],
+  );
+
+  const commitDebounced = useCallback(
+    (next: DesignSystem) => {
+      if (commitTimer.current) clearTimeout(commitTimer.current);
+      commitTimer.current = setTimeout(() => onChange(next), 150);
+    },
+    [onChange],
+  );
+
+  const update = useCallback(
+    (next: DesignSystem) => {
+      setDraft(next);
+      commitDebounced(next);
+    },
+    [commitDebounced],
+  );
 
   const inputCls =
     'w-full rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20';
 
   const setPalette = (key: keyof DesignSystem['palette'], value: string) => {
-    onChange({ ...design, palette: { ...design.palette, [key]: value } });
+    update({ ...draft, palette: { ...draft.palette, [key]: value } });
   };
 
   const setFont = (key: keyof DesignSystem['fonts'], value: string) => {
-    onChange({ ...design, fonts: { ...design.fonts, [key]: value } });
+    update({ ...draft, fonts: { ...draft.fonts, [key]: value } });
   };
 
   const setTypeScale = (key: keyof DesignSystem['typeScale'], raw: string) => {
     const n = Number(raw);
     if (!Number.isNaN(n)) {
-      onChange({ ...design, typeScale: { ...design.typeScale, [key]: n } });
+      update({ ...draft, typeScale: { ...draft.typeScale, [key]: n } });
     }
   };
 
   const setRadius = (raw: string) => {
     const n = Number(raw);
     if (!Number.isNaN(n)) {
-      onChange({ ...design, radius: n });
+      update({ ...draft, radius: n });
     }
   };
 
@@ -96,19 +125,19 @@ export function DesignPanel({
             <ColorField
               id="design-bg"
               label="Background"
-              value={design.palette.bg}
+              value={draft.palette.bg}
               onChange={(v) => setPalette('bg', v)}
             />
             <ColorField
               id="design-text"
               label="Text"
-              value={design.palette.text}
+              value={draft.palette.text}
               onChange={(v) => setPalette('text', v)}
             />
             <ColorField
               id="design-accent"
               label="Accent"
-              value={design.palette.accent}
+              value={draft.palette.accent}
               onChange={(v) => setPalette('accent', v)}
             />
           </div>
@@ -127,7 +156,7 @@ export function DesignPanel({
                 id="design-font-display"
                 type="text"
                 className={inputCls}
-                value={design.fonts.display}
+                value={draft.fonts.display}
                 onChange={(e) => setFont('display', e.target.value)}
               />
             </div>
@@ -139,7 +168,7 @@ export function DesignPanel({
                 id="design-font-body"
                 type="text"
                 className={inputCls}
-                value={design.fonts.body}
+                value={draft.fonts.body}
                 onChange={(e) => setFont('body', e.target.value)}
               />
             </div>
@@ -160,7 +189,7 @@ export function DesignPanel({
                   id="design-scale-hero"
                   type="number"
                   className={inputCls}
-                  value={design.typeScale.hero}
+                  value={draft.typeScale.hero}
                   onChange={(e) => setTypeScale('hero', e.target.value)}
                 />
               </div>
@@ -172,7 +201,7 @@ export function DesignPanel({
                   id="design-scale-body"
                   type="number"
                   className={inputCls}
-                  value={design.typeScale.body}
+                  value={draft.typeScale.body}
                   onChange={(e) => setTypeScale('body', e.target.value)}
                 />
               </div>
@@ -193,7 +222,7 @@ export function DesignPanel({
                 id="design-radius"
                 type="number"
                 className={inputCls}
-                value={design.radius}
+                value={draft.radius}
                 onChange={(e) => setRadius(e.target.value)}
               />
             </div>

@@ -1,7 +1,7 @@
 import type { Slide } from '../../../doc/model.ts';
 
 export function freshId(prefix = 'x'): string {
-  return `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 export function cloneSlideWithFreshIds(slide: Slide): Slide {

@@ -388,6 +388,7 @@ export function DeckEditor({
     if (clampedIndex !== index && pageCount > 0) onIndexChange(clampedIndex);
   }, [clampedIndex, index, pageCount, onIndexChange]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mod/clampedIndex re-render the canvas DOM the effect queries, so the highlight must re-apply when they change.
   useEffect(() => {
     const wrap = canvasWrapRef.current;
     if (!wrap) return;
@@ -396,10 +397,10 @@ export function DeckEditor({
     });
     if (editor.selectedBlockId) {
       wrap
-        .querySelector(`[data-osd-block-id="${editor.selectedBlockId}"]`)
+        .querySelector(`[data-osd-block-id="${CSS.escape(editor.selectedBlockId)}"]`)
         ?.setAttribute('data-osd-selected', '');
     }
-  });
+  }, [editor.selectedBlockId, mod, clampedIndex]);
 
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {

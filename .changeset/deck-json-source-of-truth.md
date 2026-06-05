@@ -3,4 +3,4 @@
 '@open-slide/cli': major
 ---
 
-Make deck.json the source of truth. Slides are authored as a structured document model rendered by a block/layout engine; the TSX authoring path, inspector, and design panel are removed. In-place editing returns via a structured edit API.
+Replace the TSX authoring path with a structured deck.json document model rendered by a block/layout engine, edited via a structured edit API.

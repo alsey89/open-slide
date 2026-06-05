@@ -61,6 +61,7 @@ See [`AGENTS.md`](./AGENTS.md) for the full authoring guide.
 - Arrow keys / PageUp / PageDown move between slides.
 - `F` enters fullscreen play mode; Esc exits.
 - In play mode: Space / → next, ← prev.
+- `E` (dev only) toggles the in-browser editor: select blocks, edit content, manage slides, and tune design.
 
 ## Claude Code integration
 
