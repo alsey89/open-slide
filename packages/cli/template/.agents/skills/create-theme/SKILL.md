@@ -14,7 +14,7 @@ This skill produces a **theme bundle** under `themes/`: two paired files that to
 
 Both files share the same stem so the runtime can pair them automatically.
 
-A theme is **distinct from a slide's `design` const**. The theme markdown is authoring-time aesthetic direction (copied into a real slide's source by `create-slide`). The demo `.tsx` is a self-contained preview, not a real slide — it does not appear in the slides list. A per-slide `const design: DesignSystem = { … }` (declared at the top of `slides/<id>/index.tsx`) is the runtime tokens object the user can tweak from the Design panel. The markdown commits the *direction*; the per-slide `design` const makes the slide *tweakable*; the demo `.tsx` makes the theme *previewable*.
+A theme is **distinct from a deck's design tokens**. The theme markdown is authoring-time aesthetic direction (consulted by `create-slide` when an author picks the theme). The demo `.tsx` is a self-contained preview, not a real slide — it does not appear in the slides list. Decks are now `slides/<id>/deck.json` (not `index.tsx`); the `design` field in `deck.json` holds the runtime tokens for a specific deck. The markdown commits the *direction*; the deck's `design` object makes it *concrete*; the demo `.tsx` makes the theme *previewable*.
 
 You only write files under `themes/<id>.md` and `themes/<id>.demo.tsx`. Never modify real slides or other configuration. The canvas / type-scale defaults that themes can override live in the **`slide-authoring`** skill — read it before writing the theme so your overrides are stated explicitly.
 

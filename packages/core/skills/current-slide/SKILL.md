@@ -47,9 +47,9 @@ Path is relative to the project root (the user's `cwd`, the directory that conta
 ```
 
 - `slideId` — folder name under `slides/`. Use as-is for any `/__slides/<id>/...` API or as the URL segment.
-- `pageIndex` — 0-based, for use with the page array in `index.tsx` (`export default [Cover, Body, ...]`).
+- `pageIndex` — 0-based slide index within the deck's `slides` array.
 - `pageNumber` — 1-based, for use in messages to the user ("page 3 of 8") and for the URL `?p=N`.
-- `pagePath` — relative path to the slide source. Hand straight to `Read` / `Edit`.
+- `pagePath` — the viewer still emits `slides/<id>/index.tsx` here (legacy field). For the doc model, the real file to edit is `slides/<id>/deck.json`.
 - `view` — `"slides"` (canvas view) or `"assets"` (asset manager). If `"assets"`, the user is browsing files for that slide rather than viewing a page.
 - `selection` — `null` if nothing is selected. Otherwise, the JSX element the user picked in the inspector overlay:
   - `line` (1-indexed) and `column` (0-indexed) point to the JSX opening tag inside `pagePath`. This is the canonical handle — match against the source line, not the rendered DOM.
@@ -68,7 +68,6 @@ Path is relative to the project root (the user's `cwd`, the directory that conta
 ## When NOT to use this
 
 - The user names a slide explicitly ("edit `q2-roadmap`") — use that name directly.
-- The `apply-comments` workflow already finds the right file via `@slide-comment` markers; it doesn't need this skill.
 - For listing or discovering slides — read `slides/` directly.
 
 ## Staleness — verify before acting
@@ -92,9 +91,9 @@ User: "tighten the spacing on this page"
 
 1. Read `node_modules/.open-slide/current.json`.
 2. Check `updatedAt` is recent.
-3. Read `pagePath` (e.g. `slides/q2-roadmap/index.tsx`).
-4. Identify the page at `pageIndex` in the default-exported array.
-5. Consult the `slide-authoring` skill for spacing rules, then edit that page in place.
+3. Open `slides/<slideId>/deck.json` (the real edit target — `pagePath` is a legacy field pointing to a non-existent `index.tsx`).
+4. Find the slide at `pageIndex` in the `slides` array.
+5. Consult the `slide-authoring` skill for the schema, then edit that slide's blocks in place.
 
 If `current.json` is missing or stale, ask: "Which slide and page should I tighten? The dev server hasn't published a current page recently."
 
@@ -103,8 +102,8 @@ If `current.json` is missing or stale, ask: "Which slide and page should I tight
 User: "make this bigger"
 
 1. Read `node_modules/.open-slide/current.json`.
-2. If `selection` is non-null, the user means that element. Read `pagePath`, jump to `selection.line`, and find the JSX opening tag near that line/column. Confirm with the snippet in `selection.text` and the `tagName`.
-3. Consult `slide-authoring` for type-scale and layout rules before editing.
+2. If `selection` is non-null, the user means that element. Open `slides/<slideId>/deck.json`, find the slide at `pageIndex`, then locate the block referenced by `selection.text` or `tagName`.
+3. Consult `slide-authoring` for schema and block rules before editing.
 4. Edit the JSX node in place.
 
 If `selection` is null, fall back to the page-level flow above — and consider asking "which element?" since the user used a deictic but hasn't picked one in the inspector.
