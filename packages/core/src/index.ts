@@ -14,4 +14,18 @@ export type { StepProps, StepsProps } from './app/lib/step-context.tsx';
 export { Step, Steps } from './app/lib/step-context.tsx';
 export type { SlideTransition, TransitionPhase } from './app/lib/transition.ts';
 export type { OpenSlideConfig } from './config.ts';
+export type { Block, Deck, DeckMeta, Slide } from './doc/index.ts';
+export {
+  type BlockComponent,
+  DeckValidationError,
+  getBlock,
+  getLayout,
+  type LayoutComponent,
+  registerBlock,
+  registerBuiltins,
+  registerLayout,
+  renderDeck,
+  SCHEMA_VERSION,
+  validateDeck,
+} from './doc/index.ts';
 export type { Locale, Plural } from './locale/types.ts';
