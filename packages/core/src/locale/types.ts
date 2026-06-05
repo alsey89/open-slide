@@ -282,7 +282,6 @@ export type Locale = {
     scopeGlobal: string;
     /** templates: "{count} file" / "{count} files" */
     fileCount: Plural;
-    usageUnused: string;
     searchLogos: string;
     upload: string;
     dropToUpload: string;
@@ -306,14 +305,6 @@ export type Locale = {
     deleteAssetTitle: string;
     /** template: "Delete {name}? Imports referencing this file in the slide will break." */
     deleteAssetDescription: string;
-    /** template: "{name} is used in {count} place across {slides} slide." (singular/plural via {count}/{slides}) */
-    deleteAssetInUseDescription: string;
-    deleteAssetInUseHint: string;
-    deleteAndRevert: string;
-    /** template: "Couldn't revert usage in {slideId}." */
-    toastRevertFailed: string;
-    /** template: "Deleted {name} and reverted {count} usage." */
-    toastDeletedWithRevert: string;
     noPreview: string;
     importHintComment: string;
     importHintSemi: string;
@@ -395,12 +386,6 @@ export type Locale = {
   languageToggle: {
     toggleAria: string;
     title: string;
-  };
-
-  imagePlaceholder: {
-    dropOverlay: string;
-    uploading: string;
-    uploadFailed: string;
   };
 
   notesDrawer: {

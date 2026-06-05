@@ -46,35 +46,10 @@ async function deleteAsset(slideId: string, name: string): Promise<Response> {
   return fetch(`/__assets/${slideId}/${encodeURIComponent(name)}`, { method: 'DELETE' });
 }
 
-export type AssetUsage = { slideId: string; count: number };
-
-export async function listAssetUsages(slideId: string, name: string): Promise<AssetUsage[]> {
-  const res = await fetch(`/__assets/${slideId}/${encodeURIComponent(name)}/usages`);
-  if (!res.ok) return [];
-  const data = (await res.json().catch(() => null)) as { usages?: AssetUsage[] } | null;
-  return data?.usages ?? [];
-}
-
-export async function revertAssetUsage(
-  slideId: string,
-  assetPath: string,
-): Promise<{ ok: boolean; status: number }> {
-  const res = await fetch('/__edit/revert-asset', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ slideId, assetPath }),
-  });
-  return { ok: res.ok, status: res.status };
-}
-
 export async function uploadWithAutoRename(
   slideId: string,
   file: File,
 ): Promise<{ ok: boolean; status: number; entry: AssetEntry | null }> {
-  // Vite's default `assetsInclude` matches asset extensions case-sensitively,
-  // so `<img src="./assets/foo.JPG" />` (which the placeholder edit rewrites
-  // into a real `import`) fails to parse. Lowercase the extension so the
-  // import path is always one Vite recognizes.
   let uploaded = lowercaseExtension(file);
   let res = await uploadAsset(slideId, uploaded);
   if (res.status === 409) {

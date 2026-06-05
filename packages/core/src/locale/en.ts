@@ -281,7 +281,6 @@ export const en: Locale = {
     scopeSlide: 'This slide',
     scopeGlobal: 'Global',
     fileCount: { one: '{count} file', other: '{count} files' },
-    usageUnused: 'Unused',
     searchLogos: 'Search logos',
     upload: 'Upload',
     dropToUpload: 'Drop to upload',
@@ -301,11 +300,6 @@ export const en: Locale = {
     conflictRenameCopy: 'Rename copy',
     deleteAssetTitle: 'Delete asset',
     deleteAssetDescription: 'Delete {name}? Imports referencing this file in the slide will break.',
-    deleteAssetInUseDescription: '{name} is used in {count} place(s) across {slides} slide(s).',
-    deleteAssetInUseHint: 'Deleting will revert these usages back to image placeholders.',
-    deleteAndRevert: 'Delete & revert',
-    toastRevertFailed: "Couldn't revert usage in {slideId}",
-    toastDeletedWithRevert: 'Deleted {name} and reverted {count} usage(s)',
     noPreview: 'No preview available',
     importHintComment: 'import asset from ',
     importHintSemi: ';',
@@ -372,12 +366,6 @@ export const en: Locale = {
   languageToggle: {
     toggleAria: 'Change language',
     title: 'Language',
-  },
-
-  imagePlaceholder: {
-    dropOverlay: 'Drop image to use here',
-    uploading: 'Uploading…',
-    uploadFailed: "Couldn't upload image",
   },
 
   notesDrawer: {
