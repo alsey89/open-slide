@@ -1,6 +1,7 @@
 import type { Plugin } from 'vite';
 import { registerAssetRoutes } from './routes/assets.ts';
 import { type ApiPluginOptions, makeContext } from './routes/context.ts';
+import { registerDeckRoutes } from './routes/deck.ts';
 import { registerFolderRoutes } from './routes/folders.ts';
 import { registerSlideRoutes } from './routes/slides.ts';
 import { registerSvglRoutes } from './routes/svgl.ts';
@@ -23,6 +24,7 @@ export function apiPlugin(opts: ApiPluginOptions): Plugin {
       registerAssetRoutes(server, ctx);
       registerSvglRoutes(server);
       registerFolderRoutes(server, ctx);
+      registerDeckRoutes(server, ctx);
       registerUpdateRoutes(server, ctx.coreVersion);
     },
   };
