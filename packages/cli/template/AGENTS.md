@@ -1,22 +1,71 @@
 # open-slide — Agent Guide
 
-You are authoring **slides** in this repo. Every slide is arbitrary React code that you write.
+You are authoring **slide decks** in this repo. Every deck is a `deck.json` file validated by the framework.
 
 ## Hard rules
 
-- Put your slide under `slides/<kebab-case-id>/`.
-- The entry is `slides/<id>/index.tsx`.
-- Put slide-specific images/videos/fonts under `slides/<id>/assets/`. For assets reused across decks or themes (logos, avatars), use the global `assets/` folder and import via `@assets/...`.
+- A deck lives at `slides/<kebab-case-id>/deck.json`. That file is the single source of truth for the slide.
+- Put slide-specific images/videos/fonts under `slides/<id>/assets/`. For assets reused across decks (logos, avatars), use the global `assets/` folder and import via `@assets/...`.
 - Do **not** touch `package.json`, `open-slide.config.ts`, or other slides.
-- Do not add dependencies. Use only `react` and standard web APIs.
+- Do not add dependencies.
+
+## deck.json schema
+
+```
+Deck = {
+  schemaVersion: 1,
+  meta: { title, createdAt (ISO string), theme? },
+  design: DesignSystem,
+  slides: Slide[]
+}
+
+Slide = { id, layout, slots: { <slotName>: Block[] }, notes?, transition? }
+
+Block = { id, type, props }
+```
+
+### DesignSystem shape
+
+```json
+{
+  "palette": { "bg": "#...", "text": "#...", "accent": "#..." },
+  "fonts": { "display": "<stack>", "body": "<stack>" },
+  "typeScale": { "hero": 150, "body": 40 },
+  "radius": 12
+}
+```
+
+### Built-in layouts and their slots
+
+| Layout | Slots |
+| --- | --- |
+| `title` | `title`, `subtitle` |
+| `section` | `eyebrow`, `title` |
+| `title-body` | `title`, `body` |
+| `two-col` | `title`, `left`, `right` |
+| `media-text` | `title`, `media`, `body` |
+
+### Built-in block types
+
+| Type | Props |
+| --- | --- |
+| `heading` | `text` |
+| `text` | `text` |
+| `bullets` | `items: string[]` |
+| `image` | `src`, `alt`, `fit` |
+| `quote` | `text`, `attribution` |
+| `code` | `code`, `lang` |
+
+## Custom blocks
+
+Register custom React blocks in `blocks/index.ts` via `registerBlock(type, Component)` from `@open-slide/core`. Reference them by their registered `type` string in `deck.json` just like any built-in block.
 
 ## Which skill to use
 
-- **Drafting a new deck** — use the `create-slide` skill. It walks through scoping questions, structure, and hand-off.
-- **Applying inspector comments** (`@slide-comment` markers in a page) — use the `apply-comments` skill.
-- **Creating or extracting a theme** — use the `create-theme` skill. Themes live as markdown under `themes/<id>.md` and are read by `create-slide` before authoring.
-- **Resolving "this page" / "this element"** — when the user references the current slide or selection without naming it, consult the `current-slide` skill. It reads the dev server's `node_modules/.open-slide/current.json` to find which slide, page, and inspector-picked element they mean.
-- **Any other slide edit** — read the `slide-authoring` skill before writing. It is the technical reference for everything inside `slides/<id>/`: file contract, the 1920×1080 canvas, type scale, palette, layout, assets, self-review checklist, and anti-patterns. `create-slide` and `apply-comments` both defer to it for the *how*.
+- **Drafting a new deck** — use the `create-slide` skill.
+- **Creating or extracting a theme** — use the `create-theme` skill. Themes live under `themes/<id>.md`.
+- **Resolving "this slide" / "this element"** — consult the `current-slide` skill.
+- **Any other deck edit** — read the `slide-authoring` skill for the technical reference.
 
 Keep this file short: hard rules only. All deeper guidance lives in the skills above.
 
@@ -29,4 +78,4 @@ pnpm up @open-slide/core
 pnpm sync:skills
 ```
 
-`pnpm dev` will also detect drift on startup and offer to sync. `pnpm sync:skills --dry-run` (via `pnpm exec open-slide sync:skills --dry-run`) previews changes without writing.
+`pnpm dev` will also detect drift on startup and offer to sync.

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "meta": { "title": "Getting Started", "createdAt": "2026-01-01T00:00:00Z" },
+  "design": {
+    "palette": { "bg": "#0f1115", "text": "#f5f5f4", "accent": "#7c9cff" },
+    "fonts": { "display": "Georgia, serif", "body": "-apple-system, system-ui, sans-serif" },
+    "typeScale": { "hero": 150, "body": 40 },
+    "radius": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "layout": "title",
+      "slots": {
+        "title": [{ "id": "t1", "type": "heading", "props": { "text": "Welcome to open-slide" } }],
+        "subtitle": [
+          {
+            "id": "t2",
+            "type": "text",
+            "props": { "text": "Slides as a structured document model" }
+          }
+        ]
+      },
+      "notes": "Edit slides/getting-started/deck.json to change this deck."
+    },
+    {
+      "id": "how",
+      "layout": "title-body",
+      "slots": {
+        "title": [{ "id": "h1", "type": "heading", "props": { "text": "How it works" } }],
+        "body": [
+          {
+            "id": "h2",
+            "type": "bullets",
+            "props": {
+              "items": [
+                "Each deck is a deck.json",
+                "Slides pick a layout and fill slots",
+                "Blocks render content"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
