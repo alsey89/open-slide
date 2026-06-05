@@ -7,8 +7,16 @@ import { getBlock, getLayout } from './registry.ts';
 
 function renderBlock(block: Block) {
   const Component = getBlock(block.type);
-  if (!Component) return createElement(UnknownBlock, { key: block.id, type: block.type });
-  return createElement(Component, { key: block.id, block });
+  const inner = Component
+    ? createElement(Component, { block })
+    : createElement(UnknownBlock, { type: block.type });
+  // display:contents makes the wrapper invisible to grid/flex layout while still
+  // providing a stable DOM node for click-to-block-id resolution.
+  return createElement(
+    'div',
+    { key: block.id, 'data-osd-block-id': block.id, style: { display: 'contents' } },
+    inner,
+  );
 }
 
 function makePage(slide: Slide): Page {

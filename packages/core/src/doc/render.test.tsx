@@ -62,3 +62,10 @@ test('unknown block type renders a fallback, not a crash', () => {
   const m = renderDeck(deck);
   expect(renderToStaticMarkup(createElement(m.default[1]))).toContain('unknown block: chart');
 });
+
+test('tags each block with data-osd-block-id without breaking content', () => {
+  const m = renderDeck(deck);
+  const html = renderToStaticMarkup(createElement(m.default[0]));
+  expect(html).toContain('data-osd-block-id="b1"');
+  expect(html).toContain('Hello');
+});
