@@ -6,13 +6,11 @@ import { renderDeck } from '../../../doc/render.tsx';
 import { useDeckEditor } from '../../lib/editor/use-deck-editor.ts';
 import { SlideCanvas } from '../slide-canvas.tsx';
 import { ScrollArea } from '../ui/scroll-area.tsx';
+import { freshId } from './ids.ts';
+import { OutlinePanel } from './outline-panel.tsx';
 
 const BLOCK_TYPES = ['heading', 'text', 'bullets', 'quote', 'code', 'image'] as const;
 type BlockType = (typeof BLOCK_TYPES)[number];
-
-function freshId(): string {
-  return `b-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
-}
 
 function defaultProps(type: BlockType): Record<string, unknown> {
   switch (type) {
@@ -88,7 +86,7 @@ function PropsPanel({
       slideId: currentSlideId,
       slot: addSlot,
       index: targetSlot.length,
-      block: { id: freshId(), type: addType, props: defaultProps(addType) },
+      block: { id: freshId('b'), type: addType, props: defaultProps(addType) },
     });
   };
 
@@ -434,6 +432,13 @@ export function DeckEditor({
     <>
       <style>{SELECTION_STYLE}</style>
       <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* Outline panel */}
+        <OutlinePanel
+          deck={editor.deck}
+          index={clampedIndex}
+          onIndexChange={onIndexChange}
+          onApply={editor.apply}
+        />
         {/* Canvas area */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: canvas click-to-select is intentionally a plain div — no semantic role fits this pattern */}
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard block selection via panel; click-to-select on canvas is a pointer convenience */}
