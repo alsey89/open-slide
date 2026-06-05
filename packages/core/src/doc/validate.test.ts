@@ -48,3 +48,27 @@ describe('rejections', () => {
     expect(() => validateDeck(d)).toThrow(/\.type must be a non-empty string/);
   });
 });
+
+test('rejects design that is missing palette/fonts/typeScale/radius', () => {
+  expect(() => validateDeck({ ...structuredClone(valid), design: {} })).toThrow(/design\.palette/);
+});
+test('rejects non-string palette color', () => {
+  const d = structuredClone(valid);
+  (d.design.palette as Record<string, unknown>).bg = 123;
+  expect(() => validateDeck(d)).toThrow(/palette\.bg must be a string/);
+});
+test('rejects non-number typeScale', () => {
+  const d = structuredClone(valid);
+  (d.design.typeScale as Record<string, unknown>).hero = '100';
+  expect(() => validateDeck(d)).toThrow(/typeScale\.hero must be a number/);
+});
+test('rejects non-number radius', () => {
+  const d = structuredClone(valid);
+  (d.design as Record<string, unknown>).radius = '8';
+  expect(() => validateDeck(d)).toThrow(/radius must be a number/);
+});
+test('rejects a block with missing props', () => {
+  const d = structuredClone(valid);
+  delete (d.slides[0].slots.title[0] as Record<string, unknown>).props;
+  expect(() => validateDeck(d)).toThrow(/props must be an object/);
+});

@@ -15,6 +15,21 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+function validateDesign(d: unknown, where: string): void {
+  if (!isObject(d)) fail(`${where} must be an object`);
+  if (!isObject(d.palette)) fail(`${where}.palette must be an object`);
+  if (typeof d.palette.bg !== 'string') fail(`${where}.palette.bg must be a string`);
+  if (typeof d.palette.text !== 'string') fail(`${where}.palette.text must be a string`);
+  if (typeof d.palette.accent !== 'string') fail(`${where}.palette.accent must be a string`);
+  if (!isObject(d.fonts)) fail(`${where}.fonts must be an object`);
+  if (typeof d.fonts.display !== 'string') fail(`${where}.fonts.display must be a string`);
+  if (typeof d.fonts.body !== 'string') fail(`${where}.fonts.body must be a string`);
+  if (!isObject(d.typeScale)) fail(`${where}.typeScale must be an object`);
+  if (typeof d.typeScale.hero !== 'number') fail(`${where}.typeScale.hero must be a number`);
+  if (typeof d.typeScale.body !== 'number') fail(`${where}.typeScale.body must be a number`);
+  if (typeof d.radius !== 'number') fail(`${where}.radius must be a number`);
+}
+
 export function validateDeck(input: unknown): Deck {
   if (!isObject(input)) fail('deck must be an object');
   if (input.schemaVersion !== SCHEMA_VERSION)
@@ -24,7 +39,7 @@ export function validateDeck(input: unknown): Deck {
   if (!isObject(input.meta)) fail('deck.meta must be an object');
   if (typeof input.meta.createdAt !== 'string' || Number.isNaN(Date.parse(input.meta.createdAt)))
     fail('deck.meta.createdAt must be an ISO 8601 date string');
-  if (!isObject(input.design)) fail('deck.design must be an object');
+  validateDesign(input.design, 'deck.design');
   if (!Array.isArray(input.slides) || input.slides.length === 0)
     fail('deck.slides must be a non-empty array');
 
@@ -49,8 +64,7 @@ export function validateDeck(input: unknown): Deck {
         claim(block.id, at);
         if (typeof block.type !== 'string' || block.type.length === 0)
           fail(`${at}.type must be a non-empty string`);
-        if (block.props !== undefined && !isObject(block.props))
-          fail(`${at}.props must be an object`);
+        if (!isObject(block.props)) fail(`${at}.props must be an object`);
       });
     }
     if (slide.notes !== undefined && typeof slide.notes !== 'string')

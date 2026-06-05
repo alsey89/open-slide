@@ -143,3 +143,8 @@ test('applyOps runs in sequence', () => {
   expect(d2.meta.title).toBe('Seq');
   expect(d2.slides).toHaveLength(3);
 });
+
+test('remove-slide on the only slide throws EditOpError (not a validation error)', () => {
+  const single = { ...deck(), slides: [deck().slides[0]] };
+  expect(() => applyOp(single, { kind: 'remove-slide', slideId: 's1' })).toThrow(EditOpError);
+});

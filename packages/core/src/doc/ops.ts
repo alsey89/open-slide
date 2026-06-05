@@ -47,6 +47,7 @@ function mutate(deck: Deck, op: EditOp): void {
     case 'remove-slide': {
       const idx = deck.slides.findIndex((s) => s.id === op.slideId);
       if (idx === -1) throw new EditOpError(`slide not found: ${op.slideId}`);
+      if (deck.slides.length === 1) throw new EditOpError('cannot remove the only slide');
       deck.slides.splice(idx, 1);
       return;
     }
