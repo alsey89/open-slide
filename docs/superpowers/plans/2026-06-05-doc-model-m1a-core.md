@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, React 18, vitest (root config: `packages/**/*.test.ts(x)`, node env), `react-dom/server` `renderToStaticMarkup` for DOM-free render assertions.
 
+**Prerequisite (do first):** Workspace deps are not fully installed in this fresh fork — `vitest` is declared (root devDep `^2.1.9`) but not in the pnpm store. Run `pnpm install` at the repo root and confirm `pnpm exec vitest --version` prints a version before starting Task 1. The whole plan is TDD; nothing runs without this.
+
 ---
 
 ## File structure
