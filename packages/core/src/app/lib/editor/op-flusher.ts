@@ -4,8 +4,11 @@ export type FlushState = 'idle' | 'saving' | 'error';
 
 export type Flusher = {
   enqueue: (ops: EditOp[]) => void;
+  flushNow: () => void;
   dispose: () => void;
 };
+
+const MAX_BACKOFF = 5000;
 
 export function createOpFlusher(opts: {
   flush: (ops: EditOp[]) => Promise<void>;
@@ -21,6 +24,7 @@ export function createOpFlusher(opts: {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let inFlight = false;
   let disposed = false;
+  let failures = 0;
 
   const run = async () => {
     if (inFlight || pending.length === 0 || disposed) return;
@@ -31,23 +35,27 @@ export function createOpFlusher(opts: {
     try {
       await opts.flush(batch);
       inFlight = false;
-      if (pending.length > 0) schedule();
+      failures = 0;
+      if (pending.length > 0) schedule(delay);
       else opts.onState('idle');
     } catch (e) {
-      // Put the batch back so a later enqueue/flush retries it.
       pending = [...batch, ...pending];
       inFlight = false;
+      failures += 1;
       opts.onState('error', e instanceof Error ? e.message : String(e));
+      scheduleIn(Math.min(delay * 2 ** failures, MAX_BACKOFF));
     }
   };
 
-  const schedule = () => {
+  const scheduleIn = (ms: number) => {
     if (timer) clr(timer);
     timer = set(() => {
       timer = null;
       void run();
-    }, delay);
+    }, ms);
   };
+
+  const schedule = (ms: number = delay) => scheduleIn(ms);
 
   return {
     enqueue(ops) {
@@ -55,6 +63,15 @@ export function createOpFlusher(opts: {
       pending.push(...ops);
       schedule();
     },
+    flushNow() {
+      if (timer) {
+        clr(timer);
+        timer = null;
+      }
+      void run();
+    },
+    // Does NOT flush on dispose — React StrictMode double-invokes effects and
+    // auto-flushing here would re-send ops that were already in-flight.
     dispose() {
       disposed = true;
       if (timer) clr(timer);

@@ -43,11 +43,21 @@ export function useDeckEditor(slideId: string): DeckEditor {
       flush: (ops) => postOps(slideId, ops),
       onState: (s, e) => {
         setSaveState(s);
-        if (s === 'error' && e) setError(e);
+        if (s === 'error') setError(e ?? 'save failed');
+        else setError(null);
       },
     });
     flusherRef.current = flusher;
+
+    const handleBeforeUnload = () => flusher.flushNow();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
     return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      }
       flusher.dispose();
       flusherRef.current = null;
     };
