@@ -3,6 +3,8 @@ name: current-slide
 description: Resolve which slide, page, and (optionally) selected element the user is currently viewing in the open-slide dev server. Consult this whenever the user references "this page", "this slide", "this element", "the slide I'm on", "the current page", or any deictic reference to slide content without naming it. Re-read `node_modules/.open-slide/current.json` at the start of every such turn — the user navigates between turns, so a value you read earlier in the conversation is almost certainly stale.
 ---
 
+> **Note:** Decks are now `slides/<id>/deck.json` (structured JSON), not `index.tsx`. Where this skill references `pagePath` pointing to `index.tsx`, the actual path will be `deck.json`.
+
 # Where is the user right now?
 
 When the user says "fix this page", "tweak this heading", or "the slide I'm looking at", they almost never name the slide id, page number, or element — they mean wherever they are in the dev viewer. Before asking "which slide?" or "which element?", check the file the dev server writes on every navigation and inspector pick.
@@ -74,7 +76,7 @@ Path is relative to the project root (the user's `cwd`, the directory that conta
 
 `updatedAt` is the last time the user navigated. Treat it like a cache:
 
-- **Fresh (under ~5 minutes old)**: trust it. Open `pagePath`, do the work.
+- **Fresh (under ~5 minutes old)**: trust it. Open `slides/<slideId>/deck.json`, do the work.
 - **Older than ~5 minutes, or older than your last interaction with the user**: confirm with the user before editing. The dev server may not be running; the user may have switched contexts.
 - **Hours/days old**: ignore it. Ask the user which slide they mean.
 
@@ -104,6 +106,6 @@ User: "make this bigger"
 1. Read `node_modules/.open-slide/current.json`.
 2. If `selection` is non-null, the user means that element. Open `slides/<slideId>/deck.json`, find the slide at `pageIndex`, then locate the block referenced by `selection.text` or `tagName`.
 3. Consult `slide-authoring` for schema and block rules before editing.
-4. Edit the JSX node in place.
+4. Edit the block's props in place.
 
 If `selection` is null, fall back to the page-level flow above — and consider asking "which element?" since the user used a deictic but hasn't picked one in the inspector.
