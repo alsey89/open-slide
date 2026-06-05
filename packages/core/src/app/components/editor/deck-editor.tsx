@@ -438,6 +438,7 @@ export function DeckEditor({
           index={clampedIndex}
           onIndexChange={onIndexChange}
           onApply={editor.apply}
+          onDesignChange={(design) => editor.apply({ kind: 'set-design', design })}
         />
         {/* Canvas area */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: canvas click-to-select is intentionally a plain div — no semantic role fits this pattern */}

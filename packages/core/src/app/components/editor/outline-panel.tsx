@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import type { DesignSystem } from '../../../app/lib/design.ts';
 import type { Deck } from '../../../doc/model.ts';
 import type { EditOp } from '../../../doc/ops.ts';
 import { ScrollArea } from '../ui/scroll-area.tsx';
+import { DesignPanel } from './design-panel.tsx';
 import { cloneSlideWithFreshIds, freshId } from './ids.ts';
 
 const BUILT_IN_LAYOUTS = ['title', 'section', 'title-body', 'two-col', 'media-text'] as const;
@@ -24,11 +26,13 @@ export function OutlinePanel({
   index,
   onIndexChange,
   onApply,
+  onDesignChange,
 }: {
   deck: Deck;
   index: number;
   onIndexChange: (i: number) => void;
   onApply: (op: EditOp | EditOp[]) => void;
+  onDesignChange: (design: DesignSystem) => void;
 }) {
   const slides = deck.slides;
   const currentSlide = slides[index];
@@ -275,6 +279,9 @@ export function OutlinePanel({
               </div>
             </div>
           )}
+
+          {/* Design tokens */}
+          <DesignPanel design={deck.design} onChange={onDesignChange} />
         </div>
       </ScrollArea>
     </aside>
