@@ -4,6 +4,7 @@ import {
   loadDeckJson as load,
   slideThemes as themes,
 } from 'virtual:open-slide/slides';
+import type { Deck } from '../../doc/model.ts';
 import { renderDeck } from '../../doc/render.tsx';
 import { validateDeck } from '../../doc/validate.ts';
 import type { SlideModule } from './sdk';
@@ -19,6 +20,10 @@ export function slidesByTheme(themeId: string): string[] {
 export async function loadSlide(id: string): Promise<SlideModule> {
   const json = await load(id);
   return renderDeck(validateDeck(json));
+}
+
+export async function loadDeckRaw(id: string): Promise<Deck> {
+  return validateDeck(await load(id));
 }
 
 export function slideChangeIncludes(data: unknown, slideId: string): boolean {
