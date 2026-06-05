@@ -16,8 +16,12 @@ export type { SlideTransition, TransitionPhase } from './app/lib/transition.ts';
 export type { OpenSlideConfig } from './config.ts';
 export type { Block, Deck, DeckMeta, Slide } from './doc/index.ts';
 export {
+  applyOp,
+  applyOps,
   type BlockComponent,
   DeckValidationError,
+  type EditOp,
+  EditOpError,
   getBlock,
   getLayout,
   type LayoutComponent,

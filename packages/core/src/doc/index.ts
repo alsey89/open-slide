@@ -1,6 +1,7 @@
 export { registerBuiltins } from './builtins.ts';
 export type { Block, Deck, DeckMeta, Slide } from './model.ts';
 export { SCHEMA_VERSION } from './model.ts';
+export { applyOp, applyOps, type EditOp, EditOpError } from './ops.ts';
 export {
   type BlockComponent,
   getBlock,
