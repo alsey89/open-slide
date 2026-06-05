@@ -29,6 +29,8 @@ declare module 'virtual:open-slide/folders' {
   export default manifest;
 }
 
+declare module 'virtual:open-slide/blocks';
+
 declare module 'virtual:open-slide/themes' {
   import type { DesignSystem } from './lib/design';
   import type { Page } from './lib/sdk';

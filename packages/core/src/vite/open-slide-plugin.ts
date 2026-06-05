@@ -18,6 +18,7 @@ const CONFIG_FILE = 'open-slide.config.ts';
 const SLIDES_VMOD = 'virtual:open-slide/slides';
 const CONFIG_VMOD = 'virtual:open-slide/config';
 const FOLDERS_VMOD = 'virtual:open-slide/folders';
+const BLOCKS_VMOD = 'virtual:open-slide/blocks';
 
 type FoldersManifest = {
   folders: unknown[];
@@ -201,6 +202,7 @@ export function openSlidePlugin(opts: OpenSlidePluginOptions): Plugin {
       if (id === SLIDES_VMOD) return resolved(SLIDES_VMOD);
       if (id === CONFIG_VMOD) return resolved(CONFIG_VMOD);
       if (id === FOLDERS_VMOD) return resolved(FOLDERS_VMOD);
+      if (id === BLOCKS_VMOD) return resolved(BLOCKS_VMOD);
       return null;
     },
     async load(id) {
@@ -223,6 +225,22 @@ export function openSlidePlugin(opts: OpenSlidePluginOptions): Plugin {
       if (id === resolved(FOLDERS_VMOD)) {
         const manifest = await readFoldersManifest(foldersManifestPath);
         return `export default ${JSON.stringify(manifest)};\n`;
+      }
+      if (id === resolved(BLOCKS_VMOD)) {
+        const candidates = [
+          'blocks/index.ts',
+          'blocks/index.tsx',
+          'blocks/index.js',
+          'blocks/index.jsx',
+        ];
+        for (const rel of candidates) {
+          const abs = path.resolve(userCwd, rel);
+          if (existsSync(abs)) {
+            const importPath = isDev ? `/@fs/${abs.replace(/^\/+/, '')}` : abs;
+            return `import ${JSON.stringify(importPath)};\n`;
+          }
+        }
+        return 'export {};\n';
       }
       return null;
     },
