@@ -56,8 +56,18 @@ export function useDeckEditor(slideId: string): DeckEditor {
   const apply = useCallback((ops: EditOp | EditOp[]) => {
     const list = Array.isArray(ops) ? ops : [ops];
     if (list.length === 0) return;
-    setDeck((d) => (d ? applyOps(d, list) : d));
-    flusherRef.current?.enqueue(list);
+    let ok = true;
+    setDeck((d) => {
+      if (!d) return d;
+      try {
+        return applyOps(d, list);
+      } catch (e) {
+        ok = false;
+        setError(e instanceof Error ? e.message : String(e));
+        return d;
+      }
+    });
+    if (ok) flusherRef.current?.enqueue(list);
   }, []);
 
   const select = useCallback((blockId: string | null) => setSelectedBlockId(blockId), []);

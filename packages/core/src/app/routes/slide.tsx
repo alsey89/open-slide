@@ -35,6 +35,7 @@ import { useIsMobile } from '@/lib/use-is-mobile';
 import { useLocale } from '@/lib/use-locale';
 import { useWheelPageNavigation } from '@/lib/use-wheel-page-navigation';
 import { cn } from '@/lib/utils';
+import { DeckEditor } from '../components/editor/deck-editor';
 import { PdfProgressToast } from '../components/pdf-progress-toast';
 import { openPresenterWindow, Player } from '../components/player';
 import { PptxProgressToast } from '../components/pptx-progress-toast';
@@ -55,6 +56,7 @@ export function Slide() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { slide, error } = useSlideModule(slideId);
   const [playMode, setPlayMode] = useState<'window' | 'fullscreen' | null>(null);
+  const [editing, setEditing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -130,6 +132,8 @@ export function Slide() {
       } else if (e.key === 'p' || e.key === 'P') {
         if (slideId) openPresenterWindow(slideId);
         setPlayMode('window');
+      } else if (import.meta.env.DEV && (e.key === 'e' || e.key === 'E')) {
+        setEditing((v) => !v);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -456,6 +460,19 @@ export function Slide() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+          {import.meta.env.DEV && view === 'slides' && (
+            <Button
+              size="sm"
+              variant={editing ? 'brand' : 'ghost'}
+              onClick={() => setEditing((v) => !v)}
+              title="Toggle edit mode (E)"
+            >
+              <span className="hidden md:inline">{editing ? 'Editing' : 'Edit'}</span>
+              <kbd className="ml-1 hidden rounded-[3px] bg-current/10 px-1 font-mono text-[9.5px] tracking-[0.04em] md:inline">
+                E
+              </kbd>
+            </Button>
+          )}
           <span aria-hidden className="mx-0.5 hidden h-5 w-px bg-hairline md:block" />
           {view === 'slides' && (
             <div className="inline-flex items-stretch">
@@ -514,6 +531,17 @@ export function Slide() {
       {view === 'assets' ? (
         <div className="min-h-0 flex-1">
           <AssetView slideId={slideId} />
+        </div>
+      ) : import.meta.env.DEV && editing && !playMode ? (
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <ResizableRail
+            pages={pages}
+            design={slide.design}
+            current={index}
+            onSelect={goTo}
+            moduleTransition={slide.transition}
+          />
+          <DeckEditor slideId={slideId} index={index} onIndexChange={goTo} />
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
