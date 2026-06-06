@@ -21,6 +21,7 @@ function findPackageRoot(fromFile: string): string {
 
 const PKG_ROOT = findPackageRoot(fileURLToPath(import.meta.url));
 const APP_ROOT = path.join(PKG_ROOT, 'src', 'app');
+const CORE_SRC_ENTRY = path.join(PKG_ROOT, 'src', 'index.ts');
 
 function readCoreVersion(): string {
   try {
@@ -63,13 +64,22 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
       currentPlugin({ userCwd, slidesDir }),
     ],
     resolve: {
-      alias: {
-        '@': APP_ROOT,
-        '@assets': assetsAbs,
-      },
-      // Project custom blocks (e.g. blocks/index.tsx) live outside the Vite root and
-      // import React via the automatic JSX runtime; without dedupe they resolve to a
-      // second React instance, producing "invalid hook call" crashes at runtime.
+      alias: [
+        { find: '@assets', replacement: assetsAbs },
+        { find: '@', replacement: APP_ROOT },
+        // The app runs from core's `src` (the Vite root is src/app), but project
+        // blocks import the package by name, which resolves to `dist`. That gives two
+        // copies of the block/layout registry, so custom blocks/layouts register into
+        // one and the renderer reads the other → "unknown layout/block". Alias the bare
+        // specifier to core's source entry so both share one registry. Exact match only,
+        // so subpaths like `@open-slide/core/vite` are untouched.
+        ...(existsSync(CORE_SRC_ENTRY)
+          ? [{ find: /^@open-slide\/core$/, replacement: CORE_SRC_ENTRY }]
+          : []),
+      ],
+      // Project custom blocks live outside the Vite root and import React via the
+      // automatic JSX runtime; without dedupe they resolve to a second React instance,
+      // producing "invalid hook call" crashes at runtime.
       dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     optimizeDeps: {
