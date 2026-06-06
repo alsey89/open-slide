@@ -95,11 +95,7 @@
             "id": "b6",
             "type": "bullets",
             "props": {
-              "items": [
-                "Block/slot layout",
-                "Auto-fit overflow",
-                "Custom blocks"
-              ]
+              "items": ["Block/slot layout", "Auto-fit overflow", "Custom blocks"]
             }
           }
         ]
