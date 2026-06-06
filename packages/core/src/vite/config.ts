@@ -67,6 +67,10 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
         '@': APP_ROOT,
         '@assets': assetsAbs,
       },
+      // Project custom blocks (e.g. blocks/index.tsx) live outside the Vite root and
+      // import React via the automatic JSX runtime; without dedupe they resolve to a
+      // second React instance, producing "invalid hook call" crashes at runtime.
+      dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     optimizeDeps: {
       entries: [path.join(APP_ROOT, 'main.tsx')],
