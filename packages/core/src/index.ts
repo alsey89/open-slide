@@ -25,6 +25,8 @@ export {
   getBlock,
   getLayout,
   type LayoutComponent,
+  listBlockTypes,
+  listLayouts,
   registerBlock,
   registerBuiltins,
   registerLayout,

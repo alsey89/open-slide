@@ -7,6 +7,8 @@ export {
   getBlock,
   getLayout,
   type LayoutComponent,
+  listBlockTypes,
+  listLayouts,
   registerBlock,
   registerLayout,
 } from './registry.ts';

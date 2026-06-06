@@ -32,3 +32,13 @@ export function resetRegistry(): void {
   blocks.clear();
   layouts.clear();
 }
+
+export function listBlockTypes(): string[] {
+  return [...blocks.keys()].sort();
+}
+
+export function listLayouts(): Array<{ type: string; slots: string[] }> {
+  return [...layouts.entries()]
+    .map(([type, entry]) => ({ type, slots: entry.slots }))
+    .sort((a, b) => a.type.localeCompare(b.type));
+}
