@@ -3,8 +3,6 @@ import path from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { SLIDE_ID_RE } from '../editing/slide-ops.ts';
 
-const TEXT_SNIPPET_MAX = 120;
-
 export type CurrentPluginOptions = {
   userCwd: string;
   slidesDir?: string;
@@ -16,21 +14,6 @@ type IncomingPayload = {
   totalPages?: unknown;
   slideTitle?: unknown;
   view?: unknown;
-  selection?: unknown;
-};
-
-type IncomingSelection = {
-  line?: unknown;
-  column?: unknown;
-  tagName?: unknown;
-  text?: unknown;
-};
-
-type Selection = {
-  line: number;
-  column: number;
-  tagName: string;
-  text: string;
 };
 
 type Cached = {
@@ -41,27 +24,7 @@ type Cached = {
   slideTitle: string;
   view: 'slides' | 'assets';
   pagePath: string;
-  selection: Selection | null;
 };
-
-function parseSelection(raw: unknown): Selection | null {
-  if (raw == null || typeof raw !== 'object') return null;
-  const sel = raw as IncomingSelection;
-  if (typeof sel.line !== 'number' || !Number.isFinite(sel.line)) return null;
-  if (typeof sel.column !== 'number' || !Number.isFinite(sel.column)) return null;
-  const tagName =
-    typeof sel.tagName === 'string' ? sel.tagName.toLowerCase().slice(0, 32) : 'unknown';
-  const text =
-    typeof sel.text === 'string'
-      ? sel.text.replace(/\s+/g, ' ').trim().slice(0, TEXT_SNIPPET_MAX)
-      : '';
-  return {
-    line: Math.max(1, Math.floor(sel.line)),
-    column: Math.max(0, Math.floor(sel.column)),
-    tagName,
-    text,
-  };
-}
 
 export function currentPlugin(opts: CurrentPluginOptions): Plugin {
   const userCwd = opts.userCwd;
@@ -87,7 +50,6 @@ export function currentPlugin(opts: CurrentPluginOptions): Plugin {
               slideTitle: '',
               view: 'slides',
               pagePath: '',
-              selection: null,
             };
 
         if (typeof raw?.slideId === 'string') {
@@ -106,11 +68,7 @@ export function currentPlugin(opts: CurrentPluginOptions): Plugin {
           const pageIndex = Math.max(0, Math.min(totalPages - 1, rawIndex));
           const slideTitle = typeof raw.slideTitle === 'string' ? raw.slideTitle : raw.slideId;
           const view = raw.view === 'assets' ? 'assets' : 'slides';
-          const pagePath = path.join(slidesDir, raw.slideId, 'index.tsx').split(path.sep).join('/');
-
-          if (cached?.slideId !== raw.slideId || cached?.pageIndex !== pageIndex) {
-            next.selection = null;
-          }
+          const pagePath = path.join(slidesDir, raw.slideId, 'deck.json').split(path.sep).join('/');
 
           next.slideId = raw.slideId;
           next.pageIndex = pageIndex;
@@ -119,10 +77,6 @@ export function currentPlugin(opts: CurrentPluginOptions): Plugin {
           next.slideTitle = slideTitle;
           next.view = view;
           next.pagePath = pagePath;
-        }
-
-        if ('selection' in raw) {
-          next.selection = parseSelection(raw.selection);
         }
 
         if (!next.slideId) return;
