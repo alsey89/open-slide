@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DesignSystem } from '../../../app/lib/design.ts';
 import type { Deck } from '../../../doc/model.ts';
 import type { EditOp } from '../../../doc/ops.ts';
+import { listLayouts } from '../../../doc/registry.ts';
 import { ScrollArea } from '../ui/scroll-area.tsx';
 import { DesignPanel } from './design-panel.tsx';
 import { cloneSlideWithFreshIds, freshId } from './ids.ts';
 
-const BUILT_IN_LAYOUTS = ['title', 'section', 'title-body', 'two-col', 'media-text'] as const;
-type BuiltInLayout = (typeof BUILT_IN_LAYOUTS)[number];
+const FALLBACK_LAYOUTS = ['title', 'section', 'title-body', 'two-col', 'media-text'];
 
 function getSlidePreviewText(slide: Deck['slides'][number]): string {
   for (const blocks of Object.values(slide.slots)) {
@@ -37,9 +37,14 @@ export function OutlinePanel({
   const slides = deck.slides;
   const currentSlide = slides[index];
 
+  const layouts = useMemo(() => {
+    const all = listLayouts().map((l) => l.type);
+    return all.length > 0 ? all : FALLBACK_LAYOUTS;
+  }, []);
+
   const [titleValue, setTitleValue] = useState(deck.meta.title ?? '');
   const [notesValue, setNotesValue] = useState(currentSlide?.notes ?? '');
-  const [addLayout, setAddLayout] = useState<BuiltInLayout>('title-body');
+  const [addLayout, setAddLayout] = useState<string>('title-body');
 
   const prevDeckTitleRef = useRef(deck.meta.title ?? '');
   const prevSlideIdRef = useRef(currentSlide?.id ?? '');
@@ -220,10 +225,10 @@ export function OutlinePanel({
             <span className="text-[10.5px] text-muted-foreground">Add slide</span>
             <select
               value={addLayout}
-              onChange={(e) => setAddLayout(e.target.value as BuiltInLayout)}
+              onChange={(e) => setAddLayout(e.target.value)}
               className="h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11px] outline-none focus:border-foreground/40"
             >
-              {BUILT_IN_LAYOUTS.map((l) => (
+              {layouts.map((l) => (
                 <option key={l} value={l}>
                   {l}
                 </option>
@@ -254,7 +259,7 @@ export function OutlinePanel({
                   onChange={(e) => handleLayoutChange(e.target.value)}
                   className="h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11px] outline-none focus:border-foreground/40"
                 >
-                  {BUILT_IN_LAYOUTS.map((l) => (
+                  {layouts.map((l) => (
                     <option key={l} value={l}>
                       {l}
                     </option>

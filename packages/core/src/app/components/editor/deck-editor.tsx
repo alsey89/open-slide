@@ -1,7 +1,7 @@
 import { Minus, Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Block } from '../../../doc/model.ts';
-import { getLayout } from '../../../doc/registry.ts';
+import { getLayout, listBlockTypes } from '../../../doc/registry.ts';
 import { renderDeck } from '../../../doc/render.tsx';
 import { useDeckEditor } from '../../lib/editor/use-deck-editor.ts';
 import { SlideCanvas } from '../slide-canvas.tsx';
@@ -9,10 +9,14 @@ import { ScrollArea } from '../ui/scroll-area.tsx';
 import { freshId } from './ids.ts';
 import { OutlinePanel } from './outline-panel.tsx';
 
-const BLOCK_TYPES = ['heading', 'text', 'bullets', 'quote', 'code', 'image'] as const;
-type BlockType = (typeof BLOCK_TYPES)[number];
+const BUILT_IN_BLOCK_TYPES = ['heading', 'text', 'bullets', 'quote', 'code', 'image'] as const;
+type BuiltInBlockType = (typeof BUILT_IN_BLOCK_TYPES)[number];
 
-function defaultProps(type: BlockType): Record<string, unknown> {
+function isBuiltInBlockType(type: string): type is BuiltInBlockType {
+  return (BUILT_IN_BLOCK_TYPES as readonly string[]).includes(type);
+}
+
+function defaultProps(type: BuiltInBlockType): Record<string, unknown> {
   switch (type) {
     case 'heading':
     case 'text':
@@ -66,7 +70,12 @@ function PropsPanel({
     ? (getLayout(currentSlide.layout)?.slots ?? Object.keys(currentSlide.slots))
     : [];
 
-  const [addType, setAddType] = useState<BlockType>('heading');
+  const blockTypes = useMemo(() => {
+    const types = listBlockTypes();
+    return types.length > 0 ? types : [...BUILT_IN_BLOCK_TYPES];
+  }, []);
+
+  const [addType, setAddType] = useState<string>('heading');
   const [addSlot, setAddSlot] = useState<string>(layoutSlots[0] ?? '');
 
   useEffect(() => {
@@ -81,12 +90,13 @@ function PropsPanel({
   const handleAddBlock = () => {
     if (!currentSlide || !addSlot) return;
     const targetSlot = currentSlide.slots[addSlot] ?? [];
+    const props = isBuiltInBlockType(addType) ? defaultProps(addType) : {};
     onApply({
       kind: 'add-block',
       slideId: currentSlideId,
       slot: addSlot,
       index: targetSlot.length,
-      block: { id: freshId('b'), type: addType, props: defaultProps(addType) },
+      block: { id: freshId('b'), type: addType, props },
     });
   };
 
@@ -183,10 +193,10 @@ function PropsPanel({
                 <select
                   id="editor-add-type"
                   value={addType}
-                  onChange={(e) => setAddType(e.target.value as BlockType)}
+                  onChange={(e) => setAddType(e.target.value)}
                   className="h-7 rounded-[4px] border border-border bg-background px-1.5 text-[11px] outline-none focus:border-foreground/40"
                 >
-                  {BLOCK_TYPES.map((t) => (
+                  {blockTypes.map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>
@@ -226,6 +236,147 @@ function PropsPanel({
   );
 }
 
+function JsonField({
+  propKey,
+  value,
+  applyProp,
+}: {
+  propKey: string;
+  value: unknown;
+  applyProp: (props: Record<string, unknown>) => void;
+}) {
+  const textareaCls =
+    'w-full rounded-[4px] border border-border bg-background px-2 py-1.5 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20 resize-y min-h-[60px] font-mono';
+  const [localText, setLocalText] = useState(() => JSON.stringify(value, null, 2));
+  const [invalid, setInvalid] = useState(false);
+
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (prevValueRef.current !== value) {
+      prevValueRef.current = value;
+      setLocalText(JSON.stringify(value, null, 2));
+      setInvalid(false);
+    }
+  }, [value]);
+
+  const handleChange = (text: string) => {
+    setLocalText(text);
+    try {
+      const parsed = JSON.parse(text);
+      setInvalid(false);
+      applyProp({ [propKey]: parsed });
+    } catch {
+      setInvalid(true);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <textarea
+        className={`${textareaCls} ${invalid ? 'border-destructive/60' : ''}`}
+        value={localText}
+        onChange={(e) => handleChange(e.target.value)}
+      />
+      {invalid && <span className="text-[10px] text-destructive">invalid JSON — not applied</span>}
+    </div>
+  );
+}
+
+function GenericBlockFields({
+  block,
+  applyProp,
+}: {
+  block: Block;
+  applyProp: (props: Record<string, unknown>) => void;
+}) {
+  const inputCls =
+    'w-full rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20';
+  const textareaCls =
+    'w-full rounded-[4px] border border-border bg-background px-2 py-1.5 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20 resize-y min-h-[60px]';
+
+  const [newPropKey, setNewPropKey] = useState('');
+
+  const entries = Object.entries(block.props);
+
+  const handleAddProp = () => {
+    const key = newPropKey.trim();
+    if (!key) return;
+    applyProp({ [key]: '' });
+    setNewPropKey('');
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10.5px] text-muted-foreground">Custom block — generic editor.</span>
+      {entries.map(([key, value]) => (
+        <div key={key} className="flex flex-col gap-0.5">
+          {typeof value === 'boolean' ? (
+            <label className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={value}
+                onChange={(e) => applyProp({ [key]: e.target.checked })}
+                className="h-3.5 w-3.5"
+              />
+              {key}
+            </label>
+          ) : (
+            <>
+              <span className="text-[10px] text-muted-foreground">{key}</span>
+              {typeof value === 'number' ? (
+                <input
+                  type="number"
+                  className={inputCls}
+                  value={value}
+                  onChange={(e) => {
+                    const n = Number(e.target.value);
+                    if (!Number.isNaN(n)) applyProp({ [key]: n });
+                  }}
+                />
+              ) : typeof value === 'string' ? (
+                value.length > 60 || value.includes('\n') ? (
+                  <textarea
+                    className={textareaCls}
+                    value={value}
+                    onChange={(e) => applyProp({ [key]: e.target.value })}
+                  />
+                ) : (
+                  <input
+                    className={inputCls}
+                    value={value}
+                    onChange={(e) => applyProp({ [key]: e.target.value })}
+                  />
+                )
+              ) : (
+                <JsonField propKey={key} value={value} applyProp={applyProp} />
+              )}
+            </>
+          )}
+        </div>
+      ))}
+      <div className="flex items-center gap-1 pt-1">
+        <input
+          className="min-w-0 flex-1 rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40"
+          placeholder="property name"
+          value={newPropKey}
+          onChange={(e) => setNewPropKey(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAddProp();
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleAddProp}
+          className="flex h-7 shrink-0 items-center gap-1 rounded-[4px] border border-border bg-background px-2 text-[11px] hover:bg-muted"
+        >
+          <Plus className="size-3" />
+          Add
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function BlockFields({
   block,
   applyProp,
@@ -237,6 +388,10 @@ function BlockFields({
     'w-full rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20';
   const textareaCls =
     'w-full rounded-[4px] border border-border bg-background px-2 py-1.5 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20 resize-y min-h-[60px]';
+
+  if (!isBuiltInBlockType(block.type)) {
+    return <GenericBlockFields block={block} applyProp={applyProp} />;
+  }
 
   if (block.type === 'heading' || block.type === 'text') {
     return (
