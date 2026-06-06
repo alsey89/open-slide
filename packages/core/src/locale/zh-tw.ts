@@ -279,7 +279,6 @@ export const zhTW: Locale = {
     scopeSlide: '此投影片',
     scopeGlobal: '全域',
     fileCount: { one: '{count} 個檔案', other: '{count} 個檔案' },
-    usageUnused: '未使用',
     searchLogos: '搜尋 Logo',
     upload: '上傳',
     dropToUpload: '拖入即可上傳',
@@ -299,11 +298,6 @@ export const zhTW: Locale = {
     conflictRenameCopy: '重新命名副本',
     deleteAssetTitle: '刪除素材',
     deleteAssetDescription: '要刪除 {name} 嗎?投影片中引用此檔案的匯入將失效。',
-    deleteAssetInUseDescription: '{name} 在 {slides} 個投影片中被使用了 {count} 次。',
-    deleteAssetInUseHint: '刪除後這些使用處會自動還原為圖片占位符。',
-    deleteAndRevert: '刪除並還原',
-    toastRevertFailed: '無法還原 {slideId} 中的使用',
-    toastDeletedWithRevert: '已刪除 {name} 並還原 {count} 個使用處',
     noPreview: '無預覽',
     importHintComment: 'import asset from ',
     importHintSemi: ';',
@@ -370,12 +364,6 @@ export const zhTW: Locale = {
   languageToggle: {
     toggleAria: '切換語言',
     title: '語言',
-  },
-
-  imagePlaceholder: {
-    dropOverlay: '拖入圖片以使用',
-    uploading: '上傳中…',
-    uploadFailed: '圖片上傳失敗',
   },
 
   notesDrawer: {

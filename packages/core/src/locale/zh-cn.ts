@@ -279,7 +279,6 @@ export const zhCN: Locale = {
     scopeSlide: '当前幻灯片',
     scopeGlobal: '全局',
     fileCount: { one: '{count} 个文件', other: '{count} 个文件' },
-    usageUnused: '未使用',
     searchLogos: '搜索 Logo',
     upload: '上传',
     dropToUpload: '拖入即可上传',
@@ -299,11 +298,6 @@ export const zhCN: Locale = {
     conflictRenameCopy: '重命名副本',
     deleteAssetTitle: '删除素材',
     deleteAssetDescription: '要删除 {name} 吗?幻灯片中引用此文件的导入将失效。',
-    deleteAssetInUseDescription: '{name} 在 {slides} 个幻灯片中被使用了 {count} 次。',
-    deleteAssetInUseHint: '删除后这些使用处会自动还原为图片占位符。',
-    deleteAndRevert: '删除并还原',
-    toastRevertFailed: '无法还原 {slideId} 中的使用',
-    toastDeletedWithRevert: '已删除 {name} 并还原 {count} 个使用处',
     noPreview: '无预览',
     importHintComment: 'import asset from ',
     importHintSemi: ';',
@@ -370,12 +364,6 @@ export const zhCN: Locale = {
   languageToggle: {
     toggleAria: '切换语言',
     title: '语言',
-  },
-
-  imagePlaceholder: {
-    dropOverlay: '拖入图片以使用',
-    uploading: '上传中…',
-    uploadFailed: '图片上传失败',
   },
 
   notesDrawer: {

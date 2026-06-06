@@ -33,11 +33,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   type AssetEntry,
-  type AssetUsage,
   fetchSvgAsFile,
-  listAssetUsages,
   renamedCopy,
-  revertAssetUsage,
   type SvglItem,
   searchSvgl,
   useAssets,
@@ -65,7 +62,6 @@ export function AssetView({ slideId }: Props) {
   const [conflict, setConflict] = useState<ConflictState | null>(null);
   const [preview, setPreview] = useState<AssetEntry | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<AssetEntry | null>(null);
-  const [confirmDeleteUsages, setConfirmDeleteUsages] = useState<AssetUsage[] | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [logoSearchOpen, setLogoSearchOpen] = useState(false);
   const dragDepth = useRef(0);
@@ -251,10 +247,6 @@ export function AssetView({ slideId }: Props) {
                   onRename={() => setRenaming(asset.name)}
                   onDelete={() => {
                     setConfirmDelete(asset);
-                    setConfirmDeleteUsages(null);
-                    listAssetUsages(effectiveSlideId, asset.name)
-                      .then((u) => setConfirmDeleteUsages(u))
-                      .catch(() => setConfirmDeleteUsages([]));
                   }}
                 />
               ),
@@ -292,41 +284,16 @@ export function AssetView({ slideId }: Props) {
       {confirmDelete && (
         <DeleteDialog
           asset={confirmDelete}
-          usages={confirmDeleteUsages}
-          onCancel={() => {
-            setConfirmDelete(null);
-            setConfirmDeleteUsages(null);
-          }}
+          onCancel={() => setConfirmDelete(null)}
           onConfirm={async () => {
             const target = confirmDelete;
-            const usages = confirmDeleteUsages ?? [];
             setConfirmDelete(null);
-            setConfirmDeleteUsages(null);
-            const assetPath =
-              scope === 'global' ? `@assets/${target.name}` : `./assets/${target.name}`;
-            for (const u of usages) {
-              const rev = await revertAssetUsage(u.slideId, assetPath);
-              if (!rev.ok) {
-                toast.error(format(t.asset.toastRevertFailed, { slideId: u.slideId }));
-                return;
-              }
-            }
             const res = await remove(target.name);
             if (!res.ok) {
               toast.error(format(t.asset.toastDeleteFailed, { status: res.status }));
               return;
             }
-            const totalUsages = usages.reduce((acc, u) => acc + u.count, 0);
-            if (totalUsages > 0) {
-              toast.success(
-                format(t.asset.toastDeletedWithRevert, {
-                  name: target.name,
-                  count: totalUsages,
-                }),
-              );
-            } else {
-              toast.success(format(t.asset.toastDeleted, { name: target.name }));
-            }
+            toast.success(format(t.asset.toastDeleted, { name: target.name }));
           }}
         />
       )}
@@ -416,11 +383,6 @@ function AssetCard({
           </div>
           <div className="folio flex items-center gap-1.5">
             <span className="truncate">{formatSize(asset.size)}</span>
-            {asset.unused ? (
-              <span className="shrink-0 rounded-sm bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground leading-none">
-                {t.asset.usageUnused}
-              </span>
-            ) : null}
           </div>
         </div>
         <DropdownMenu>
@@ -562,19 +524,14 @@ function ConflictDialog({
 
 function DeleteDialog({
   asset,
-  usages,
   onCancel,
   onConfirm,
 }: {
   asset: AssetEntry;
-  usages: AssetUsage[] | null;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   const t = useLocale();
-  const inUse = (usages?.length ?? 0) > 0;
-  const totalUses = usages?.reduce((acc, u) => acc + u.count, 0) ?? 0;
-  const slideCount = usages?.length ?? 0;
   const [descPrefix, descSuffix] = t.asset.deleteAssetDescription.split('{name}');
   return (
     <Dialog open onOpenChange={(open) => !open && onCancel()}>
@@ -582,40 +539,17 @@ function DeleteDialog({
         <DialogHeader>
           <DialogTitle>{t.asset.deleteAssetTitle}</DialogTitle>
           <DialogDescription>
-            {inUse ? (
-              <>
-                {format(t.asset.deleteAssetInUseDescription, {
-                  name: asset.name,
-                  count: totalUses,
-                  slides: slideCount,
-                })}{' '}
-                {t.asset.deleteAssetInUseHint}
-              </>
-            ) : (
-              <>
-                {descPrefix}
-                <span className="font-mono">{asset.name}</span>
-                {descSuffix}
-              </>
-            )}
+            {descPrefix}
+            <span className="font-mono">{asset.name}</span>
+            {descSuffix}
           </DialogDescription>
         </DialogHeader>
-        {inUse && usages && (
-          <ul className="max-h-40 overflow-y-auto rounded-[5px] border border-hairline bg-muted/40 px-3 py-2 font-mono text-[11.5px] leading-relaxed">
-            {usages.map((u) => (
-              <li key={u.slideId} className="flex items-center justify-between gap-3">
-                <span className="truncate">{u.slideId}</span>
-                <span className="text-muted-foreground">×{u.count}</span>
-              </li>
-            ))}
-          </ul>
-        )}
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
             {t.common.cancel}
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={usages === null}>
-            {inUse ? t.asset.deleteAndRevert : t.common.delete}
+          <Button variant="destructive" onClick={onConfirm}>
+            {t.common.delete}
           </Button>
         </DialogFooter>
       </DialogContent>

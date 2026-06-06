@@ -3,6 +3,8 @@ name: create-theme
 description: Use this skill when the user wants to create, draft, author, or extract a slide theme in this open-slide repo. Triggers on phrases like "create a theme", "make a theme called X", "extract a theme from <slide>", "build a theme from these images". Produces two paired files under `themes/` — `<id>.md` (palette, typography, layout, fixed Title/Footer components, motion) and `<id>.demo.tsx` (a runnable demo slide that the dev-UI Themes panel previews). Do NOT use for editing real slides — only for authoring the theme bundle.
 ---
 
+> **Note:** Decks are now `slides/<id>/deck.json` (structured JSON), not `index.tsx`. When this skill instructs extracting a theme from an existing slide, read `deck.json` instead of `index.tsx`. Theme demo files under `themes/` remain TSX.
+
 # Create a slide theme
 
 This skill produces a **theme bundle** under `themes/`: two paired files that together describe a reusable visual identity.
@@ -12,7 +14,7 @@ This skill produces a **theme bundle** under `themes/`: two paired files that to
 
 Both files share the same stem so the runtime can pair them automatically.
 
-A theme is **distinct from a slide's `design` const**. The theme markdown is authoring-time aesthetic direction (copied into a real slide's source by `create-slide`). The demo `.tsx` is a self-contained preview, not a real slide — it does not appear in the slides list. A per-slide `const design: DesignSystem = { … }` (declared at the top of `slides/<id>/index.tsx`) is the runtime tokens object the user can tweak from the Design panel. The markdown commits the *direction*; the per-slide `design` const makes the slide *tweakable*; the demo `.tsx` makes the theme *previewable*.
+A theme is **distinct from a deck's design tokens**. The theme markdown is authoring-time aesthetic direction (consulted by `create-slide` when an author picks the theme). The demo `.tsx` is a self-contained preview, not a real slide — it does not appear in the slides list. Decks are now `slides/<id>/deck.json` (not `index.tsx`); the `design` field in `deck.json` holds the runtime tokens for a specific deck. The markdown commits the *direction*; the deck's `design` object makes it *concrete*; the demo `.tsx` makes the theme *previewable*.
 
 You only write files under `themes/<id>.md` and `themes/<id>.demo.tsx`. Never modify real slides or other configuration. The canvas / type-scale defaults that themes can override live in the **`slide-authoring`** skill — read it before writing the theme so your overrides are stated explicitly.
 
@@ -22,7 +24,7 @@ A theme can be derived from any combination of three input shapes:
 
 - **Image references** — paths or URLs to slide screenshots, mood-board images, brand assets.
 - **Free-text description** — prose describing the desired palette, fonts, feel.
-- **An existing slide** — `slides/<id>/index.tsx` whose visual identity should be lifted out into a reusable theme.
+- **An existing slide** — `slides/<id>/deck.json` whose visual identity should be lifted out into a reusable theme.
 
 If the user's original message already specifies the inputs unambiguously, skip the question and proceed. Otherwise call `AskUserQuestion` (multi-select) so they can pick one or more sources, and ask follow-ups (paths, slide id, prose) only as needed.
 
@@ -30,13 +32,12 @@ If the user's original message already specifies the inputs unambiguously, skip 
 
 - **Images**: read each path with the `Read` tool (it accepts images). Note dominant colors as hex, type weight/style, layout rhythm, decorative motifs, and any recurring chrome (header bar, footer line, page numbers).
 - **Text**: extract explicit tokens (hex codes, font names, motion verbs) and implicit tone words ("editorial", "playful", "brutalist"). Resolve vague language into concrete decisions before writing.
-- **Existing slide**: read `slides/<id>/index.tsx` and pull:
-  - The `palette` object → Palette section.
-  - Font constants and any `font-size` patterns → Typography section.
-  - Padding / alignment patterns → Layout section.
-  - Recurring components (TrafficLights, Eyebrow, Footer-style helpers, WindowShell, …) → Fixed components section.
-  - `@keyframes` blocks and the shared `styles` string → Motion section.
-  - The aesthetic feel implied by the design → Aesthetic paragraph.
+- **Existing slide**: read `slides/<id>/deck.json` and pull:
+  - `design.palette` (`bg`, `text`, `accent`) → Palette section.
+  - `design.fonts` (`display`, `body`) and `design.typeScale` values → Typography section.
+  - `design.radius` and layout patterns implied by block arrangements → Layout section.
+  - Recurring block types and slot structures (e.g. eyebrow patterns, footer-style blocks) → Fixed components section.
+  - The aesthetic feel implied by the design tokens and block content → Aesthetic paragraph.
 
 When inputs disagree (e.g. images use blue but the description says green), ask the user which to honor.
 
@@ -176,7 +177,7 @@ const Cover: Page = () => (
 
 ## Step 4b — Write `themes/<id>.demo.tsx`
 
-The demo is a normal slide module — same shape as `slides/<id>/index.tsx`, just sitting under `themes/` so the runtime knows it's preview-only. The dev-UI Themes panel imports it and renders it inside `SlideCanvas` (1920×1080).
+The demo is a standalone preview module that lives under `themes/` so the runtime knows it's preview-only. It is NOT a deck — do not confuse it with `slides/<id>/deck.json`. The dev-UI Themes panel imports it and renders it inside `SlideCanvas` (1920×1080).
 
 Contract:
 

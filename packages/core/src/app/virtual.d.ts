@@ -1,9 +1,8 @@
 declare module 'virtual:open-slide/slides' {
-  import type { SlideModule } from './lib/sdk';
   export const slideIds: string[];
   export const slideThemes: Record<string, string>;
   export const slideCreatedAt: Record<string, number>;
-  export function loadSlide(id: string): Promise<SlideModule>;
+  export function loadDeckJson(id: string): Promise<unknown>;
 }
 
 declare module 'virtual:open-slide/config' {
@@ -29,6 +28,8 @@ declare module 'virtual:open-slide/folders' {
   const manifest: FoldersManifest;
   export default manifest;
 }
+
+declare module 'virtual:open-slide/blocks';
 
 declare module 'virtual:open-slide/themes' {
   import type { DesignSystem } from './lib/design';

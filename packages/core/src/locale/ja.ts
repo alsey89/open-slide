@@ -284,7 +284,6 @@ export const ja: Locale = {
     scopeSlide: 'このスライド',
     scopeGlobal: 'グローバル',
     fileCount: { one: 'ファイル {count} 件', other: 'ファイル {count} 件' },
-    usageUnused: '未使用',
     searchLogos: 'ロゴを検索',
     upload: 'アップロード',
     dropToUpload: 'ドロップでアップロード',
@@ -305,11 +304,6 @@ export const ja: Locale = {
     deleteAssetTitle: 'アセットを削除',
     deleteAssetDescription:
       '{name} を削除しますか?スライド内でこのファイルを参照しているインポートは壊れます。',
-    deleteAssetInUseDescription: '{name} は {slides} 枚のスライドで {count} 箇所使用されています。',
-    deleteAssetInUseHint: '削除すると、これらの使用箇所は画像プレースホルダーに戻ります。',
-    deleteAndRevert: '削除して戻す',
-    toastRevertFailed: '{slideId} の使用箇所を戻せませんでした',
-    toastDeletedWithRevert: '{name} を削除し、{count} 箇所をプレースホルダーに戻しました',
     noPreview: 'プレビューはありません',
     importHintComment: 'import asset from ',
     importHintSemi: ';',
@@ -377,12 +371,6 @@ export const ja: Locale = {
   languageToggle: {
     toggleAria: '言語を切り替え',
     title: '言語',
-  },
-
-  imagePlaceholder: {
-    dropOverlay: 'ここにドロップして使用',
-    uploading: 'アップロード中…',
-    uploadFailed: '画像のアップロードに失敗しました',
   },
 
   notesDrawer: {

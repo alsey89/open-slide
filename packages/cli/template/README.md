@@ -1,6 +1,6 @@
 # open-slide workspace
 
-Slides as React components. Each slide lives under `slides/<id>/index.tsx` and default-exports an array of page components. The `@open-slide/core` runtime handles layout, scaling, navigation, thumbnails, and fullscreen play mode — you just write the pages.
+Slides as structured JSON. Each deck lives under `slides/<id>/deck.json`. The `@open-slide/core` runtime handles layout, scaling, navigation, thumbnails, and fullscreen play mode.
 
 ## Getting started
 
@@ -9,7 +9,7 @@ pnpm install
 pnpm dev
 ```
 
-Then open the dev server and edit `slides/getting-started/index.tsx`, or create a new slide at `slides/<your-slide>/index.tsx`.
+Then open `http://localhost:5173/s/getting-started`, or create a new deck at `slides/<your-slide>/deck.json`.
 
 ## Scripts
 
@@ -19,33 +19,53 @@ Then open the dev server and edit `slides/getting-started/index.tsx`, or create 
 | `pnpm build` | Build a static bundle you can deploy. |
 | `pnpm preview` | Preview the built bundle locally. |
 
-## Authoring a slide
+## Authoring a deck
 
-```tsx
-// slides/my-slide/index.tsx
-import type { Page, SlideMeta } from '@open-slide/core';
+A deck is a `deck.json` file. Each slide picks a built-in `layout` and fills named `slots` with `blocks`.
 
-const Cover: Page = () => (
-  <div style={{ width: '100%', height: '100%' }}>Hello</div>
-);
-
-export const meta: SlideMeta = { title: 'My slide' };
-export default [Cover] satisfies Page[];
+```json
+{
+  "schemaVersion": 1,
+  "meta": { "title": "My Deck", "createdAt": "2026-01-01T00:00:00Z" },
+  "design": {
+    "palette": { "bg": "#0f172a", "text": "#f8fafc", "accent": "#fbbf24" },
+    "fonts": { "display": "system-ui, sans-serif", "body": "system-ui, sans-serif" },
+    "typeScale": { "hero": 150, "body": 40 },
+    "radius": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "layout": "title",
+      "slots": {
+        "title": [{ "id": "t1", "type": "heading", "props": { "text": "Hello" } }],
+        "subtitle": [{ "id": "t2", "type": "text", "props": { "text": "A subtitle" } }]
+      }
+    }
+  ]
+}
 ```
 
-Every page renders into a fixed **1920 × 1080** canvas — design with absolute pixel values. Put images, videos, and fonts under `slides/<id>/assets/` and import them directly.
+Built-in layouts: `title`, `section`, `title-body`, `two-col`, `media-text`.
 
-See [`CLAUDE.md`](./CLAUDE.md) for the full authoring guide.
+Built-in block types: `heading`, `text`, `bullets`, `image`, `quote`, `code`.
+
+Put slide-local assets under `slides/<id>/assets/`. Global assets (logos, avatars) go in the root `assets/` folder (`@assets/...`).
+
+Custom React blocks: register in `blocks/index.ts` via `registerBlock` from `@open-slide/core`; reference by the registered type in `deck.json`.
+
+See [`AGENTS.md`](./AGENTS.md) for the full authoring guide.
 
 ## Navigation
 
-- Arrow keys / PageUp / PageDown move between pages.
+- Arrow keys / PageUp / PageDown move between slides.
 - `F` enters fullscreen play mode; Esc exits.
 - In play mode: Space / → next, ← prev.
+- `E` (dev only) toggles the in-browser editor: select blocks, edit content, manage slides, and tune design.
 
 ## Claude Code integration
 
-This workspace ships with Claude Code skills preconfigured under `.claude/skills/` and `.agents/skills/`. Ask Claude Code to "make slides about X" and the `create-slide` skill takes over. Use `apply-comments` to iterate via inspector-style markers inside your source.
+This workspace ships with Claude Code skills preconfigured under `.claude/skills/` and `.agents/skills/`. Ask Claude Code to "make slides about X" and the `create-slide` skill takes over.
 
 ## Config
 
