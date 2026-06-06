@@ -1,9 +1,5 @@
 import { registerBlock, registerLayout } from '@open-slide/core';
 
-// ── Shared style injection (keyframes + Google Font) ─────────────────────────
-// Rendered once by gradient-hero. CSS animations are fine in static render
-// (they simply don't animate); no browser API is called at module scope.
-
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")`;
 
 function FxStyles() {
@@ -224,67 +220,70 @@ registerBlock('big-stat', ({ block }) => {
   const caption = String(block.props.caption ?? '');
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        padding: '40px 32px',
-        boxSizing: 'border-box',
-        textAlign: 'center',
-      }}
-    >
+    <>
+      <FxStyles />
       <div
         style={{
-          fontFamily: "'Fraunces', Georgia, serif",
-          fontSize: 280,
-          fontWeight: 900,
-          lineHeight: 0.88,
-          letterSpacing: '-0.04em',
-          background: 'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 45%, #00f0dc 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          animation: 'statPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          padding: '40px 32px',
+          boxSizing: 'border-box',
+          textAlign: 'center',
         }}
       >
-        {value}
+        <div
+          style={{
+            fontFamily: "'Fraunces', Georgia, serif",
+            fontSize: 280,
+            fontWeight: 900,
+            lineHeight: 0.88,
+            letterSpacing: '-0.04em',
+            background: 'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 45%, #00f0dc 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: 'statPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both',
+          }}
+        >
+          {value}
+        </div>
+        {label && (
+          <div
+            style={{
+              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+              fontSize: 22,
+              fontWeight: 500,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--osd-text)',
+              marginTop: 20,
+              animation: 'fadeSlideUp 0.5s ease both',
+              animationDelay: '0.2s',
+            }}
+          >
+            {label}
+          </div>
+        )}
+        {caption && (
+          <div
+            style={{
+              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+              fontSize: 14,
+              color: 'color-mix(in srgb, var(--osd-text) 40%, transparent)',
+              marginTop: 10,
+              letterSpacing: '0.06em',
+              animation: 'fadeSlideUp 0.5s ease both',
+              animationDelay: '0.35s',
+            }}
+          >
+            {caption}
+          </div>
+        )}
       </div>
-      {label && (
-        <div
-          style={{
-            fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-            fontSize: 22,
-            fontWeight: 500,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: 'var(--osd-text)',
-            marginTop: 20,
-            animation: 'fadeSlideUp 0.5s ease both',
-            animationDelay: '0.2s',
-          }}
-        >
-          {label}
-        </div>
-      )}
-      {caption && (
-        <div
-          style={{
-            fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-            fontSize: 14,
-            color: 'color-mix(in srgb, var(--osd-text) 40%, transparent)',
-            marginTop: 10,
-            letterSpacing: '0.06em',
-            animation: 'fadeSlideUp 0.5s ease both',
-            animationDelay: '0.35s',
-          }}
-        >
-          {caption}
-        </div>
-      )}
-    </div>
+    </>
   );
 });
 
@@ -293,36 +292,39 @@ registerBlock('pill-row', ({ block }) => {
   const items: string[] = Array.isArray(block.props.items) ? block.props.items : [];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 12,
-        padding: '24px 32px',
-        alignItems: 'center',
-      }}
-    >
-      {items.map((item) => (
-        <span
-          key={String(item)}
-          style={{
-            fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-            fontSize: 15,
-            fontWeight: 500,
-            letterSpacing: '0.08em',
-            color: 'var(--osd-text)',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.14)',
-            borderRadius: 999,
-            padding: '8px 20px',
-            whiteSpace: 'nowrap',
-            animation: 'fadeSlideUp 0.45s ease both',
-          }}
-        >
-          {String(item)}
-        </span>
-      ))}
-    </div>
+    <>
+      <FxStyles />
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 12,
+          padding: '24px 32px',
+          alignItems: 'center',
+        }}
+      >
+        {items.map((item) => (
+          <span
+            key={String(item)}
+            style={{
+              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+              fontSize: 15,
+              fontWeight: 500,
+              letterSpacing: '0.08em',
+              color: 'var(--osd-text)',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: 999,
+              padding: '8px 20px',
+              whiteSpace: 'nowrap',
+              animation: 'fadeSlideUp 0.45s ease both',
+            }}
+          >
+            {String(item)}
+          </span>
+        ))}
+      </div>
+    </>
   );
 });
 
@@ -333,59 +335,62 @@ registerBlock('feature-cards', ({ block }) => {
   const items: CardItem[] = Array.isArray(raw) ? (raw as CardItem[]) : [];
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: 24,
-        padding: '32px 40px',
-        boxSizing: 'border-box',
-        width: '100%',
-        height: '100%',
-        alignContent: 'start',
-      }}
-    >
-      {items.map((item) => (
-        <div
-          key={String(item.title ?? item.icon ?? item.desc ?? Math.random())}
-          className="osd-card-fx"
-          style={{
-            background:
-              'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 16,
-            padding: '32px 28px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            animation: 'fadeSlideUp 0.5s ease both',
-          }}
-        >
-          <div style={{ fontSize: 44, lineHeight: 1 }}>{String(item.icon ?? '◆')}</div>
+    <>
+      <FxStyles />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 24,
+          padding: '32px 40px',
+          boxSizing: 'border-box',
+          width: '100%',
+          height: '100%',
+          alignContent: 'start',
+        }}
+      >
+        {items.map((item) => (
           <div
+            key={String(item.title ?? item.icon ?? item.desc ?? Math.random())}
+            className="osd-card-fx"
             style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              fontSize: 24,
-              fontWeight: 700,
-              color: 'var(--osd-text)',
-              lineHeight: 1.2,
+              background:
+                'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 16,
+              padding: '32px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              animation: 'fadeSlideUp 0.5s ease both',
             }}
           >
-            {String(item.title ?? '')}
+            <div style={{ fontSize: 44, lineHeight: 1 }}>{String(item.icon ?? '◆')}</div>
+            <div
+              style={{
+                fontFamily: "'Fraunces', Georgia, serif",
+                fontSize: 24,
+                fontWeight: 700,
+                color: 'var(--osd-text)',
+                lineHeight: 1.2,
+              }}
+            >
+              {String(item.title ?? '')}
+            </div>
+            <div
+              style={{
+                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+                fontSize: 14,
+                color: 'color-mix(in srgb, var(--osd-text) 55%, transparent)',
+                lineHeight: 1.6,
+              }}
+            >
+              {String(item.desc ?? '')}
+            </div>
           </div>
-          <div
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 14,
-              color: 'color-mix(in srgb, var(--osd-text) 55%, transparent)',
-              lineHeight: 1.6,
-            }}
-          >
-            {String(item.desc ?? '')}
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 });
 
@@ -395,80 +400,83 @@ registerBlock('code-window', ({ block }) => {
   const code = String(block.props.code ?? '');
 
   return (
-    <div
-      style={{
-        width: '100%',
-        padding: '32px 40px',
-        boxSizing: 'border-box',
-      }}
-    >
+    <>
+      <FxStyles />
       <div
         style={{
-          borderRadius: 14,
-          overflow: 'hidden',
-          boxShadow: '0 32px 80px -12px rgba(0,0,0,0.7)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          width: '100%',
+          padding: '32px 40px',
+          boxSizing: 'border-box',
         }}
       >
-        {/* Title bar */}
         <div
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            borderBottom: '1px solid rgba(255,255,255,0.07)',
-            padding: '12px 18px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
+            borderRadius: 14,
+            overflow: 'hidden',
+            boxShadow: '0 32px 80px -12px rgba(0,0,0,0.7)',
+            border: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
-            {(['#ff5f57', '#ffbd2e', '#28c840'] as const).map((c) => (
-              <div
-                key={c}
-                style={{
-                  width: 13,
-                  height: 13,
-                  borderRadius: '50%',
-                  background: c,
-                  boxShadow: `0 0 6px 1px ${c}66`,
-                }}
-              />
-            ))}
+          {/* Title bar */}
+          <div
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              borderBottom: '1px solid rgba(255,255,255,0.07)',
+              padding: '12px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
+              {(['#ff5f57', '#ffbd2e', '#28c840'] as const).map((c) => (
+                <div
+                  key={c}
+                  style={{
+                    width: 13,
+                    height: 13,
+                    borderRadius: '50%',
+                    background: c,
+                    boxShadow: `0 0 6px 1px ${c}66`,
+                  }}
+                />
+              ))}
+            </div>
+            <span
+              style={{
+                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+                fontSize: 13,
+                color: 'color-mix(in srgb, var(--osd-text) 45%, transparent)',
+                letterSpacing: '0.04em',
+                flex: 1,
+                textAlign: 'center',
+                marginRight: 52,
+              }}
+            >
+              {title}
+            </span>
           </div>
-          <span
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 13,
-              color: 'color-mix(in srgb, var(--osd-text) 45%, transparent)',
-              letterSpacing: '0.04em',
-              flex: 1,
-              textAlign: 'center',
-              marginRight: 52,
-            }}
-          >
-            {title}
-          </span>
-        </div>
-        {/* Code body */}
-        <div style={{ background: 'rgba(0,0,0,0.45)', padding: '28px 32px' }}>
-          <pre
-            style={{
-              margin: 0,
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 17,
-              lineHeight: 1.75,
-              color: 'color-mix(in srgb, var(--osd-text) 88%, transparent)',
-              whiteSpace: 'pre',
-              overflowX: 'auto',
-              animation: 'lineGlow 3s ease-in-out infinite',
-              animationDelay: '1.2s',
-            }}
-          >
-            {code}
-          </pre>
+          {/* Code body */}
+          <div style={{ background: 'rgba(0,0,0,0.45)', padding: '28px 32px' }}>
+            <pre
+              style={{
+                margin: 0,
+                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+                fontSize: 17,
+                lineHeight: 1.75,
+                color: 'color-mix(in srgb, var(--osd-text) 88%, transparent)',
+                whiteSpace: 'pre',
+                overflowX: 'auto',
+                animation: 'lineGlow 3s ease-in-out infinite',
+                animationDelay: '1.2s',
+              }}
+            >
+              {code}
+            </pre>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });
 
@@ -484,49 +492,52 @@ registerBlock('marquee', ({ block }) => {
   const duration = `${speed}s`;
 
   return (
-    <div
-      style={{
-        width: '100%',
-        overflow: 'hidden',
-        padding: '20px 0',
-        boxSizing: 'border-box',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-      }}
-    >
+    <>
+      <FxStyles />
       <div
         style={{
-          display: 'flex',
-          whiteSpace: 'nowrap',
-          animation: `marqueeScroll ${duration} linear infinite`,
-          willChange: 'transform',
+          width: '100%',
+          overflow: 'hidden',
+          padding: '20px 0',
+          boxSizing: 'border-box',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        {tagged.map(({ t, k }) => (
-          <span
-            key={k}
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 32,
-              fontWeight: 500,
-              letterSpacing: '0.04em',
-              color: 'var(--osd-accent)',
-              paddingRight: 48,
-            }}
-          >
-            {t}
+        <div
+          style={{
+            display: 'flex',
+            whiteSpace: 'nowrap',
+            animation: `marqueeScroll ${duration} linear infinite`,
+            willChange: 'transform',
+          }}
+        >
+          {tagged.map(({ t, k }) => (
             <span
+              key={k}
               style={{
-                color: 'color-mix(in srgb, var(--osd-accent) 35%, transparent)',
-                marginLeft: 48,
+                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+                fontSize: 32,
+                fontWeight: 500,
+                letterSpacing: '0.04em',
+                color: 'var(--osd-accent)',
+                paddingRight: 48,
               }}
             >
-              {' •'}
+              {t}
+              <span
+                style={{
+                  color: 'color-mix(in srgb, var(--osd-accent) 35%, transparent)',
+                  marginLeft: 48,
+                }}
+              >
+                {' •'}
+              </span>
             </span>
-          </span>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 });
 
@@ -536,77 +547,80 @@ registerBlock('quote-spotlight', ({ block }) => {
   const by = String(block.props.by ?? '');
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        height: '100%',
-        padding: '60px 96px',
-        boxSizing: 'border-box',
-        position: 'relative',
-      }}
-    >
-      {/* Decorative quotation mark */}
+    <>
+      <FxStyles />
       <div
         style={{
-          fontFamily: "'Fraunces', Georgia, serif",
-          fontSize: 320,
-          fontWeight: 900,
-          lineHeight: 0.75,
-          background:
-            'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 50%, transparent 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          position: 'absolute',
-          top: 20,
-          left: 72,
-          userSelect: 'none',
-          pointerEvents: 'none',
-          opacity: 0.35,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          height: '100%',
+          padding: '60px 96px',
+          boxSizing: 'border-box',
+          position: 'relative',
         }}
       >
-        {'"'}
-      </div>
-
-      <blockquote style={{ margin: 0, position: 'relative', zIndex: 1 }}>
-        <p
+        {/* Decorative quotation mark */}
+        <div
           style={{
             fontFamily: "'Fraunces', Georgia, serif",
-            fontSize: 52,
-            fontWeight: 300,
-            fontStyle: 'italic',
-            lineHeight: 1.35,
-            color: 'var(--osd-text)',
-            margin: 0,
-            marginBottom: 36,
-            animation: 'fadeSlideUp 0.7s ease both',
+            fontSize: 320,
+            fontWeight: 900,
+            lineHeight: 0.75,
+            background:
+              'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 50%, transparent 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            position: 'absolute',
+            top: 20,
+            left: 72,
+            userSelect: 'none',
+            pointerEvents: 'none',
+            opacity: 0.35,
           }}
         >
-          {text}
-        </p>
-        {by && (
-          <cite
+          {'"'}
+        </div>
+
+        <blockquote style={{ margin: 0, position: 'relative', zIndex: 1 }}>
+          <p
             style={{
-              display: 'block',
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 16,
-              fontWeight: 500,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--osd-accent)',
-              fontStyle: 'normal',
-              animation: 'fadeSlideUp 0.5s ease both',
-              animationDelay: '0.25s',
+              fontFamily: "'Fraunces', Georgia, serif",
+              fontSize: 52,
+              fontWeight: 300,
+              fontStyle: 'italic',
+              lineHeight: 1.35,
+              color: 'var(--osd-text)',
+              margin: 0,
+              marginBottom: 36,
+              animation: 'fadeSlideUp 0.7s ease both',
             }}
           >
-            {'— '}
-            {by}
-          </cite>
-        )}
-      </blockquote>
-    </div>
+            {text}
+          </p>
+          {by && (
+            <cite
+              style={{
+                display: 'block',
+                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
+                fontSize: 16,
+                fontWeight: 500,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--osd-accent)',
+                fontStyle: 'normal',
+                animation: 'fadeSlideUp 0.5s ease both',
+                animationDelay: '0.25s',
+              }}
+            >
+              {'— '}
+              {by}
+            </cite>
+          )}
+        </blockquote>
+      </div>
+    </>
   );
 });
 
@@ -614,16 +628,19 @@ registerBlock('quote-spotlight', ({ block }) => {
 registerLayout(
   'bleed',
   ({ renderSlot }) => (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        boxSizing: 'border-box',
-      }}
-    >
-      {renderSlot('main')}
-    </div>
+    <>
+      <FxStyles />
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+        }}
+      >
+        {renderSlot('main')}
+      </div>
+    </>
   ),
   ['main'],
 );
@@ -632,43 +649,46 @@ registerLayout(
 registerLayout(
   'split',
   ({ renderSlot }) => (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        boxSizing: 'border-box',
-      }}
-    >
-      {/* aside — 38%, accent-tinted translucent panel */}
+    <>
+      <FxStyles />
       <div
         style={{
-          width: '38%',
-          flexShrink: 0,
+          width: '100%',
           height: '100%',
-          background:
-            'linear-gradient(180deg, color-mix(in srgb, var(--osd-accent) 12%, var(--osd-bg)) 0%, var(--osd-bg) 100%)',
-          borderRight: '1px solid rgba(255,255,255,0.08)',
-          padding: '56px 48px',
+          display: 'flex',
           boxSizing: 'border-box',
-          overflowY: 'auto',
         }}
       >
-        {renderSlot('aside')}
+        {/* aside — 38%, accent-tinted translucent panel */}
+        <div
+          style={{
+            width: '38%',
+            flexShrink: 0,
+            height: '100%',
+            background:
+              'linear-gradient(180deg, color-mix(in srgb, var(--osd-accent) 12%, var(--osd-bg)) 0%, var(--osd-bg) 100%)',
+            borderRight: '1px solid rgba(255,255,255,0.08)',
+            padding: '56px 48px',
+            boxSizing: 'border-box',
+            overflowY: 'auto',
+          }}
+        >
+          {renderSlot('aside')}
+        </div>
+        {/* main — 62% */}
+        <div
+          style={{
+            flex: 1,
+            height: '100%',
+            padding: '56px 56px',
+            boxSizing: 'border-box',
+            overflowY: 'auto',
+          }}
+        >
+          {renderSlot('main')}
+        </div>
       </div>
-      {/* main — 62% */}
-      <div
-        style={{
-          flex: 1,
-          height: '100%',
-          padding: '56px 56px',
-          boxSizing: 'border-box',
-          overflowY: 'auto',
-        }}
-      >
-        {renderSlot('main')}
-      </div>
-    </div>
+    </>
   ),
   ['aside', 'main'],
 );
