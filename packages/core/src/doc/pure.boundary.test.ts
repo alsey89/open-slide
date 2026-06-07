@@ -15,6 +15,7 @@ const PURE_MODULES = [
   'transition.ts',
   'ids.ts',
   'pure.ts',
+  'inverse.ts',
 ];
 
 // Collect every runtime module specifier: `import ... from`, `export ... from`, and

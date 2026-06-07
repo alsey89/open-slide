@@ -100,7 +100,11 @@ function mutate(deck: Deck, op: EditOp): void {
         for (const name of Object.keys(slide.slots)) {
           const block = slide.slots[name].find((b) => b.id === op.blockId);
           if (block) {
+            // Merge, then drop keys explicitly set to undefined so undo can remove keys a forward op added.
             block.props = { ...block.props, ...op.props };
+            for (const k of Object.keys(op.props)) {
+              if (op.props[k] === undefined) delete block.props[k];
+            }
             return;
           }
         }

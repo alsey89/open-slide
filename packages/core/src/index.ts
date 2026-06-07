@@ -22,6 +22,7 @@ export type { Block, Deck, DeckMeta, Slide } from './doc/index.ts';
 export {
   applyOp,
   applyOps,
+  applyOpWithInverse,
   type BlockComponent,
   type BlockPropSchema,
   DeckValidationError,
@@ -30,6 +31,7 @@ export {
   getBlock,
   getBlockSchema,
   getLayout,
+  invertOp,
   type LayoutComponent,
   listBlockTypes,
   listLayouts,
