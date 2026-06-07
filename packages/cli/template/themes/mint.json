@@ -1,0 +1,20 @@
+{
+  "name": "Mint",
+  "description": "Fresh mint canvas with a pink accent, all sans.",
+  "design": {
+    "palette": {
+      "bg": "#e9f5ee",
+      "text": "#0f3324",
+      "accent": "#ec4899"
+    },
+    "fonts": {
+      "display": "\"Inter\", system-ui, sans-serif",
+      "body": "\"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 160,
+      "body": 32
+    },
+    "radius": 16
+  }
+}

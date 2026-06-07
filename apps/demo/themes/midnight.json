@@ -1,0 +1,24 @@
+{
+  "name": "Midnight",
+  "description": "Dark slate with a cool blue accent and a serif display.",
+  "design": {
+    "palette": {
+      "bg": "#0f1115",
+      "surface": "#1a1d24",
+      "text": "#f5f3ee",
+      "muted": "#9aa0ab",
+      "accent": "#7cc4ff",
+      "border": "#2b2f38"
+    },
+    "fonts": {
+      "display": "Georgia, \"Times New Roman\", serif",
+      "body": "-apple-system, BlinkMacSystemFont, \"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 192,
+      "body": 32
+    },
+    "radius": 6,
+    "shadow": "0 10px 30px rgba(0,0,0,0.45)"
+  }
+}

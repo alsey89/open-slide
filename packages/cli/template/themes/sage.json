@@ -1,0 +1,20 @@
+{
+  "name": "Sage",
+  "description": "Earthy tan and forest green, fully serif.",
+  "design": {
+    "palette": {
+      "bg": "#ede2cc",
+      "text": "#3a2a1a",
+      "accent": "#2f6e3a"
+    },
+    "fonts": {
+      "display": "\"Times New Roman\", Times, serif",
+      "body": "Georgia, \"Times New Roman\", serif"
+    },
+    "typeScale": {
+      "hero": 168,
+      "body": 32
+    },
+    "radius": 4
+  }
+}

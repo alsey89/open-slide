@@ -1,0 +1,20 @@
+{
+  "name": "Terminal",
+  "description": "Dark monospace console with a mint-and-amber palette.",
+  "design": {
+    "palette": {
+      "bg": "#101418",
+      "text": "#a7f3d0",
+      "accent": "#fbbf24"
+    },
+    "fonts": {
+      "display": "\"SF Mono\", \"JetBrains Mono\", Menlo, monospace",
+      "body": "\"SF Mono\", \"JetBrains Mono\", Menlo, monospace"
+    },
+    "typeScale": {
+      "hero": 144,
+      "body": 24
+    },
+    "radius": 4
+  }
+}
