@@ -1,18 +1,7 @@
+import type { SlideTransition } from '../../doc/transition.ts';
 import type { Page } from './sdk';
 
-export type TransitionPhase = {
-  keyframes: Keyframe[] | PropertyIndexedKeyframes;
-  easing?: string;
-  duration?: number;
-  delay?: number;
-};
-
-export type SlideTransition = {
-  duration: number;
-  easing?: string;
-  enter?: TransitionPhase;
-  exit?: TransitionPhase;
-};
+export type { SlideTransition, TransitionPhase } from '../../doc/transition.ts';
 
 export function resolveTransition(
   pages: Page[],

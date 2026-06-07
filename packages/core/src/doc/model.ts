@@ -1,5 +1,5 @@
-import type { SlideTransition } from '../app/lib/transition.ts';
 import type { DesignSystem } from './design.ts';
+import type { SlideTransition } from './transition.ts';
 
 export const SCHEMA_VERSION = 1 as const;
 
