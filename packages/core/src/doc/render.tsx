@@ -1,7 +1,7 @@
 import { createElement } from 'react';
-import { normalizeDesign } from '../app/lib/design.ts';
 import type { Page, SlideModule } from '../app/lib/sdk.ts';
 import { UnknownBlock } from './blocks/index.ts';
+import { normalizeDesign } from './design.ts';
 import { MissingLayout } from './layouts/index.ts';
 import type { Block, Deck, Slide } from './model.ts';
 import { getBlock, getLayout } from './registry.ts';
