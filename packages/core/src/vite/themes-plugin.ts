@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import fg from 'fast-glob';
-import { normalizePath, type Plugin } from 'vite';
+import type { Plugin } from 'vite';
 import type { OpenSlideConfig } from '../config.ts';
 
 export type ThemesPluginOptions = {
@@ -16,99 +16,49 @@ function resolved(id: string): string {
   return `\0${id}`;
 }
 
-type Frontmatter = {
+export type ParsedTheme = {
+  id: string;
   name: string;
   description: string;
+  design: Record<string, unknown>;
 };
 
-type ParsedTheme = {
-  id: string;
-  frontmatter: Frontmatter;
-  body: string;
-  demoAbs: string | null;
-};
-
-const FM_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
-
-function parseFrontmatter(raw: string, themeId: string): { fm: Frontmatter; body: string } {
-  const match = raw.match(FM_RE);
-  const fmText = match ? match[1] : '';
-  const body = match ? match[2] : raw;
-
-  const data: Record<string, string> = {};
-  for (const line of fmText.split(/\r?\n/)) {
-    const m = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
-    if (!m) continue;
-    let value = m[2].trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
+export function parseThemeFile(id: string, raw: string): ParsedTheme {
+  let data: Record<string, unknown> = {};
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      data = parsed as Record<string, unknown>;
     }
-    data[m[1]] = value;
+  } catch {
+    data = {};
   }
-
-  return {
-    fm: {
-      name: data.name || themeId,
-      description: data.description || '',
-    },
-    body: body.trim(),
-  };
+  const name = typeof data.name === 'string' && data.name ? data.name : id;
+  const description = typeof data.description === 'string' ? data.description : '';
+  const design =
+    data.design && typeof data.design === 'object' && !Array.isArray(data.design)
+      ? (data.design as Record<string, unknown>)
+      : {};
+  return { id, name, description, design };
 }
 
-async function findThemes(userCwd: string, themesDir: string): Promise<string[]> {
-  const abs = path.resolve(userCwd, themesDir);
-  if (!existsSync(abs)) return [];
-  const hits = await fg('*.md', { cwd: abs, absolute: true, onlyFiles: true });
+export function generateThemesModule(themes: ParsedTheme[]): string {
+  return `// virtual:open-slide/themes — generated\nexport const themes = ${JSON.stringify(themes)};\n`;
+}
+
+async function findThemeFiles(themesRoot: string): Promise<string[]> {
+  if (!existsSync(themesRoot)) return [];
+  const hits = await fg('*.json', { cwd: themesRoot, absolute: true, onlyFiles: true });
   return hits.sort();
 }
 
-async function readTheme(mdAbs: string, themesRoot: string): Promise<ParsedTheme> {
-  const id = path.basename(mdAbs, '.md');
-  const raw = await fs.readFile(mdAbs, 'utf8');
-  const { fm, body } = parseFrontmatter(raw, id);
-  const demoCandidates = [`${id}.demo.tsx`, `${id}.demo.jsx`, `${id}.demo.ts`, `${id}.demo.js`];
-  let demoAbs: string | null = null;
-  for (const cand of demoCandidates) {
-    const p = path.join(themesRoot, cand);
-    if (existsSync(p)) {
-      demoAbs = p;
-      break;
-    }
-  }
-  return { id, frontmatter: fm, body, demoAbs };
-}
-
-function generateThemesModule(themes: ParsedTheme[], isDev: boolean): string {
-  const meta = themes.map((t) => ({
-    id: t.id,
-    name: t.frontmatter.name,
-    description: t.frontmatter.description,
-    body: t.body,
-    hasDemo: t.demoAbs !== null,
-  }));
-
-  const cases = themes
-    .flatMap((t) => {
-      const abs = t.demoAbs;
-      if (!abs) return [];
-      const importPath = isDev ? `/@fs/${normalizePath(abs).replace(/^\/+/, '')}` : abs;
-      return [`    case ${JSON.stringify(t.id)}: return import(${JSON.stringify(importPath)});`];
-    })
-    .join('\n');
-
-  return `// virtual:open-slide/themes — generated
-export const themes = ${JSON.stringify(meta)};
-
-export async function loadThemeDemo(id) {
-  switch (id) {
-${cases}
-    default: throw new Error('Theme demo not found: ' + id);
-  }
-}
-`;
+async function readThemes(themesRoot: string): Promise<ParsedTheme[]> {
+  const files = await findThemeFiles(themesRoot);
+  return Promise.all(
+    files.map(async (abs) =>
+      parseThemeFile(path.basename(abs, '.json'), await fs.readFile(abs, 'utf8')),
+    ),
+  );
 }
 
 export function themesPlugin(opts: ThemesPluginOptions): Plugin {
@@ -116,29 +66,22 @@ export function themesPlugin(opts: ThemesPluginOptions): Plugin {
   const themesDir = config.themesDir ?? 'themes';
   const themesRoot = path.resolve(userCwd, themesDir);
 
-  let isDev = false;
-
   return {
     name: 'open-slide:themes',
-    config(_c, env) {
-      isDev = env.command === 'serve';
-    },
     resolveId(id) {
       if (id === THEMES_VMOD) return resolved(THEMES_VMOD);
       return null;
     },
     async load(id) {
       if (id !== resolved(THEMES_VMOD)) return null;
-      const files = await findThemes(userCwd, themesDir);
-      const themes = await Promise.all(files.map((f) => readTheme(f, themesRoot)));
-      return generateThemesModule(themes, isDev);
+      return generateThemesModule(await readThemes(themesRoot));
     },
     configureServer(server) {
       const isThemeFile = (p: string) => {
         const rel = path.relative(themesRoot, p);
         if (rel.startsWith('..') || path.isAbsolute(rel)) return false;
         if (rel.includes(path.sep)) return false;
-        return /\.(md|demo\.(tsx|jsx|ts|js))$/.test(rel);
+        return rel.endsWith('.json');
       };
 
       let reloadTimer: ReturnType<typeof setTimeout> | null = null;

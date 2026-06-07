@@ -1,0 +1,20 @@
+{
+  "name": "Solar",
+  "description": "Solarized cream with an amber accent and serif display.",
+  "design": {
+    "palette": {
+      "bg": "#fdf6e3",
+      "text": "#073642",
+      "accent": "#b58900"
+    },
+    "fonts": {
+      "display": "Georgia, \"Times New Roman\", serif",
+      "body": "\"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 144,
+      "body": 28
+    },
+    "radius": 14
+  }
+}

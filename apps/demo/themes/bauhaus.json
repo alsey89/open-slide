@@ -1,0 +1,20 @@
+{
+  "name": "Bauhaus",
+  "description": "Oversized type on white with a bold yellow accent.",
+  "design": {
+    "palette": {
+      "bg": "#fafafa",
+      "text": "#0a0a0a",
+      "accent": "#facc15"
+    },
+    "fonts": {
+      "display": "\"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "body": "\"Helvetica Neue\", Helvetica, Arial, sans-serif"
+    },
+    "typeScale": {
+      "hero": 220,
+      "body": 32
+    },
+    "radius": 0
+  }
+}

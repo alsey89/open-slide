@@ -9,6 +9,7 @@ import {
   type PropField,
 } from '../../../doc/registry.ts';
 import { renderDeck } from '../../../doc/render.tsx';
+import { postSaveTheme } from '../../lib/editor/edit-client.ts';
 import { useDeckEditor } from '../../lib/editor/use-deck-editor.ts';
 import { SlideCanvas } from '../slide-canvas.tsx';
 import { ScrollArea } from '../ui/scroll-area.tsx';
@@ -645,8 +646,9 @@ export function DeckEditor({
     );
   }
 
+  const deck = editor.deck;
   const Page = mod.default[clampedIndex];
-  const currentSlide = editor.deck.slides[clampedIndex];
+  const currentSlide = deck.slides[clampedIndex];
 
   return (
     <>
@@ -659,6 +661,15 @@ export function DeckEditor({
           onIndexChange={onIndexChange}
           onApply={editor.apply}
           onDesignChange={(design) => editor.apply({ kind: 'set-design', design })}
+          onApplyTheme={(theme) =>
+            editor.apply([
+              { kind: 'set-design', design: theme.design },
+              { kind: 'set-deck-theme', theme: theme.id },
+            ])
+          }
+          onSaveTheme={(name) => {
+            void postSaveTheme(name, deck.design);
+          }}
         />
         {/* Canvas area */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: canvas click-to-select is intentionally a plain div — no semantic role fits this pattern */}

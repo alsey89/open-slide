@@ -157,3 +157,14 @@ test('remove-slide on the only slide throws EditOpError (not a validation error)
   const single = { ...deck(), slides: [deck().slides[0]] };
   expect(() => applyOp(single, { kind: 'remove-slide', slideId: 's1' })).toThrow(EditOpError);
 });
+
+test('set-deck-theme stamps meta.theme', () => {
+  const next = applyOp(deck(), { kind: 'set-deck-theme', theme: 'midnight' });
+  expect(next.meta.theme).toBe('midnight');
+});
+
+test('set-deck-theme clears meta.theme when theme is undefined', () => {
+  const stamped = applyOp(deck(), { kind: 'set-deck-theme', theme: 'midnight' });
+  const next = applyOp(stamped, { kind: 'set-deck-theme' });
+  expect(next.meta.theme).toBeUndefined();
+});

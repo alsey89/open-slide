@@ -1,0 +1,20 @@
+{
+  "name": "Coral",
+  "description": "Cool grey canvas with a warm coral accent.",
+  "design": {
+    "palette": {
+      "bg": "#eef1f4",
+      "text": "#1c2733",
+      "accent": "#ff6a5b"
+    },
+    "fonts": {
+      "display": "\"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "body": "-apple-system, BlinkMacSystemFont, \"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 156,
+      "body": 30
+    },
+    "radius": 8
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Lilac",
+  "description": "Pale lavender with a yellow accent and serif display.",
+  "design": {
+    "palette": {
+      "bg": "#ece2f5",
+      "text": "#2a1c4a",
+      "accent": "#facc15"
+    },
+    "fonts": {
+      "display": "Georgia, \"Times New Roman\", serif",
+      "body": "-apple-system, BlinkMacSystemFont, \"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 168,
+      "body": 34
+    },
+    "radius": 20
+  }
+}

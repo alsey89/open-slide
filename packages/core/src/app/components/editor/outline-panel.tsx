@@ -3,6 +3,7 @@ import type { DesignSystem } from '../../../app/lib/design.ts';
 import type { Deck } from '../../../doc/model.ts';
 import type { EditOp } from '../../../doc/ops.ts';
 import { listLayouts } from '../../../doc/registry.ts';
+import type { Theme } from '../../lib/themes';
 import { ScrollArea } from '../ui/scroll-area.tsx';
 import { DesignPanel } from './design-panel.tsx';
 import { cloneSlideWithFreshIds, freshId } from './ids.ts';
@@ -27,12 +28,16 @@ export function OutlinePanel({
   onIndexChange,
   onApply,
   onDesignChange,
+  onApplyTheme,
+  onSaveTheme,
 }: {
   deck: Deck;
   index: number;
   onIndexChange: (i: number) => void;
   onApply: (op: EditOp | EditOp[]) => void;
   onDesignChange: (design: DesignSystem) => void;
+  onApplyTheme: (theme: Theme) => void;
+  onSaveTheme: (name: string) => void;
 }) {
   const slides = deck.slides;
   const currentSlide = slides[index];
@@ -286,7 +291,12 @@ export function OutlinePanel({
           )}
 
           {/* Design tokens */}
-          <DesignPanel design={deck.design} onChange={onDesignChange} />
+          <DesignPanel
+            design={deck.design}
+            onChange={onDesignChange}
+            onApplyTheme={onApplyTheme}
+            onSaveTheme={onSaveTheme}
+          />
         </div>
       </ScrollArea>
     </aside>

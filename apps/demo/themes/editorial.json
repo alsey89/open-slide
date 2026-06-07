@@ -1,0 +1,20 @@
+{
+  "name": "Editorial",
+  "description": "Stark white, hard corners, a crimson accent.",
+  "design": {
+    "palette": {
+      "bg": "#ffffff",
+      "text": "#0a0a0a",
+      "accent": "#e11d48"
+    },
+    "fonts": {
+      "display": "\"Helvetica Neue\", Helvetica, Arial, sans-serif",
+      "body": "\"Helvetica Neue\", Helvetica, Arial, sans-serif"
+    },
+    "typeScale": {
+      "hero": 200,
+      "body": 28
+    },
+    "radius": 0
+  }
+}

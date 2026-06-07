@@ -1,0 +1,20 @@
+{
+  "name": "Apricot",
+  "description": "Soft peach with generous radii and an orange accent.",
+  "design": {
+    "palette": {
+      "bg": "#fde9d9",
+      "text": "#3a1f3d",
+      "accent": "#f97316"
+    },
+    "fonts": {
+      "display": "Georgia, \"Times New Roman\", serif",
+      "body": "-apple-system, BlinkMacSystemFont, \"Inter\", system-ui, sans-serif"
+    },
+    "typeScale": {
+      "hero": 184,
+      "body": 36
+    },
+    "radius": 24
+  }
+}

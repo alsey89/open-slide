@@ -59,7 +59,7 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
       tailwindcss(),
       openSlidePlugin({ userCwd, config, coreVersion: CORE_VERSION }),
       themesPlugin({ userCwd, config }),
-      apiPlugin({ userCwd, slidesDir, assetsDir, coreVersion: CORE_VERSION }),
+      apiPlugin({ userCwd, slidesDir, themesDir, assetsDir, coreVersion: CORE_VERSION }),
       notesPlugin({ userCwd, slidesDir }),
       currentPlugin({ userCwd, slidesDir }),
     ],

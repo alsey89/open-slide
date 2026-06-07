@@ -1,0 +1,20 @@
+{
+  "name": "Noir",
+  "description": "Black paper, warm ivory text, a gold accent.",
+  "design": {
+    "palette": {
+      "bg": "#0a0a0a",
+      "text": "#f3edd9",
+      "accent": "#eab308"
+    },
+    "fonts": {
+      "display": "Georgia, \"Times New Roman\", serif",
+      "body": "\"Helvetica Neue\", Helvetica, Arial, sans-serif"
+    },
+    "typeScale": {
+      "hero": 200,
+      "body": 32
+    },
+    "radius": 2
+  }
+}

@@ -5,6 +5,7 @@ import { registerDeckRoutes } from './routes/deck.ts';
 import { registerFolderRoutes } from './routes/folders.ts';
 import { registerSlideRoutes } from './routes/slides.ts';
 import { registerSvglRoutes } from './routes/svgl.ts';
+import { registerThemeRoutes } from './routes/themes.ts';
 import { registerUpdateRoutes } from './routes/update.ts';
 import { registerWatchers } from './routes/watchers.ts';
 
@@ -25,6 +26,7 @@ export function apiPlugin(opts: ApiPluginOptions): Plugin {
       registerSvglRoutes(server);
       registerFolderRoutes(server, ctx);
       registerDeckRoutes(server, ctx);
+      registerThemeRoutes(server, ctx);
       registerUpdateRoutes(server, ctx.coreVersion);
     },
   };

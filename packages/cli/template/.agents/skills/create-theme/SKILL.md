@@ -1,251 +1,68 @@
 ---
 name: create-theme
-description: Use this skill when the user wants to create, draft, author, or extract a slide theme in this open-slide repo. Triggers on phrases like "create a theme", "make a theme called X", "extract a theme from <slide>", "build a theme from these images". Produces two paired files under `themes/` — `<id>.md` (palette, typography, layout, fixed Title/Footer components, motion) and `<id>.demo.tsx` (a runnable demo slide that the dev-UI Themes panel previews). Do NOT use for editing real slides — only for authoring the theme bundle.
+description: Use this skill when the user wants to create, draft, author, or extract a slide theme in this open-slide repo. Triggers on phrases like "create a theme", "make a theme called X", "extract a theme from <slide>", "build a theme from these images". Produces one file under `themes/` — `<id>.json`, a named design-token preset that previews in the /themes gallery and applies to a deck from the design panel. Do NOT use for editing real slides — only for authoring the theme preset.
 ---
-
-> **Note:** Decks are now `slides/<id>/deck.json` (structured JSON), not `index.tsx`. When this skill instructs extracting a theme from an existing slide, read `deck.json` instead of `index.tsx`. Theme demo files under `themes/` remain TSX.
 
 # Create a slide theme
 
-This skill produces a **theme bundle** under `themes/`: two paired files that together describe a reusable visual identity.
+A **theme** is a named design-token preset: a single JSON file under `themes/` that captures a reusable visual identity (palette, fonts, type scale, shape). It is *not* code and not a demo slide — it is the same `design` tokens a deck carries, packaged with a name so it can be browsed in the `/themes` gallery and applied to any deck from the deck editor's design panel.
 
-1. `themes/<id>.md` — agent-facing documentation: palette, typography, layout, fixed Title/Footer/Eyebrow components, motion. This is what `create-slide` reads when an author picks the theme.
-2. `themes/<id>.demo.tsx` — a runnable mini-slide (a normal slide module: `export default Page[]`) that demonstrates the theme on 2–3 pages. The dev UI's **Themes panel** loads this file and renders it as the theme's live preview.
+## What you produce
 
-Both files share the same stem so the runtime can pair them automatically.
+One file: `themes/<id>.json`, where `<id>` is a kebab-case slug derived from the name.
 
-A theme is **distinct from a deck's design tokens**. The theme markdown is authoring-time aesthetic direction (consulted by `create-slide` when an author picks the theme). The demo `.tsx` is a self-contained preview, not a real slide — it does not appear in the slides list. Decks are now `slides/<id>/deck.json` (not `index.tsx`); the `design` field in `deck.json` holds the runtime tokens for a specific deck. The markdown commits the *direction*; the deck's `design` object makes it *concrete*; the demo `.tsx` makes the theme *previewable*.
-
-You only write files under `themes/<id>.md` and `themes/<id>.demo.tsx`. Never modify real slides or other configuration. The canvas / type-scale defaults that themes can override live in the **`slide-authoring`** skill — read it before writing the theme so your overrides are stated explicitly.
-
-## Step 1 — Identify the input source
-
-A theme can be derived from any combination of three input shapes:
-
-- **Image references** — paths or URLs to slide screenshots, mood-board images, brand assets.
-- **Free-text description** — prose describing the desired palette, fonts, feel.
-- **An existing slide** — `slides/<id>/deck.json` whose visual identity should be lifted out into a reusable theme.
-
-If the user's original message already specifies the inputs unambiguously, skip the question and proceed. Otherwise call `AskUserQuestion` (multi-select) so they can pick one or more sources, and ask follow-ups (paths, slide id, prose) only as needed.
-
-## Step 2 — Gather raw inputs
-
-- **Images**: read each path with the `Read` tool (it accepts images). Note dominant colors as hex, type weight/style, layout rhythm, decorative motifs, and any recurring chrome (header bar, footer line, page numbers).
-- **Text**: extract explicit tokens (hex codes, font names, motion verbs) and implicit tone words ("editorial", "playful", "brutalist"). Resolve vague language into concrete decisions before writing.
-- **Existing slide**: read `slides/<id>/deck.json` and pull:
-  - `design.palette` (`bg`, `surface`, `text`, `muted`, `accent`, `border`) → Palette section.
-  - `design.fonts` (`display`, `body`) and `design.typeScale` (`hero`, `heading`, `body`, `caption`) → Typography section.
-  - `design.space`, `design.radius`, `design.shadow` and layout patterns implied by block arrangements → Layout section.
-  - Recurring block types and slot structures (e.g. eyebrow patterns, footer-style blocks) → Fixed components section.
-  - The aesthetic feel implied by the design tokens and block content → Aesthetic paragraph.
-
-When inputs disagree (e.g. images use blue but the description says green), ask the user which to honor.
-
-## Step 3 — Pick a theme id
-
-Use **kebab-case**, short, descriptive. Examples: `editorial-noir`, `brutalist-mono`, `pastel-soft`, `dev-terminal`. Check `themes/` to avoid collisions.
-
-## Step 4 — Write `themes/<id>.md`
-
-Produce a file with this exact section order. Section bodies adapt to the theme; the headings stay consistent across all themes.
-
-````markdown
----
-name: <Human title, e.g. "Editorial Noir">
-description: <one-line elevator pitch>
----
-
-# <Theme name>
-
-## Palette
-
-| Role   | Value     | Notes                          |
-| ------ | --------- | ------------------------------ |
-| bg     | `#0f172a` | page background                |
-| text   | `#f8fafc` | primary copy                   |
-| accent | `#fbbf24` | callouts, eyebrow, key numbers |
-| muted  | `#94a3b8` | secondary copy, dividers       |
-| ...    | ...       | extend as the theme requires   |
-
-## Typography
-
-- Display font: `<stack>` — weight 800–900 for headlines.
-- Body font: `<stack>` — weight 400–500.
-- Type-scale overrides (only list what differs from `slide-authoring` defaults):
-  - Hero title: 180 px (default 140–200 ✓)
-  - Body text: 36 px
-
-## Layout
-
-- Content padding: 120 px from canvas edges (1920 × 1080).
-- Alignment: left-aligned, single column.
-- Grid notes: optional 12-column overlay at 80 px gutter for content pages.
-
-## Fixed components
-
-These are paste-ready. Copy them verbatim into a slide that uses this theme.
-
-### Title
-
-```tsx
-const Title = ({ children }: { children: React.ReactNode }) => (
-  <h1
-    style={{
-      fontSize: 140,
-      fontWeight: 900,
-      lineHeight: 1.05,
-      letterSpacing: '-0.02em',
-      margin: 0,
-      color: '#f8fafc',
-    }}
-  >
-    {children}
-  </h1>
-);
-```
-
-### Footer
-
-Pull the page number from `useSlidePageNumber()` — never hardcode `pageNum` / `total` props.
-
-```tsx
-import { useSlidePageNumber } from '@open-slide/core';
-
-const Footer = () => {
-  const { current, total } = useSlidePageNumber();
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: 120,
-        right: 120,
-        bottom: 60,
-        display: 'flex',
-        justifyContent: 'space-between',
-        fontSize: 24,
-        color: '#94a3b8',
-      }}
-    >
-      <span>EDITORIAL NOIR · 2026</span>
-      <span>{current} / {total}</span>
-    </div>
-  );
-};
-```
-
-### Eyebrow / accents (optional)
-
-```tsx
-const Eyebrow = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ fontSize: 26, letterSpacing: '0.2em', color: '#fbbf24' }}>
-    {children}
-  </div>
-);
-```
-
-## Motion
-
-- Philosophy: static / subtle / rich — pick one and explain in one sentence.
-- Reusable keyframes (paste-ready, only if the philosophy is subtle or rich):
-
-```css
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+```json
+{
+  "name": "Midnight",
+  "description": "Dark slate with a cool blue accent and a serif display.",
+  "design": {
+    "palette": { "bg": "#0f1115", "surface": "#1a1d24", "text": "#f5f3ee", "muted": "#9aa0ab", "accent": "#7cc4ff", "border": "#2b2f38" },
+    "fonts": { "display": "Georgia, \"Times New Roman\", serif", "body": "-apple-system, system-ui, sans-serif" },
+    "typeScale": { "hero": 192, "heading": 64, "body": 32, "caption": 20 },
+    "radius": 6,
+    "shadow": "0 10px 30px rgba(0,0,0,0.45)"
+  }
 }
 ```
 
-## Aesthetic
+- `name` — display name (required). `description` — one short sentence (optional but recommended).
+- `design` — a **partial** of the deck design system. Specify only the roles your theme cares about; every omitted role inherits the framework default (`normalizeDesign` fills the gaps). A minimal theme can be `"design": {}` (inherits everything).
 
-One paragraph. What it feels like, the references it draws on, what to avoid (e.g. "no rounded corners; no gradients; no decorative emoji"). Commit to a single direction — minimal, maximalist, editorial, retro, brutalist, soft/pastel, neon, paper/print.
+## The design tokens
 
-## Example usage
+`design` may include any of:
 
-```tsx
-const Cover: Page = () => (
-  <div style={{ width: '100%', height: '100%', background: '#0f172a', color: '#f8fafc', padding: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-    <Eyebrow>CHAPTER 01</Eyebrow>
-    <Title>The Big Idea</Title>
-    <p style={{ fontSize: 36, color: '#94a3b8', maxWidth: 1200, marginTop: 32 }}>
-      A short subtitle that explains what this slide is about.
-    </p>
-    <Footer />
-  </div>
-);
-```
-````
+| Group | Fields | Notes |
+| --- | --- | --- |
+| `palette` | `bg`, `surface`, `text`, `muted`, `accent`, `border` | CSS color strings. `bg` is the slide background; `surface` is card/panel fill; `text` is primary copy; `muted` is secondary copy; `accent` is the one highlight color; `border` is hairlines. |
+| `fonts` | `display`, `body` | CSS font-family stacks. `display` = headings/hero; `body` = paragraph copy. |
+| `typeScale` | `hero`, `heading`, `body`, `caption` | px numbers. Sensible ranges: hero 120–220, heading 48–80, body 28–36, caption 18–22. |
+| `space` | number | base spacing unit in px (default 8). |
+| `radius` | number | corner radius in px (0 = sharp, 24 = very round). |
+| `shadow` | string | CSS box-shadow for elevated surfaces. |
 
-## Step 4b — Write `themes/<id>.demo.tsx`
+## Process
 
-The demo is a standalone preview module that lives under `themes/` so the runtime knows it's preview-only. It is NOT a deck — do not confuse it with `slides/<id>/deck.json`. The dev-UI Themes panel imports it and renders it inside `SlideCanvas` (1920×1080).
+1. **Gather intent.** Inputs may be: a written description ("warm, editorial, serif"), reference images, or an existing deck. Ask only what you need to pick a coherent palette + type pairing.
+2. **From an existing deck:** read `slides/<id>/deck.json` and lift its `design` block as the starting point — then refine.
+3. **From images:** sample the dominant background, primary text color, and the single strongest accent. Pick a font pairing that matches the mood.
+4. **Choose an id + name.** Kebab-case the name for the filename (`Midnight Blue` → `midnight-blue.json`).
+5. **Write `themes/<id>.json`** with `name`, `description`, and the partial `design`. Only include roles that differ from a default you'd be happy inheriting.
+6. **Verify contrast.** `text` on `bg`, and `bg`/`text` on `accent` (the sample card renders text on the accent), should be legible.
 
-Contract:
+## Guidance
 
-- `import { type Page, useSlidePageNumber } from '@open-slide/core';`
-- Inline the **same** `Title`, `Footer`, `Eyebrow` components defined in the theme markdown — verbatim, no abstractions, no imports from elsewhere. The demo and the markdown must stay in lockstep so what the user sees in the panel matches what `create-slide` will paste into a real slide.
-- Export 2–3 `Page` components and a default array. Aim for: a Cover (Eyebrow + Title + subtitle), one Content page exercising body type + accent, and a Closer or "End" card. The "Example usage" block at the bottom of the markdown is a good starting point — extend it.
-- If the theme has runtime-tweakable tokens worth surfacing in the Design panel later, also `export const design: DesignSystem = {...}`.
-- No external assets, no `import` from `@/`, no slides-only helpers (e.g. `WindowShell` from a real slide). Demo files must be self-contained.
+- **Keep it a partial.** Don't restate defaults you don't care about — fewer keys is clearer and lets the framework evolve defaults under you.
+- **One accent.** Themes read best with a single accent color; the sample preview uses `accent` for the eyebrow and a filled card.
+- **No code.** There are no fixed components, no motion, no demo slide — just tokens. If a user asks for a custom header/footer block, that belongs in a deck's custom blocks, not a theme.
 
-Skeleton:
+## After authoring
 
-```tsx
-import { type Page, useSlidePageNumber } from '@open-slide/core';
+- The theme appears automatically in the `/themes` gallery (the dev server watches `themes/*.json`), previewed by rendering a sample slide through your tokens.
+- A user applies it from a deck editor's **design panel → Themes**: clicking it copies the tokens into the deck's `design` and stamps `meta.theme` with your id as a provenance label.
+- "Save as theme…" in that same panel is the human-side equivalent — it writes a new `themes/<id>.json` from the deck's current design.
 
-const Title = ({ children }: { children: React.ReactNode }) => (
-  // …same JSX as in themes/<id>.md
-);
-const Footer = () => {
-  const { current, total } = useSlidePageNumber();
-  // …
-};
-const Eyebrow = ({ children }: { children: React.ReactNode }) => (
-  // …
-);
+## Do not
 
-const Cover: Page = () => (
-  // …
-);
-const Content: Page = () => (
-  // …
-);
-const Closer: Page = () => (
-  // …
-);
-
-export default [Cover, Content, Closer];
-```
-
-## Step 5 — Self-review
-
-Run this checklist before finishing:
-
-- [ ] Palette covers `bg` / `surface` / `text` / `muted` / `accent` / `border` at minimum, all as hex.
-- [ ] Type scale specifies hero, heading, body, caption sizes (or explicitly defers to `slide-authoring` defaults).
-- [ ] At least Title and Footer are defined as paste-ready React with concrete inline styles.
-- [ ] Motion section commits to one of static / subtle / rich.
-- [ ] Aesthetic paragraph names a single coherent direction.
-- [ ] Both files written: `themes/<id>.md` and `themes/<id>.demo.tsx`. No slide changes, no config changes.
-- [ ] Demo `.tsx` exports 2–3 pages and inlines the same Title/Footer/Eyebrow components defined in the markdown.
-- [ ] Demo opens cleanly in the **Themes** panel of the dev UI — re-checked by you only by reading the file (do not start a server).
-
-## Step 6 — Hand off
-
-Tell the user:
-
-- The theme id and the two file paths (`themes/<id>.md` + `themes/<id>.demo.tsx`).
-- That the demo will appear in the dev UI's **Themes** panel as a live card and detail view (HMR — no restart needed).
-- That `/create-slide` will list the theme as a picker option on its next run.
-- A one-line summary of the look (palette + aesthetic).
-
-Do not run the dev server. Do not modify real slides — even to demonstrate the theme; the demo `.tsx` is the demonstration.
-
-## Anti-patterns
-
-- ❌ Writing executable code in `themes/<id>.md` outside the labeled component snippets — the markdown is documentation.
-- ❌ Producing only the markdown without the demo, or only the demo without the markdown. A theme is the **bundle** — both files, every time.
-- ❌ Treating `themes/<id>.demo.tsx` as a real slide. It is preview-only and lives outside the slides list; never put it under `slides/`.
-- ❌ Importing from `@/` or any slide-specific helper inside the demo. The demo is self-contained.
-- ❌ Inventing palette / fonts when the user supplied images or an existing slide. Extract, don't fabricate.
-- ❌ Editing `slides/`, `packages/`, `package.json`, or `open-slide.config.ts`.
-- ❌ Skipping the Fixed components section. Title and Footer are the most common reuse target — they must be paste-ready.
+- Do not edit files under `slides/`, `packages/`, or `package.json`.
+- Do not write `.md` or `.demo.tsx` theme files — the theme is the single JSON preset.
