@@ -58,6 +58,7 @@ export function invertOp(before: Deck, op: EditOp): EditOp {
       };
     }
     case 'add-block':
+      // Undo cannot delete a slot key, so if add-block created the slot, the slot stays as [].
       return { kind: 'remove-block', blockId: op.block.id };
     case 'remove-block': {
       const loc = locateBlock(before, op.blockId);

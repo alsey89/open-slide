@@ -1,5 +1,6 @@
 # esbuild-wasm block-compile spike — findings
 
+- esbuild-wasm version: 0.24.2
 - esbuild.wasm payload: 11.36 MB
 - initialize(): 40 ms (one-time, cold)
 - build() one block: 68 ms

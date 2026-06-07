@@ -158,6 +158,24 @@ describe('set-slot-blocks inverse leaves a previously-absent slot as []', () => 
   });
 });
 
+describe('add-block inverse leaves a previously-absent slot as []', () => {
+  it('documents the slot-key limitation', () => {
+    const before = makeDeck();
+    const op: EditOp = {
+      kind: 'add-block',
+      slideId: 's2',
+      slot: 'extra',
+      index: 0,
+      block: { id: 'bx', type: 'text', props: { text: 'X' } },
+    };
+    const { deck: after, inverse } = applyOpWithInverse(before, op);
+    expect(after.slides[1].slots.extra).toHaveLength(1);
+    const restored = applyOp(after, inverse);
+    // The slot key cannot be removed by any op, so it remains as [] rather than disappearing.
+    expect(restored.slides[1].slots.extra).toEqual([]);
+  });
+});
+
 describe('invertOp throws on a missing slide', () => {
   it('throws for move-slide with an unknown slideId', () => {
     expect(() =>
