@@ -24,5 +24,6 @@ export {
   type PropField,
   type PropFieldType,
 } from './registry.ts';
+export { addSlideFromLayout, buildSlide } from './scaffold.ts';
 export type { SlideTransition, TransitionPhase } from './transition.ts';
 export { DeckValidationError, validateDeck } from './validate.ts';

@@ -20,11 +20,13 @@ export {
 } from './doc/design.ts';
 export type { Block, Deck, DeckMeta, Slide } from './doc/index.ts';
 export {
+  addSlideFromLayout,
   applyOp,
   applyOps,
   applyOpWithInverse,
   type BlockComponent,
   type BlockPropSchema,
+  buildSlide,
   DeckValidationError,
   type EditOp,
   EditOpError,

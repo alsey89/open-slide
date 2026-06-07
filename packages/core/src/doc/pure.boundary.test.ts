@@ -16,6 +16,7 @@ const PURE_MODULES = [
   'ids.ts',
   'pure.ts',
   'inverse.ts',
+  'scaffold.ts',
 ];
 
 // Collect every runtime module specifier: `import ... from`, `export ... from`, and

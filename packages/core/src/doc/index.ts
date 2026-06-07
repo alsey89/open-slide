@@ -18,4 +18,5 @@ export {
   registerLayout,
 } from './registry.ts';
 export { renderDeck } from './render.tsx';
+export { addSlideFromLayout, buildSlide } from './scaffold.ts';
 export { DeckValidationError, validateDeck } from './validate.ts';
