@@ -4,6 +4,7 @@ export type FlushState = 'idle' | 'saving' | 'error';
 
 export type Flusher = {
   enqueue: (ops: EditOp[]) => void;
+  clearPending: () => void;
   flushNow: () => void;
   dispose: () => void;
 };
@@ -62,6 +63,9 @@ export function createOpFlusher(opts: {
       if (disposed || ops.length === 0) return;
       pending.push(...ops);
       schedule();
+    },
+    clearPending() {
+      pending = [];
     },
     flushNow() {
       if (timer) {
