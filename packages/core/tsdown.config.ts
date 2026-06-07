@@ -6,6 +6,7 @@ export default defineConfig({
     'cli/bin': 'src/cli/bin.ts',
     'vite/index': 'src/vite/index.ts',
     'locale/index': 'src/locale/index.ts',
+    'doc/pure': 'src/doc/pure.ts',
   },
   format: 'esm',
   target: 'node18',
