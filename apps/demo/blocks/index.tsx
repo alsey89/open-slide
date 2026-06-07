@@ -1,694 +1,667 @@
-import { registerBlock, registerLayout } from '@open-slide/core';
+import { type Block, registerBlock, registerLayout } from '@open-slide/core';
+import type { CSSProperties, ReactNode } from 'react';
 
-const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")`;
+/**
+ * "Pylon" — a custom block pack for a renewable-energy startup pitch deck.
+ * Every slide is a full-bleed custom React composition placed on the `stage`
+ * layout. Demonstrates the creative ceiling: arbitrary React, SVG data-viz,
+ * web fonts, and motion — all registered by name and driven from deck.json.
+ */
 
-function FxStyles() {
+const ACCENT = 'var(--osd-accent)';
+const MONO = "'Spline Sans Mono', ui-monospace, monospace";
+
+function Fx() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,700;9..144,900&family=Spline+Sans+Mono:wght@400;500&display=swap');
-
-      @keyframes meshDrift1 {
-        0%   { transform: translate(0px, 0px) scale(1);   }
-        33%  { transform: translate(60px, -40px) scale(1.08); }
-        66%  { transform: translate(-40px, 50px) scale(0.95); }
-        100% { transform: translate(0px, 0px) scale(1);   }
-      }
-      @keyframes meshDrift2 {
-        0%   { transform: translate(0px, 0px) scale(1);   }
-        40%  { transform: translate(-80px, 60px) scale(1.1); }
-        70%  { transform: translate(50px, -30px) scale(0.92); }
-        100% { transform: translate(0px, 0px) scale(1);   }
-      }
-      @keyframes meshDrift3 {
-        0%   { transform: translate(0px, 0px); }
-        50%  { transform: translate(40px, 80px); }
-        100% { transform: translate(0px, 0px); }
-      }
-      @keyframes marqueeScroll {
-        from { transform: translateX(0); }
-        to   { transform: translateX(-50%); }
-      }
-      @keyframes fadeSlideUp {
-        from { opacity: 0; transform: translateY(28px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes statPop {
-        from { opacity: 0; transform: scale(0.85); }
-        to   { opacity: 1; transform: scale(1); }
-      }
-      @keyframes lineGlow {
-        0%, 100% { box-shadow: 0 0 0px 0px transparent; }
-        50%       { box-shadow: 0 0 12px 2px var(--osd-accent); }
-      }
-      .osd-card-fx {
-        transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease;
-      }
-      .osd-card-fx:hover {
-        transform: translateY(-6px) scale(1.015);
-        box-shadow: 0 24px 48px -8px rgba(0,0,0,0.55);
-      }
+      @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap');
+      @keyframes pylon-drift { 0%{transform:translate(0,0)} 50%{transform:translate(-3%,2%)} 100%{transform:translate(0,0)} }
+      @keyframes pylon-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.82)} }
+      @keyframes pylon-rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+      @keyframes pylon-grow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+      @keyframes pylon-draw { to{stroke-dashoffset:0} }
     `}</style>
   );
 }
 
-// ── 1. callout (original, kept) ───────────────────────────────────────────────
-registerBlock('callout', ({ block }) => (
-  <div
-    style={{
-      border: '2px solid var(--osd-accent)',
-      borderRadius: 'var(--osd-radius)',
-      padding: 32,
-      fontFamily: 'var(--osd-font-body)',
-      fontSize: 'var(--osd-size-body)',
-      color: 'var(--osd-text)',
-    }}
-  >
-    {String(block.props.text ?? '')}
-  </div>
-));
+function str(v: unknown, fallback = ''): string {
+  return v == null ? fallback : String(v);
+}
 
-// ── 2. gradient-hero ──────────────────────────────────────────────────────────
-registerBlock('gradient-hero', ({ block }) => {
-  const eyebrow = String(block.props.eyebrow ?? '');
-  const title = String(block.props.title ?? '');
-  const sub = String(block.props.sub ?? '');
-
-  return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          background: 'var(--osd-bg)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          padding: '80px 96px',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* Grain overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: GRAIN_SVG,
-            backgroundRepeat: 'repeat',
-            opacity: 0.55,
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        />
-        {/* Mesh blob 1 — accent */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 820,
-            height: 820,
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, color-mix(in srgb, var(--osd-accent) 55%, transparent) 0%, transparent 70%)',
-            filter: 'blur(120px)',
-            top: -200,
-            right: -100,
-            animation: 'meshDrift1 18s ease-in-out infinite',
-            zIndex: 0,
-          }}
-        />
-        {/* Mesh blob 2 — hot magenta */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 700,
-            height: 700,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,30,120,0.38) 0%, transparent 68%)',
-            filter: 'blur(100px)',
-            bottom: -180,
-            left: 80,
-            animation: 'meshDrift2 22s ease-in-out infinite',
-            zIndex: 0,
-          }}
-        />
-        {/* Mesh blob 3 — electric cyan */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 500,
-            height: 500,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,240,220,0.22) 0%, transparent 70%)',
-            filter: 'blur(90px)',
-            bottom: 100,
-            right: 300,
-            animation: 'meshDrift3 26s ease-in-out infinite',
-            zIndex: 0,
-          }}
-        />
-
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: 1100 }}>
-          {eyebrow && (
-            <div
-              style={{
-                display: 'inline-block',
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 15,
-                fontWeight: 500,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: 'var(--osd-accent)',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid color-mix(in srgb, var(--osd-accent) 40%, transparent)',
-                borderRadius: 6,
-                padding: '6px 14px',
-                marginBottom: 36,
-                animation: 'fadeSlideUp 0.6s ease both',
-                animationDelay: '0.05s',
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-          <h1
-            style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              fontSize: 140,
-              fontWeight: 900,
-              lineHeight: 0.95,
-              letterSpacing: '-0.03em',
-              color: 'var(--osd-text)',
-              margin: 0,
-              marginBottom: 32,
-              animation: 'fadeSlideUp 0.7s ease both',
-              animationDelay: '0.18s',
-            }}
-          >
-            {title}
-          </h1>
-          {sub && (
-            <p
-              style={{
-                fontFamily: "'Fraunces', Georgia, serif",
-                fontSize: 28,
-                fontWeight: 300,
-                color: 'color-mix(in srgb, var(--osd-text) 60%, transparent)',
-                margin: 0,
-                maxWidth: 720,
-                lineHeight: 1.45,
-                animation: 'fadeSlideUp 0.7s ease both',
-                animationDelay: '0.34s',
-              }}
-            >
-              {sub}
-            </p>
-          )}
-        </div>
-      </div>
-    </>
-  );
+const display = (size: number, weight = 800): CSSProperties => ({
+  fontFamily: 'var(--osd-font-display)',
+  fontSize: size,
+  fontWeight: weight,
+  lineHeight: 1.02,
+  letterSpacing: '-0.02em',
+  margin: 0,
 });
 
-// ── 3. big-stat ───────────────────────────────────────────────────────────────
-registerBlock('big-stat', ({ block }) => {
-  const value = String(block.props.value ?? '');
-  const label = String(block.props.label ?? '');
-  const caption = String(block.props.caption ?? '');
-
+function Chrome() {
   return (
-    <>
-      <FxStyles />
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        left: 120,
+        right: 120,
+        bottom: 56,
+        display: 'flex',
+        justifyContent: 'space-between',
+        fontFamily: MONO,
+        fontSize: 19,
+        letterSpacing: '0.12em',
+        color: 'var(--osd-muted)',
+        textTransform: 'uppercase',
+      }}
+    >
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+        <span
+          style={{
+            width: 9,
+            height: 9,
+            borderRadius: '50%',
+            background: ACCENT,
+            boxShadow: `0 0 12px ${ACCENT}`,
+            animation: 'pylon-pulse 2.2s ease-in-out infinite',
+          }}
+        />
+        Pylon
+      </span>
+      <span>Series A · 2026</span>
+    </div>
+  );
+}
+
+function Stage({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'var(--osd-bg)',
+        color: 'var(--osd-text)',
+        fontFamily: 'var(--osd-font-body)',
+        overflow: 'hidden',
+      }}
+    >
+      <Fx />
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(var(--osd-border) 1px, transparent 1px), linear-gradient(90deg, var(--osd-border) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+          opacity: 0.4,
+          maskImage: 'radial-gradient(120% 100% at 50% 0%, #000 40%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(120% 100% at 50% 0%, #000 40%, transparent 100%)',
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          width: 900,
+          height: 900,
+          left: -200,
+          top: -300,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${ACCENT}22, transparent 60%)`,
+          filter: 'blur(20px)',
+          animation: 'pylon-drift 18s ease-in-out infinite',
+        }}
+      />
+      {/* top/side 116, bottom 156 reserves room for the chrome footer */}
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          padding: '40px 32px',
+          position: 'absolute',
+          inset: 0,
+          padding: '116px 120px 156px',
           boxSizing: 'border-box',
-          textAlign: 'center',
         }}
       >
-        <div
+        {children}
+      </div>
+      <Chrome />
+    </div>
+  );
+}
+
+function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        fontFamily: MONO,
+        fontSize: 22,
+        letterSpacing: '0.22em',
+        textTransform: 'uppercase',
+        color: ACCENT,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 14,
+      }}
+    >
+      <span style={{ width: 40, height: 2, background: ACCENT, display: 'inline-block' }} />
+      {children}
+    </div>
+  );
+}
+
+function PylonHero({ block }: { block: Block }) {
+  const p = block.props;
+  const close = p.variant === 'close';
+  return (
+    <Stage>
+      <div
+        style={{ height: '100%', display: 'grid', alignContent: 'center', gap: 30, maxWidth: 1480 }}
+      >
+        <div style={{ animation: 'pylon-rise .7s ease both' }}>
+          <Eyebrow>{str(p.eyebrow, 'Predictive maintenance for the grid')}</Eyebrow>
+        </div>
+        <h1
           style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            fontSize: 280,
-            fontWeight: 900,
-            lineHeight: 0.88,
-            letterSpacing: '-0.04em',
-            background: 'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 45%, #00f0dc 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'statPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both',
+            ...display(close ? 128 : 150),
+            animation: 'pylon-rise .7s ease .08s both',
+            backgroundImage: close
+              ? `linear-gradient(100deg, var(--osd-text), ${ACCENT})`
+              : undefined,
+            backgroundClip: close ? 'text' : undefined,
+            WebkitBackgroundClip: close ? 'text' : undefined,
+            color: close ? 'transparent' : 'var(--osd-text)',
           }}
         >
-          {value}
-        </div>
-        {label && (
-          <div
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 22,
-              fontWeight: 500,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--osd-text)',
-              marginTop: 20,
-              animation: 'fadeSlideUp 0.5s ease both',
-              animationDelay: '0.2s',
-            }}
-          >
-            {label}
-          </div>
-        )}
-        {caption && (
-          <div
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 14,
-              color: 'color-mix(in srgb, var(--osd-text) 40%, transparent)',
-              marginTop: 10,
-              letterSpacing: '0.06em',
-              animation: 'fadeSlideUp 0.5s ease both',
-              animationDelay: '0.35s',
-            }}
-          >
-            {caption}
-          </div>
-        )}
-      </div>
-    </>
-  );
-});
-
-// ── 4. pill-row ───────────────────────────────────────────────────────────────
-registerBlock('pill-row', ({ block }) => {
-  const items: string[] = Array.isArray(block.props.items) ? block.props.items : [];
-
-  return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 12,
-          padding: '24px 32px',
-          alignItems: 'center',
-        }}
-      >
-        {items.map((item) => (
-          <span
-            key={String(item)}
-            style={{
-              fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-              fontSize: 15,
-              fontWeight: 500,
-              letterSpacing: '0.08em',
-              color: 'var(--osd-text)',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              borderRadius: 999,
-              padding: '8px 20px',
-              whiteSpace: 'nowrap',
-              animation: 'fadeSlideUp 0.45s ease both',
-            }}
-          >
-            {String(item)}
-          </span>
-        ))}
-      </div>
-    </>
-  );
-});
-
-// ── 5. feature-cards ─────────────────────────────────────────────────────────
-registerBlock('feature-cards', ({ block }) => {
-  type CardItem = { icon?: unknown; title?: unknown; desc?: unknown };
-  const raw = block.props.items;
-  const items: CardItem[] = Array.isArray(raw) ? (raw as CardItem[]) : [];
-
-  return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 24,
-          padding: '32px 40px',
-          boxSizing: 'border-box',
-          width: '100%',
-          height: '100%',
-          alignContent: 'start',
-        }}
-      >
-        {items.map((item) => (
-          <div
-            key={String(item.title ?? item.icon ?? item.desc ?? Math.random())}
-            className="osd-card-fx"
-            style={{
-              background:
-                'linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 16,
-              padding: '32px 28px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-              animation: 'fadeSlideUp 0.5s ease both',
-            }}
-          >
-            <div style={{ fontSize: 44, lineHeight: 1 }}>{String(item.icon ?? '◆')}</div>
-            <div
-              style={{
-                fontFamily: "'Fraunces', Georgia, serif",
-                fontSize: 24,
-                fontWeight: 700,
-                color: 'var(--osd-text)',
-                lineHeight: 1.2,
-              }}
-            >
-              {String(item.title ?? '')}
-            </div>
-            <div
-              style={{
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 14,
-                color: 'color-mix(in srgb, var(--osd-text) 55%, transparent)',
-                lineHeight: 1.6,
-              }}
-            >
-              {String(item.desc ?? '')}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-});
-
-// ── 6. code-window ────────────────────────────────────────────────────────────
-registerBlock('code-window', ({ block }) => {
-  const title = String(block.props.title ?? 'untitled.ts');
-  const code = String(block.props.code ?? '');
-
-  return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          width: '100%',
-          padding: '32px 40px',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div
+          {str(p.title, 'Keep the grid online.')}
+        </h1>
+        <p
           style={{
-            borderRadius: 14,
-            overflow: 'hidden',
-            boxShadow: '0 32px 80px -12px rgba(0,0,0,0.7)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            fontSize: 34,
+            lineHeight: 1.4,
+            color: 'var(--osd-muted)',
+            maxWidth: 1040,
+            margin: 0,
+            animation: 'pylon-rise .7s ease .16s both',
           }}
         >
-          {/* Title bar */}
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              borderBottom: '1px solid rgba(255,255,255,0.07)',
-              padding: '12px 18px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
-              {(['#ff5f57', '#ffbd2e', '#28c840'] as const).map((c) => (
-                <div
-                  key={c}
-                  style={{
-                    width: 13,
-                    height: 13,
-                    borderRadius: '50%',
-                    background: c,
-                    boxShadow: `0 0 6px 1px ${c}66`,
-                  }}
-                />
-              ))}
-            </div>
-            <span
-              style={{
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 13,
-                color: 'color-mix(in srgb, var(--osd-text) 45%, transparent)',
-                letterSpacing: '0.04em',
-                flex: 1,
-                textAlign: 'center',
-                marginRight: 52,
-              }}
-            >
-              {title}
-            </span>
-          </div>
-          {/* Code body */}
-          <div style={{ background: 'rgba(0,0,0,0.45)', padding: '28px 32px' }}>
-            <pre
-              style={{
-                margin: 0,
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 17,
-                lineHeight: 1.75,
-                color: 'color-mix(in srgb, var(--osd-text) 88%, transparent)',
-                whiteSpace: 'pre',
-                overflowX: 'auto',
-                animation: 'lineGlow 3s ease-in-out infinite',
-                animationDelay: '1.2s',
-              }}
-            >
-              {code}
-            </pre>
-          </div>
-        </div>
+          {str(p.sub)}
+        </p>
       </div>
-    </>
+    </Stage>
   );
-});
+}
 
-// ── 7. marquee ────────────────────────────────────────────────────────────────
-registerBlock('marquee', ({ block }) => {
-  const items: string[] = Array.isArray(block.props.items) ? block.props.items : [];
-  const speed = Number(block.props.speed ?? 28);
-  const content = items.length > 0 ? items : ['open-slide', 'blocks', 'layouts', 'motion'];
-  const tagged = [
-    ...content.map((t) => ({ t, k: `a-${t}` })),
-    ...content.map((t) => ({ t, k: `b-${t}` })),
-  ];
-  const duration = `${speed}s`;
-
+function PylonStatement({ block }: { block: Block }) {
+  const p = block.props;
+  const points = Array.isArray(p.points) ? (p.points as string[]) : [];
+  const figure = (p.figure ?? null) as { value?: string; label?: string } | null;
+  const problem = p.tone === 'problem';
   return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          width: '100%',
-          overflow: 'hidden',
-          padding: '20px 0',
-          boxSizing: 'border-box',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 44 }}>
+        <Eyebrow>{str(p.eyebrow, problem ? 'The problem' : 'The solution')}</Eyebrow>
         <div
           style={{
-            display: 'flex',
-            whiteSpace: 'nowrap',
-            animation: `marqueeScroll ${duration} linear infinite`,
-            willChange: 'transform',
+            display: 'grid',
+            gridTemplateColumns: figure ? '1.35fr 1fr' : '1fr',
+            gap: 80,
+            alignItems: 'center',
+            minHeight: 0,
           }}
         >
-          {tagged.map(({ t, k }) => (
-            <span
-              key={k}
+          <div style={{ display: 'grid', gap: 36 }}>
+            <h2 style={{ ...display(figure ? 68 : 76, 700), maxWidth: 1080 }}>{str(p.title)}</h2>
+            {points.length > 0 && (
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 16 }}>
+                {points.map((pt, i) => (
+                  <li
+                    // biome-ignore lint/suspicious/noArrayIndexKey: static deck content
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      gap: 18,
+                      fontSize: 27,
+                      lineHeight: 1.4,
+                      alignItems: 'baseline',
+                    }}
+                  >
+                    <span style={{ color: ACCENT, fontFamily: MONO, fontSize: 24 }}>
+                      {problem ? '×' : '→'}
+                    </span>
+                    <span style={{ color: 'var(--osd-muted)' }}>{pt}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {figure && (
+            <div
               style={{
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 32,
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                color: 'var(--osd-accent)',
-                paddingRight: 48,
+                borderLeft: '2px solid var(--osd-border)',
+                paddingLeft: 72,
+                display: 'grid',
+                gap: 8,
               }}
             >
-              {t}
-              <span
+              <div
                 style={{
-                  color: 'color-mix(in srgb, var(--osd-accent) 35%, transparent)',
-                  marginLeft: 48,
+                  ...display(148, 800),
+                  color: problem ? '#ff6b5e' : ACCENT,
+                  textShadow: problem ? 'none' : `0 0 60px ${ACCENT}55`,
                 }}
               >
-                {' •'}
-              </span>
-            </span>
+                {str(figure.value)}
+              </div>
+              <div style={{ fontSize: 26, color: 'var(--osd-muted)', maxWidth: 420 }}>
+                {str(figure.label)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Stage>
+  );
+}
+
+function PylonSteps({ block }: { block: Block }) {
+  const p = block.props;
+  const steps = (Array.isArray(p.steps) ? p.steps : []) as Array<{ title?: string; desc?: string }>;
+  return (
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto auto 1fr', gap: 56 }}>
+        <Eyebrow>{str(p.eyebrow, 'How it works')}</Eyebrow>
+        <h2 style={{ ...display(64, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${Math.max(steps.length, 1)}, 1fr)`,
+            gap: 40,
+            alignContent: 'start',
+          }}
+        >
+          {steps.map((s, i) => (
+            <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: static deck content
+              key={i}
+              style={{
+                background: 'var(--osd-surface)',
+                border: '1px solid var(--osd-border)',
+                borderRadius: 'var(--osd-radius)',
+                padding: 48,
+                display: 'grid',
+                gap: 22,
+                position: 'relative',
+                animation: `pylon-rise .6s ease ${i * 0.1}s both`,
+              }}
+            >
+              <div
+                style={{ fontFamily: MONO, fontSize: 26, color: ACCENT, letterSpacing: '0.1em' }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <div style={display(46, 700)}>{str(s.title)}</div>
+              <div style={{ fontSize: 28, lineHeight: 1.45, color: 'var(--osd-muted)' }}>
+                {str(s.desc)}
+              </div>
+              {i < steps.length - 1 && (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    right: -28,
+                    top: '50%',
+                    color: ACCENT,
+                    fontFamily: MONO,
+                    fontSize: 32,
+                  }}
+                >
+                  →
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
-    </>
+    </Stage>
   );
-});
+}
 
-// ── 8. quote-spotlight ────────────────────────────────────────────────────────
-registerBlock('quote-spotlight', ({ block }) => {
-  const text = String(block.props.text ?? '');
-  const by = String(block.props.by ?? '');
-
+function PylonMarket({ block }: { block: Block }) {
+  const p = block.props;
+  const rings = (Array.isArray(p.rings) ? p.rings : []) as Array<{
+    label?: string;
+    value?: string;
+    note?: string;
+  }>;
+  const radii = [320, 220, 130];
+  const colors = ['var(--osd-border)', '#c4f04266', ACCENT];
   return (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          height: '100%',
-          padding: '60px 96px',
-          boxSizing: 'border-box',
-          position: 'relative',
-        }}
-      >
-        {/* Decorative quotation mark */}
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 56 }}>
+        <Eyebrow>{str(p.eyebrow, 'Market')}</Eyebrow>
         <div
           style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            fontSize: 320,
-            fontWeight: 900,
-            lineHeight: 0.75,
-            background:
-              'linear-gradient(135deg, var(--osd-accent) 0%, #ff1e78 50%, transparent 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            position: 'absolute',
-            top: 20,
-            left: 72,
-            userSelect: 'none',
-            pointerEvents: 'none',
-            opacity: 0.35,
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            alignItems: 'center',
+            gap: 80,
+            minHeight: 0,
           }}
         >
-          {'"'}
+          <svg viewBox="0 0 700 700" style={{ width: '100%', maxHeight: 600 }}>
+            <title>Market sizing rings</title>
+            {radii.map((r, i) => (
+              <circle
+                // biome-ignore lint/suspicious/noArrayIndexKey: static
+                key={i}
+                cx={350}
+                cy={350}
+                r={r}
+                fill={i === 2 ? '#c4f0421f' : 'none'}
+                stroke={colors[i]}
+                strokeWidth={i === 2 ? 3 : 2}
+                strokeDasharray={i === 2 ? undefined : '6 8'}
+              />
+            ))}
+            {rings.map((ring, i) => (
+              <text
+                // biome-ignore lint/suspicious/noArrayIndexKey: static
+                key={i}
+                x={350}
+                y={350 - radii[i] + 46}
+                textAnchor="middle"
+                fill={i === 2 ? '#c4f042' : '#eaf0ea'}
+                style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 40 }}
+              >
+                {str(ring.value)}
+              </text>
+            ))}
+          </svg>
+          <div style={{ display: 'grid', gap: 30 }}>
+            <h2 style={{ ...display(60, 700), maxWidth: 640 }}>{str(p.title)}</h2>
+            <div style={{ display: 'grid', gap: 18 }}>
+              {rings.map((ring, i) => (
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static
+                  key={i}
+                  style={{ display: 'flex', gap: 18, alignItems: 'center' }}
+                >
+                  <span
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: 4,
+                      background: i === 2 ? ACCENT : colors[i],
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ fontFamily: MONO, fontSize: 24, color: ACCENT, width: 70 }}>
+                    {str(ring.label)}
+                  </span>
+                  <span style={{ fontSize: 28, color: 'var(--osd-muted)' }}>{str(ring.note)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+      </div>
+    </Stage>
+  );
+}
 
-        <blockquote style={{ margin: 0, position: 'relative', zIndex: 1 }}>
-          <p
-            style={{
-              fontFamily: "'Fraunces', Georgia, serif",
-              fontSize: 52,
-              fontWeight: 300,
-              fontStyle: 'italic',
-              lineHeight: 1.35,
-              color: 'var(--osd-text)',
-              margin: 0,
-              marginBottom: 36,
-              animation: 'fadeSlideUp 0.7s ease both',
-            }}
-          >
-            {text}
-          </p>
-          {by && (
-            <cite
+function PylonTraction({ block }: { block: Block }) {
+  const p = block.props;
+  const series = (Array.isArray(p.series) ? p.series : [3, 8, 14, 26, 41, 63]) as number[];
+  const metrics = (Array.isArray(p.metrics) ? p.metrics : []) as Array<{
+    value?: string;
+    label?: string;
+  }>;
+  const max = Math.max(...series, 1);
+  const W = 1680;
+  const H = 360;
+  const pts = series.map((v, i) => {
+    const x = (i / (series.length - 1)) * W;
+    const y = H - (v / max) * (H - 30);
+    return [x, y] as const;
+  });
+  const line = pts
+    .map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
+    .join(' ');
+  const area = `${line} L${W},${H} L0,${H} Z`;
+  return (
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 48 }}>
+        <Eyebrow>{str(p.eyebrow, 'Traction')}</Eyebrow>
+        <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 30, minHeight: 0 }}>
+          <h2 style={{ ...display(62, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+          <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }} preserveAspectRatio="none">
+            <title>Traction over time</title>
+            <defs>
+              <linearGradient id="pylon-area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#c4f042" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#c4f042" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={area} fill="url(#pylon-area)" />
+            <path
+              d={line}
+              fill="none"
+              stroke="#c4f042"
+              strokeWidth={4}
+              strokeLinejoin="round"
+              strokeDasharray={4000}
+              strokeDashoffset={4000}
+              style={{ animation: 'pylon-draw 1.6s ease forwards' }}
+            />
+            {pts.map(([x, y], i) => (
+              <circle
+                // biome-ignore lint/suspicious/noArrayIndexKey: static
+                key={i}
+                cx={x}
+                cy={y}
+                r={6}
+                fill="#0a0d0c"
+                stroke="#c4f042"
+                strokeWidth={3}
+              />
+            ))}
+          </svg>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: 90,
+            borderTop: '1px solid var(--osd-border)',
+            paddingTop: 40,
+          }}
+        >
+          {metrics.map((m, i) => (
+            <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: static
+              key={i}
+              style={{ display: 'grid', gap: 8 }}
+            >
+              <div style={{ ...display(78, 800), color: ACCENT }}>{str(m.value)}</div>
+              <div
+                style={{
+                  fontSize: 26,
+                  color: 'var(--osd-muted)',
+                  fontFamily: MONO,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {str(m.label)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Stage>
+  );
+}
+
+function PylonTeam({ block }: { block: Block }) {
+  const p = block.props;
+  const members = (Array.isArray(p.members) ? p.members : []) as Array<{
+    name?: string;
+    role?: string;
+    prev?: string;
+  }>;
+  const initials = (n: string) =>
+    n
+      .split(' ')
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join('');
+  return (
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto auto 1fr', gap: 56 }}>
+        <Eyebrow>{str(p.eyebrow, 'Team')}</Eyebrow>
+        <h2 style={{ ...display(64, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${Math.max(members.length, 1)}, 1fr)`,
+            gap: 40,
+            alignContent: 'start',
+          }}
+        >
+          {members.map((m, i) => (
+            <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: static
+              key={i}
               style={{
-                display: 'block',
-                fontFamily: "'Spline Sans Mono', ui-monospace, monospace",
-                fontSize: 16,
-                fontWeight: 500,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--osd-accent)',
-                fontStyle: 'normal',
-                animation: 'fadeSlideUp 0.5s ease both',
-                animationDelay: '0.25s',
+                display: 'grid',
+                gap: 24,
+                animation: `pylon-rise .6s ease ${i * 0.08}s both`,
               }}
             >
-              {'— '}
-              {by}
-            </cite>
-          )}
-        </blockquote>
+              <div
+                style={{
+                  width: 140,
+                  height: 140,
+                  borderRadius: 28,
+                  background: 'linear-gradient(140deg, #c4f04233, var(--osd-surface))',
+                  border: '1px solid var(--osd-border)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontFamily: 'var(--osd-font-display)',
+                  fontWeight: 800,
+                  fontSize: 56,
+                  color: ACCENT,
+                }}
+              >
+                {initials(str(m.name, '–'))}
+              </div>
+              <div>
+                <div style={display(40, 700)}>{str(m.name)}</div>
+                <div style={{ fontSize: 26, color: ACCENT, marginTop: 6 }}>{str(m.role)}</div>
+                <div
+                  style={{
+                    fontSize: 24,
+                    color: 'var(--osd-muted)',
+                    marginTop: 10,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {str(m.prev)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </>
+    </Stage>
   );
-});
+}
 
-// ── Layout 1: bleed ───────────────────────────────────────────────────────────
-registerLayout(
-  'bleed',
-  ({ renderSlot }) => (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-          boxSizing: 'border-box',
-        }}
-      >
-        {renderSlot('main')}
-      </div>
-    </>
-  ),
-  ['main'],
-);
-
-// ── Layout 2: split ───────────────────────────────────────────────────────────
-registerLayout(
-  'split',
-  ({ renderSlot }) => (
-    <>
-      <FxStyles />
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* aside — 38%, accent-tinted translucent panel */}
+function PylonAsk({ block }: { block: Block }) {
+  const p = block.props;
+  const allocations = (Array.isArray(p.allocations) ? p.allocations : []) as Array<{
+    label?: string;
+    pct?: number;
+  }>;
+  const shades = ['#c4f042', '#8fd14f', '#4fb3a0', '#2f6e7a'];
+  return (
+    <Stage>
+      <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 64 }}>
+        <Eyebrow>{str(p.eyebrow, 'The ask')}</Eyebrow>
         <div
           style={{
-            width: '38%',
-            flexShrink: 0,
-            height: '100%',
-            background:
-              'linear-gradient(180deg, color-mix(in srgb, var(--osd-accent) 12%, var(--osd-bg)) 0%, var(--osd-bg) 100%)',
-            borderRight: '1px solid rgba(255,255,255,0.08)',
-            padding: '56px 48px',
-            boxSizing: 'border-box',
-            overflowY: 'auto',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.1fr',
+            gap: 100,
+            alignItems: 'center',
           }}
         >
-          {renderSlot('aside')}
-        </div>
-        {/* main — 62% */}
-        <div
-          style={{
-            flex: 1,
-            height: '100%',
-            padding: '56px 56px',
-            boxSizing: 'border-box',
-            overflowY: 'auto',
-          }}
-        >
-          {renderSlot('main')}
+          <div style={{ display: 'grid', gap: 28 }}>
+            <div style={{ ...display(148, 800), color: ACCENT, textShadow: '0 0 70px #c4f04244' }}>
+              {str(p.amount, '$12M')}
+            </div>
+            <h2 style={{ ...display(46, 700), maxWidth: 620 }}>{str(p.title)}</h2>
+          </div>
+          <div style={{ display: 'grid', gap: 36 }}>
+            <div
+              style={{
+                display: 'flex',
+                height: 64,
+                borderRadius: 12,
+                overflow: 'hidden',
+                border: '1px solid var(--osd-border)',
+                transformOrigin: 'left',
+                animation: 'pylon-grow .9s ease both',
+              }}
+            >
+              {allocations.map((a, i) => (
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static
+                  key={i}
+                  style={{ width: `${a.pct ?? 0}%`, background: shades[i % shades.length] }}
+                />
+              ))}
+            </div>
+            <div style={{ display: 'grid', gap: 18 }}>
+              {allocations.map((a, i) => (
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static
+                  key={i}
+                  style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 30 }}
+                >
+                  <span
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: 5,
+                      background: shades[i % shades.length],
+                    }}
+                  />
+                  <span style={{ fontFamily: MONO, color: ACCENT, width: 90 }}>{a.pct ?? 0}%</span>
+                  <span style={{ color: 'var(--osd-muted)' }}>{str(a.label)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </>
-  ),
-  ['aside', 'main'],
-);
+    </Stage>
+  );
+}
+
+registerLayout('stage', ({ renderSlot }) => <>{renderSlot('main')}</>, ['main']);
+
+registerBlock('pylon-hero', PylonHero, [
+  { key: 'eyebrow', type: 'text', label: 'Eyebrow' },
+  { key: 'title', type: 'textarea', label: 'Title' },
+  { key: 'sub', type: 'textarea', label: 'Subtitle' },
+  { key: 'variant', type: 'select', label: 'Variant', options: ['open', 'close'] },
+]);
+registerBlock('pylon-statement', PylonStatement, [
+  { key: 'eyebrow', type: 'text', label: 'Eyebrow' },
+  { key: 'title', type: 'textarea', label: 'Title' },
+  { key: 'tone', type: 'select', label: 'Tone', options: ['problem', 'solution'] },
+]);
+registerBlock('pylon-steps', PylonSteps);
+registerBlock('pylon-market', PylonMarket);
+registerBlock('pylon-traction', PylonTraction);
+registerBlock('pylon-team', PylonTeam);
+registerBlock('pylon-ask', PylonAsk);

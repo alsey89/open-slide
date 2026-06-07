@@ -22,7 +22,6 @@ pnpm + Turbo monorepo.
 | [`packages/core`](packages/core) | `@open-slide/core` | Runtime (viewer, present mode, inspector), Vite plugin, `open-slide` dev/build CLI. |
 | [`packages/cli`](packages/cli) | `@open-slide/cli` | `npx @open-slide/cli init` scaffolder + project template. |
 | [`apps/demo`](apps/demo) | private | Local consumer of `@open-slide/core` via `workspace:*`. The dogfood target for the framework. |
-| [`apps/web`](apps/web) | private | Marketing site (Next.js). |
 
 ## Prerequisites
 
@@ -84,7 +83,7 @@ pnpm cli <script>
    - `minor` — new public API, additive features.
    - `major` — breaking changes.
 
-   Apps (`apps/demo`, `apps/web`) and root tooling do **not** need a changeset.
+   Apps (`apps/demo`) and root tooling do **not** need a changeset.
 
    Keep the description **short and direct** — one line, present-tense, what changed from a user's perspective. Match the tone of existing `.changeset/*.md` files. No paragraphs, no rationale, no "this PR…".
 

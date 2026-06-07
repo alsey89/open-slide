@@ -46,9 +46,9 @@ A deck is a `deck.json` file. Each slide picks a built-in `layout` and fills nam
 }
 ```
 
-Built-in layouts: `title`, `section`, `title-body`, `two-col`, `media-text`.
+Built-in layouts: `title`, `section`, `title-body`, `two-col`, `media-text`, `full-bleed`, `grid`, `blank`.
 
-Built-in block types: `heading`, `text`, `bullets`, `image`, `quote`, `code`.
+Built-in block types: `heading`, `text`, `bullets`, `image`, `quote`, `code`, `stat`, `callout`, `divider`.
 
 Put slide-local assets under `slides/<id>/assets/`. Global assets (logos, avatars) go in the root `assets/` folder (`@assets/...`).
 

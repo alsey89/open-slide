@@ -33,9 +33,9 @@ If the user's original message already specifies the inputs unambiguously, skip 
 - **Images**: read each path with the `Read` tool (it accepts images). Note dominant colors as hex, type weight/style, layout rhythm, decorative motifs, and any recurring chrome (header bar, footer line, page numbers).
 - **Text**: extract explicit tokens (hex codes, font names, motion verbs) and implicit tone words ("editorial", "playful", "brutalist"). Resolve vague language into concrete decisions before writing.
 - **Existing slide**: read `slides/<id>/deck.json` and pull:
-  - `design.palette` (`bg`, `text`, `accent`) → Palette section.
-  - `design.fonts` (`display`, `body`) and `design.typeScale` values → Typography section.
-  - `design.radius` and layout patterns implied by block arrangements → Layout section.
+  - `design.palette` (`bg`, `surface`, `text`, `muted`, `accent`, `border`) → Palette section.
+  - `design.fonts` (`display`, `body`) and `design.typeScale` (`hero`, `heading`, `body`, `caption`) → Typography section.
+  - `design.space`, `design.radius`, `design.shadow` and layout patterns implied by block arrangements → Layout section.
   - Recurring block types and slot structures (e.g. eyebrow patterns, footer-style blocks) → Fixed components section.
   - The aesthetic feel implied by the design tokens and block content → Aesthetic paragraph.
 
@@ -220,7 +220,7 @@ export default [Cover, Content, Closer];
 
 Run this checklist before finishing:
 
-- [ ] Palette covers `bg` / `text` / `accent` / `muted` at minimum, all as hex.
+- [ ] Palette covers `bg` / `surface` / `text` / `muted` / `accent` / `border` at minimum, all as hex.
 - [ ] Type scale specifies hero, heading, body, caption sizes (or explicitly defers to `slide-authoring` defaults).
 - [ ] At least Title and Footer are defined as paste-ready React with concrete inline styles.
 - [ ] Motion section commits to one of static / subtle / rich.

@@ -1,7 +1,13 @@
 import { Minus, Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Block } from '../../../doc/model.ts';
-import { getLayout, listBlockTypes } from '../../../doc/registry.ts';
+import {
+  type BlockPropSchema,
+  getBlockSchema,
+  getLayout,
+  listBlockTypes,
+  type PropField,
+} from '../../../doc/registry.ts';
 import { renderDeck } from '../../../doc/render.tsx';
 import { useDeckEditor } from '../../lib/editor/use-deck-editor.ts';
 import { SlideCanvas } from '../slide-canvas.tsx';
@@ -9,7 +15,17 @@ import { ScrollArea } from '../ui/scroll-area.tsx';
 import { freshId } from './ids.ts';
 import { OutlinePanel } from './outline-panel.tsx';
 
-const BUILT_IN_BLOCK_TYPES = ['heading', 'text', 'bullets', 'quote', 'code', 'image'] as const;
+const BUILT_IN_BLOCK_TYPES = [
+  'heading',
+  'text',
+  'bullets',
+  'quote',
+  'code',
+  'image',
+  'stat',
+  'callout',
+  'divider',
+] as const;
 type BuiltInBlockType = (typeof BUILT_IN_BLOCK_TYPES)[number];
 
 function isBuiltInBlockType(type: string): type is BuiltInBlockType {
@@ -29,6 +45,12 @@ function defaultProps(type: BuiltInBlockType): Record<string, unknown> {
       return { code: '', lang: '' };
     case 'image':
       return { src: '', alt: '' };
+    case 'stat':
+      return { value: '100%', label: 'Label', caption: '' };
+    case 'callout':
+      return { text: 'New', variant: 'accent' };
+    case 'divider':
+      return {};
   }
 }
 
@@ -377,6 +399,170 @@ function GenericBlockFields({
   );
 }
 
+const fieldInputCls =
+  'w-full rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20';
+const fieldTextareaCls =
+  'w-full rounded-[4px] border border-border bg-background px-2 py-1.5 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20 resize-y min-h-[60px]';
+
+function StringListField({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (items: string[]) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {value.map((item, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: list items have no stable id
+        <div key={i} className="flex items-center gap-1">
+          <input
+            className="min-w-0 flex-1 rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40"
+            value={item}
+            onChange={(e) => {
+              const next = [...value];
+              next[i] = e.target.value;
+              onChange(next);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => onChange(value.filter((_, j) => j !== i))}
+            className="flex size-5 shrink-0 items-center justify-center rounded-[3px] text-muted-foreground hover:bg-muted hover:text-destructive"
+          >
+            <Minus className="size-3" />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...value, 'Item'])}
+        className="flex h-6 items-center justify-center gap-1 rounded-[4px] border border-dashed border-border text-[11px] text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+      >
+        <Plus className="size-3" />
+        Add item
+      </button>
+    </div>
+  );
+}
+
+function PropFieldControl({
+  id,
+  field,
+  value,
+  applyProp,
+}: {
+  id: string;
+  field: PropField;
+  value: unknown;
+  applyProp: (props: Record<string, unknown>) => void;
+}) {
+  switch (field.type) {
+    case 'textarea':
+      return (
+        <textarea
+          id={id}
+          className={fieldTextareaCls}
+          placeholder={field.placeholder}
+          value={String(value ?? '')}
+          onChange={(e) => applyProp({ [field.key]: e.target.value })}
+        />
+      );
+    case 'number':
+      return (
+        <input
+          id={id}
+          type="number"
+          className={fieldInputCls}
+          value={typeof value === 'number' ? value : ''}
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (!Number.isNaN(n)) applyProp({ [field.key]: n });
+          }}
+        />
+      );
+    case 'boolean':
+      return (
+        <label className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+          <input
+            id={id}
+            type="checkbox"
+            checked={Boolean(value)}
+            onChange={(e) => applyProp({ [field.key]: e.target.checked })}
+            className="h-3.5 w-3.5"
+          />
+          {field.label ?? field.key}
+        </label>
+      );
+    case 'select':
+      return (
+        <select
+          id={id}
+          className="h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11px] outline-none focus:border-foreground/40"
+          value={String(value ?? field.options?.[0] ?? '')}
+          onChange={(e) => applyProp({ [field.key]: e.target.value })}
+        >
+          {(field.options ?? []).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      );
+    case 'string-list':
+      return (
+        <StringListField
+          value={Array.isArray(value) ? (value as string[]) : []}
+          onChange={(items) => applyProp({ [field.key]: items })}
+        />
+      );
+    default:
+      return (
+        <input
+          id={id}
+          type="text"
+          className={fieldInputCls}
+          placeholder={field.placeholder}
+          value={String(value ?? '')}
+          onChange={(e) => applyProp({ [field.key]: e.target.value })}
+        />
+      );
+  }
+}
+
+function SchemaFields({
+  block,
+  schema,
+  applyProp,
+}: {
+  block: Block;
+  schema: BlockPropSchema;
+  applyProp: (props: Record<string, unknown>) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      {schema.map((field) => {
+        const id = `field-${block.id}-${field.key}`;
+        return (
+          <div key={field.key} className="flex flex-col gap-1">
+            {field.label && field.type !== 'boolean' && (
+              <label htmlFor={id} className="text-[10px] text-muted-foreground">
+                {field.label}
+              </label>
+            )}
+            <PropFieldControl
+              id={id}
+              field={field}
+              value={block.props[field.key]}
+              applyProp={applyProp}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function BlockFields({
   block,
   applyProp,
@@ -384,131 +570,9 @@ function BlockFields({
   block: Block;
   applyProp: (props: Record<string, unknown>) => void;
 }) {
-  const inputCls =
-    'w-full rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20';
-  const textareaCls =
-    'w-full rounded-[4px] border border-border bg-background px-2 py-1.5 text-[11.5px] outline-none focus:border-foreground/40 focus:ring-1 focus:ring-ring/20 resize-y min-h-[60px]';
-
-  if (!isBuiltInBlockType(block.type)) {
-    return <GenericBlockFields block={block} applyProp={applyProp} />;
-  }
-
-  if (block.type === 'heading' || block.type === 'text') {
-    return (
-      <textarea
-        className={textareaCls}
-        value={String(block.props.text ?? '')}
-        onChange={(e) => applyProp({ text: e.target.value })}
-      />
-    );
-  }
-
-  if (block.type === 'quote') {
-    return (
-      <>
-        <textarea
-          className={textareaCls}
-          placeholder="Quote text"
-          value={String(block.props.text ?? '')}
-          onChange={(e) => applyProp({ text: e.target.value })}
-        />
-        <input
-          className={inputCls}
-          placeholder="Attribution"
-          value={String(block.props.attribution ?? '')}
-          onChange={(e) => applyProp({ attribution: e.target.value })}
-        />
-      </>
-    );
-  }
-
-  if (block.type === 'code') {
-    return (
-      <>
-        <textarea
-          className={textareaCls}
-          placeholder="Code"
-          value={String(block.props.code ?? '')}
-          onChange={(e) => applyProp({ code: e.target.value })}
-        />
-        <input
-          className={inputCls}
-          placeholder="Language (e.g. ts)"
-          value={String(block.props.lang ?? '')}
-          onChange={(e) => applyProp({ lang: e.target.value })}
-        />
-      </>
-    );
-  }
-
-  if (block.type === 'image') {
-    return (
-      <>
-        <input
-          className={inputCls}
-          placeholder="src"
-          value={String(block.props.src ?? '')}
-          onChange={(e) => applyProp({ src: e.target.value })}
-        />
-        <input
-          className={inputCls}
-          placeholder="alt"
-          value={String(block.props.alt ?? '')}
-          onChange={(e) => applyProp({ alt: e.target.value })}
-        />
-        <select
-          className="h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11px] outline-none focus:border-foreground/40"
-          value={String(block.props.fit ?? 'cover')}
-          onChange={(e) => applyProp({ fit: e.target.value })}
-        >
-          <option value="cover">cover</option>
-          <option value="contain">contain</option>
-        </select>
-      </>
-    );
-  }
-
-  if (block.type === 'bullets') {
-    const items = Array.isArray(block.props.items) ? (block.props.items as string[]) : [];
-    return (
-      <div className="flex flex-col gap-1.5">
-        {items.map((item, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: bullet items have no stable id
-          <div key={i} className="flex items-center gap-1">
-            <input
-              className="min-w-0 flex-1 rounded-[4px] border border-border bg-background px-2 py-1 text-[11.5px] outline-none focus:border-foreground/40"
-              value={item}
-              onChange={(e) => {
-                const next = [...items];
-                next[i] = e.target.value;
-                applyProp({ items: next });
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                const next = items.filter((_, j) => j !== i);
-                applyProp({ items: next });
-              }}
-              className="flex size-5 shrink-0 items-center justify-center rounded-[3px] text-muted-foreground hover:bg-muted hover:text-destructive"
-            >
-              <Minus className="size-3" />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => applyProp({ items: [...items, 'Item'] })}
-          className="flex h-6 items-center justify-center gap-1 rounded-[4px] border border-dashed border-border text-[11px] text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-        >
-          <Plus className="size-3" />
-          Add item
-        </button>
-      </div>
-    );
-  }
-
-  return <span className="text-[11px] text-muted-foreground">No editable fields</span>;
+  const schema = getBlockSchema(block.type);
+  if (schema) return <SchemaFields block={block} schema={schema} applyProp={applyProp} />;
+  return <GenericBlockFields block={block} applyProp={applyProp} />;
 }
 
 const SELECTION_STYLE = `

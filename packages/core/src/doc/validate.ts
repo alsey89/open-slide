@@ -15,19 +15,49 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+// Every design field is optional; renderDeck fills gaps via normalizeDesign.
+// We only validate the type of whatever IS present.
+function validateStringFields(
+  obj: Record<string, unknown>,
+  keys: readonly string[],
+  where: string,
+): void {
+  for (const k of keys) {
+    if (obj[k] !== undefined && typeof obj[k] !== 'string') fail(`${where}.${k} must be a string`);
+  }
+}
+
 function validateDesign(d: unknown, where: string): void {
+  if (d === undefined) return;
   if (!isObject(d)) fail(`${where} must be an object`);
-  if (!isObject(d.palette)) fail(`${where}.palette must be an object`);
-  if (typeof d.palette.bg !== 'string') fail(`${where}.palette.bg must be a string`);
-  if (typeof d.palette.text !== 'string') fail(`${where}.palette.text must be a string`);
-  if (typeof d.palette.accent !== 'string') fail(`${where}.palette.accent must be a string`);
-  if (!isObject(d.fonts)) fail(`${where}.fonts must be an object`);
-  if (typeof d.fonts.display !== 'string') fail(`${where}.fonts.display must be a string`);
-  if (typeof d.fonts.body !== 'string') fail(`${where}.fonts.body must be a string`);
-  if (!isObject(d.typeScale)) fail(`${where}.typeScale must be an object`);
-  if (typeof d.typeScale.hero !== 'number') fail(`${where}.typeScale.hero must be a number`);
-  if (typeof d.typeScale.body !== 'number') fail(`${where}.typeScale.body must be a number`);
-  if (typeof d.radius !== 'number') fail(`${where}.radius must be a number`);
+
+  if (d.palette !== undefined) {
+    if (!isObject(d.palette)) fail(`${where}.palette must be an object`);
+    validateStringFields(
+      d.palette,
+      ['bg', 'surface', 'text', 'muted', 'accent', 'border'],
+      `${where}.palette`,
+    );
+  }
+
+  if (d.fonts !== undefined) {
+    if (!isObject(d.fonts)) fail(`${where}.fonts must be an object`);
+    validateStringFields(d.fonts, ['display', 'body'], `${where}.fonts`);
+  }
+
+  if (d.typeScale !== undefined) {
+    if (!isObject(d.typeScale)) fail(`${where}.typeScale must be an object`);
+    for (const k of ['hero', 'heading', 'body', 'caption']) {
+      if (d.typeScale[k] !== undefined && typeof d.typeScale[k] !== 'number')
+        fail(`${where}.typeScale.${k} must be a number`);
+    }
+  }
+
+  if (d.space !== undefined && typeof d.space !== 'number') fail(`${where}.space must be a number`);
+  if (d.radius !== undefined && typeof d.radius !== 'number')
+    fail(`${where}.radius must be a number`);
+  if (d.shadow !== undefined && typeof d.shadow !== 'string')
+    fail(`${where}.shadow must be a string`);
 }
 
 export function validateDeck(input: unknown): Deck {

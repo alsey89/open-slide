@@ -7,10 +7,19 @@ function deck(): Deck {
     schemaVersion: 1,
     meta: { title: 'D', createdAt: '2026-06-05T12:00:00Z' },
     design: {
-      palette: { bg: '#fff', text: '#000', accent: '#f00' },
+      palette: {
+        bg: '#fff',
+        surface: '#fff',
+        text: '#000',
+        muted: '#888',
+        accent: '#f00',
+        border: '#ccc',
+      },
       fonts: { display: 'a', body: 'b' },
-      typeScale: { hero: 100, body: 30 },
+      typeScale: { hero: 100, heading: 60, body: 30, caption: 18 },
+      space: 8,
       radius: 8,
+      shadow: 'none',
     },
     slides: [
       {

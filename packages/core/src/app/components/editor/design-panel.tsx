@@ -102,6 +102,17 @@ export function DesignPanel({
     }
   };
 
+  const setSpace = (raw: string) => {
+    const n = Number(raw);
+    if (!Number.isNaN(n)) {
+      update({ ...draft, space: n });
+    }
+  };
+
+  const setShadow = (value: string) => {
+    update({ ...draft, shadow: value });
+  };
+
   return (
     <div className="flex flex-col divide-y divide-hairline border-t border-hairline">
       <button
@@ -129,16 +140,34 @@ export function DesignPanel({
               onChange={(v) => setPalette('bg', v)}
             />
             <ColorField
+              id="design-surface"
+              label="Surface"
+              value={draft.palette.surface}
+              onChange={(v) => setPalette('surface', v)}
+            />
+            <ColorField
               id="design-text"
               label="Text"
               value={draft.palette.text}
               onChange={(v) => setPalette('text', v)}
             />
             <ColorField
+              id="design-muted"
+              label="Muted"
+              value={draft.palette.muted}
+              onChange={(v) => setPalette('muted', v)}
+            />
+            <ColorField
               id="design-accent"
               label="Accent"
               value={draft.palette.accent}
               onChange={(v) => setPalette('accent', v)}
+            />
+            <ColorField
+              id="design-border"
+              label="Border"
+              value={draft.palette.border}
+              onChange={(v) => setPalette('border', v)}
             />
           </div>
 
@@ -194,6 +223,21 @@ export function DesignPanel({
                 />
               </div>
               <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="design-scale-heading"
+                  className="text-[10.5px] text-muted-foreground"
+                >
+                  Heading (px)
+                </label>
+                <input
+                  id="design-scale-heading"
+                  type="number"
+                  className={inputCls}
+                  value={draft.typeScale.heading}
+                  onChange={(e) => setTypeScale('heading', e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
                 <label htmlFor="design-scale-body" className="text-[10.5px] text-muted-foreground">
                   Body (px)
                 </label>
@@ -205,25 +249,66 @@ export function DesignPanel({
                   onChange={(e) => setTypeScale('body', e.target.value)}
                 />
               </div>
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="design-scale-caption"
+                  className="text-[10.5px] text-muted-foreground"
+                >
+                  Caption (px)
+                </label>
+                <input
+                  id="design-scale-caption"
+                  type="number"
+                  className={inputCls}
+                  value={draft.typeScale.caption}
+                  onChange={(e) => setTypeScale('caption', e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Radius */}
+          {/* Shape & elevation */}
           <div className="flex flex-col gap-2.5 px-3 py-3">
             <div className="flex items-center gap-2">
-              <span className="eyebrow">Shape</span>
+              <span className="eyebrow">Shape &amp; elevation</span>
               <span aria-hidden className="h-px flex-1 bg-hairline" />
             </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className="flex flex-col gap-1">
+                <label htmlFor="design-radius" className="text-[10.5px] text-muted-foreground">
+                  Radius (px)
+                </label>
+                <input
+                  id="design-radius"
+                  type="number"
+                  className={inputCls}
+                  value={draft.radius}
+                  onChange={(e) => setRadius(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor="design-space" className="text-[10.5px] text-muted-foreground">
+                  Spacing (px)
+                </label>
+                <input
+                  id="design-space"
+                  type="number"
+                  className={inputCls}
+                  value={draft.space}
+                  onChange={(e) => setSpace(e.target.value)}
+                />
+              </div>
+            </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="design-radius" className="text-[10.5px] text-muted-foreground">
-                Radius (px)
+              <label htmlFor="design-shadow" className="text-[10.5px] text-muted-foreground">
+                Shadow (CSS)
               </label>
               <input
-                id="design-radius"
-                type="number"
+                id="design-shadow"
+                type="text"
                 className={inputCls}
-                value={draft.radius}
-                onChange={(e) => setRadius(e.target.value)}
+                value={draft.shadow}
+                onChange={(e) => setShadow(e.target.value)}
               />
             </div>
           </div>

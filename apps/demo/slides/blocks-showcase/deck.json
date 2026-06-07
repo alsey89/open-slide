@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Blocks Showcase",
+    "createdAt": "2026-06-06T12:00:00.000Z"
+  },
+  "design": {
+    "palette": {
+      "bg": "#0d0f14",
+      "surface": "#171a22",
+      "text": "#f4f3ee",
+      "muted": "#9aa0ab",
+      "accent": "#7c9cff",
+      "border": "#2a2e38"
+    },
+    "fonts": {
+      "display": "Georgia, serif",
+      "body": "-apple-system, system-ui, sans-serif"
+    },
+    "typeScale": { "hero": 150, "heading": 56, "body": 36, "caption": 22 },
+    "space": 10,
+    "radius": 14,
+    "shadow": "0 10px 30px rgba(0,0,0,0.5)"
+  },
+  "slides": [
+    {
+      "id": "bs-cover",
+      "layout": "blank",
+      "slots": {
+        "content": [
+          {
+            "id": "bs-cover-callout",
+            "type": "callout",
+            "props": { "text": "WS2 · new primitives", "variant": "outline" }
+          },
+          { "id": "bs-cover-h", "type": "heading", "props": { "text": "Blocks Showcase" } },
+          {
+            "id": "bs-cover-sub",
+            "type": "text",
+            "props": { "text": "stat · callout · divider · full-bleed · grid · blank" }
+          }
+        ]
+      },
+      "notes": "Cover slide on the blank layout."
+    },
+    {
+      "id": "bs-stats",
+      "layout": "grid",
+      "slots": {
+        "title": [{ "id": "bs-stats-h", "type": "heading", "props": { "text": "By the numbers" } }],
+        "items": [
+          {
+            "id": "bs-stat-1",
+            "type": "stat",
+            "props": { "value": "15", "label": "design tokens", "caption": "up from 8" }
+          },
+          {
+            "id": "bs-stat-2",
+            "type": "stat",
+            "props": {
+              "value": "9",
+              "label": "built-in blocks",
+              "caption": "+stat, callout, divider"
+            }
+          },
+          {
+            "id": "bs-stat-3",
+            "type": "stat",
+            "props": { "value": "8", "label": "layouts", "caption": "+full-bleed, grid, blank" }
+          }
+        ]
+      },
+      "notes": "Grid layout with three stat blocks."
+    },
+    {
+      "id": "bs-divider",
+      "layout": "title-body",
+      "slots": {
+        "title": [
+          { "id": "bs-div-h", "type": "heading", "props": { "text": "Dividers & callouts" } }
+        ],
+        "body": [
+          {
+            "id": "bs-div-c1",
+            "type": "callout",
+            "props": { "text": "accent", "variant": "accent" }
+          },
+          { "id": "bs-div-d", "type": "divider", "props": {} },
+          {
+            "id": "bs-div-c2",
+            "type": "callout",
+            "props": { "text": "surface", "variant": "surface" }
+          },
+          {
+            "id": "bs-div-t",
+            "type": "text",
+            "props": {
+              "text": "A divider is a hairline using the border token; callouts come in accent, surface, and outline variants."
+            }
+          }
+        ]
+      },
+      "notes": "Shows the divider and the three callout variants."
+    },
+    {
+      "id": "bs-bleed",
+      "layout": "full-bleed",
+      "slots": {
+        "media": [],
+        "content": [
+          {
+            "id": "bs-bleed-callout",
+            "type": "callout",
+            "props": { "text": "full-bleed", "variant": "surface" }
+          },
+          {
+            "id": "bs-bleed-h",
+            "type": "heading",
+            "props": { "text": "Content overlays the bleed" }
+          }
+        ]
+      },
+      "notes": "Full-bleed layout; content anchored to the bottom over the media slot."
+    }
+  ]
+}

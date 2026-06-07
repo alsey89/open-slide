@@ -1,6 +1,7 @@
 import { beforeEach, expect, test } from 'vitest';
 import {
   getBlock,
+  getBlockSchema,
   getLayout,
   listBlockTypes,
   listLayouts,
@@ -16,6 +17,23 @@ test('registers and resolves a block', () => {
   registerBlock('heading', C);
   expect(getBlock('heading')).toBe(C);
   expect(getBlock('missing')).toBeUndefined();
+});
+
+test('registers a block with a prop schema and resolves it', () => {
+  const C = () => null;
+  registerBlock('heading', C, [{ key: 'text', type: 'textarea' }]);
+  expect(getBlockSchema('heading')).toEqual([{ key: 'text', type: 'textarea' }]);
+});
+
+test('a block registered without a schema has no schema', () => {
+  registerBlock('plain', () => null);
+  expect(getBlockSchema('plain')).toBeUndefined();
+});
+
+test('resetRegistry clears block schemas', () => {
+  registerBlock('x', () => null, [{ key: 'a', type: 'text' }]);
+  resetRegistry();
+  expect(getBlockSchema('x')).toBeUndefined();
 });
 
 test('registers a layout with its slot names', () => {

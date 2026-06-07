@@ -1,4 +1,4 @@
-import { type DesignSystem, defaultDesign } from './design';
+import { type DesignSystem, defaultDesign, normalizeDesign } from './design';
 
 const SANS_SYSTEM = '-apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif';
 const SANS_INTER = '"Inter", system-ui, sans-serif';
@@ -7,13 +7,23 @@ const SERIF_GEORGIA = 'Georgia, "Times New Roman", serif';
 const SERIF_TIMES = '"Times New Roman", Times, serif';
 const MONO_SF = '"SF Mono", "JetBrains Mono", Menlo, monospace';
 
+// Presets specify only the roles they care about; normalizeDesign fills the
+// rest (surface/muted/border/heading/caption/space/shadow) from defaults.
 const designPresets: DesignSystem[] = [
   defaultDesign,
   {
-    palette: { bg: '#0f1115', text: '#f5f3ee', accent: '#7cc4ff' },
+    palette: {
+      bg: '#0f1115',
+      surface: '#1a1d24',
+      text: '#f5f3ee',
+      muted: '#9aa0ab',
+      accent: '#7cc4ff',
+      border: '#2b2f38',
+    },
     fonts: { display: SERIF_GEORGIA, body: SANS_SYSTEM },
     typeScale: { hero: 192, body: 32 },
     radius: 6,
+    shadow: '0 10px 30px rgba(0,0,0,0.45)',
   },
   {
     palette: { bg: '#eef1f4', text: '#1c2733', accent: '#ff6a5b' },
@@ -75,7 +85,7 @@ const designPresets: DesignSystem[] = [
     typeScale: { hero: 220, body: 32 },
     radius: 0,
   },
-];
+].map(normalizeDesign);
 
 function pickRandom(): DesignSystem {
   const idx = Math.floor(Math.random() * designPresets.length);

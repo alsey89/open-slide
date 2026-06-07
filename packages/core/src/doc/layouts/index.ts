@@ -1,3 +1,6 @@
+export { Blank } from './blank.tsx';
+export { FullBleed } from './full-bleed.tsx';
+export { Grid } from './grid.tsx';
 export { MediaText } from './media-text.tsx';
 export { MissingLayout } from './missing.tsx';
 export { Section } from './section.tsx';
@@ -11,4 +14,7 @@ export const LAYOUT_SLOTS: Record<string, string[]> = {
   'two-col': ['title', 'left', 'right'],
   'media-text': ['title', 'media', 'body'],
   section: ['eyebrow', 'title'],
+  'full-bleed': ['media', 'content'],
+  grid: ['title', 'items'],
+  blank: ['content'],
 };

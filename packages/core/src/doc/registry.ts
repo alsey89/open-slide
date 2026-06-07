@@ -7,11 +7,41 @@ export type LayoutComponent = ComponentType<{
   renderSlot: (name: string) => ReactNode;
 }>;
 
+export type PropFieldType =
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'boolean'
+  | 'select'
+  | 'color'
+  | 'string-list';
+
+export type PropField = {
+  key: string;
+  type: PropFieldType;
+  label?: string;
+  placeholder?: string;
+  /** Required for `select`; ignored otherwise. */
+  options?: string[];
+};
+
+export type BlockPropSchema = PropField[];
+
 const blocks = new Map<string, BlockComponent>();
+const blockSchemas = new Map<string, BlockPropSchema>();
 const layouts = new Map<string, { component: LayoutComponent; slots: string[] }>();
 
-export function registerBlock(type: string, component: BlockComponent): void {
+export function registerBlock(
+  type: string,
+  component: BlockComponent,
+  schema?: BlockPropSchema,
+): void {
   blocks.set(type, component);
+  if (schema) blockSchemas.set(type, schema);
+}
+
+export function getBlockSchema(type: string): BlockPropSchema | undefined {
+  return blockSchemas.get(type);
 }
 
 export function registerLayout(type: string, component: LayoutComponent, slots: string[]): void {
@@ -30,6 +60,7 @@ export function getLayout(
 
 export function resetRegistry(): void {
   blocks.clear();
+  blockSchemas.clear();
   layouts.clear();
 }
 

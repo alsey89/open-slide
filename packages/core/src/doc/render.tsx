@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import { normalizeDesign } from '../app/lib/design.ts';
 import type { Page, SlideModule } from '../app/lib/sdk.ts';
 import { UnknownBlock } from './blocks/index.ts';
 import { MissingLayout } from './layouts/index.ts';
@@ -34,7 +35,7 @@ export function renderDeck(deck: Deck): SlideModule {
   return {
     default: deck.slides.map(makePage),
     meta: { title: deck.meta.title, theme: deck.meta.theme, createdAt: deck.meta.createdAt },
-    design: deck.design,
+    design: normalizeDesign(deck.design),
     notes: deck.slides.map((s) => s.notes),
   };
 }

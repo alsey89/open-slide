@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Pylon — Series A",
+    "createdAt": "2026-06-07T12:00:00.000Z"
+  },
+  "design": {
+    "palette": {
+      "bg": "#0a0d0c",
+      "surface": "#111614",
+      "text": "#eaf0ea",
+      "muted": "#7c8c82",
+      "accent": "#c4f042",
+      "border": "#1e2a26"
+    },
+    "fonts": {
+      "display": "'Syne', sans-serif",
+      "body": "'Hanken Grotesk', system-ui, sans-serif"
+    },
+    "typeScale": { "hero": 150, "heading": 60, "body": 34, "caption": 20 },
+    "space": 10,
+    "radius": 14,
+    "shadow": "0 30px 80px -20px rgba(0,0,0,0.7)"
+  },
+  "slides": [
+    {
+      "id": "p-cover",
+      "layout": "stage",
+      "notes": "Open on the promise. Pylon = predictive maintenance for renewable energy.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-cover-b",
+            "type": "pylon-hero",
+            "props": {
+              "eyebrow": "Predictive maintenance · renewable energy",
+              "title": "Stop guessing when the grid fails.",
+              "sub": "Pylon turns the telemetry your wind and solar assets already produce into failures caught weeks before they happen.",
+              "variant": "open"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-problem",
+      "layout": "stage",
+      "notes": "The pain + the dollar figure.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-problem-b",
+            "type": "pylon-statement",
+            "props": {
+              "eyebrow": "The problem",
+              "tone": "problem",
+              "title": "Renewable assets fail silently — and the bill is enormous.",
+              "points": [
+                "Maintenance is still calendar-based or reactive, never predictive.",
+                "A single offline turbine loses ~$2,400 a day in generation.",
+                "Operators drown in raw sensor data they can't act on."
+              ],
+              "figure": {
+                "value": "$8.4B",
+                "label": "lost every year to unplanned downtime across wind & solar"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-solution",
+      "layout": "stage",
+      "notes": "What Pylon does + the headline result.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-solution-b",
+            "type": "pylon-statement",
+            "props": {
+              "eyebrow": "The solution",
+              "tone": "solution",
+              "title": "One model, watching every asset, all the time.",
+              "points": [
+                "Plugs into existing SCADA & sensor streams — no new hardware.",
+                "Flags the specific component, weeks ahead of failure.",
+                "Writes the work order and routes it to the crew."
+              ],
+              "figure": {
+                "value": "−43%",
+                "label": "unplanned downtime in year one, on average"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-how",
+      "layout": "stage",
+      "notes": "Three steps: connect, detect, dispatch.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-how-b",
+            "type": "pylon-steps",
+            "props": {
+              "eyebrow": "How it works",
+              "title": "From raw telemetry to a dispatched crew.",
+              "steps": [
+                {
+                  "title": "Connect",
+                  "desc": "Stream existing SCADA, vibration, and thermal data into Pylon in under a day."
+                },
+                {
+                  "title": "Detect",
+                  "desc": "Models learn each asset's signature and flag anomalies before thresholds trip."
+                },
+                {
+                  "title": "Dispatch",
+                  "desc": "Pylon writes the work order, predicts the part, and schedules the crew."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-market",
+      "layout": "stage",
+      "notes": "TAM / SAM / SOM concentric rings.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-market-b",
+            "type": "pylon-market",
+            "props": {
+              "eyebrow": "Market",
+              "title": "Riding a decade of grid build-out.",
+              "rings": [
+                { "label": "TAM", "value": "$48B", "note": "Global renewable O&M spend by 2030" },
+                { "label": "SAM", "value": "$11B", "note": "Utility-scale wind & solar operators" },
+                { "label": "SOM", "value": "$640M", "note": "North America, 3-year reachable" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-traction",
+      "layout": "stage",
+      "notes": "Growth chart + headline metrics.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-traction-b",
+            "type": "pylon-traction",
+            "props": {
+              "eyebrow": "Traction",
+              "title": "Growing with every megawatt we monitor.",
+              "series": [4, 9, 17, 28, 47, 72],
+              "metrics": [
+                { "value": "2.1 GW", "label": "under management" },
+                { "value": "$3.4M", "label": "ARR · +18% MoM" },
+                { "value": "9", "label": "utility customers" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-why-now",
+      "layout": "stage",
+      "notes": "Why now — three forces.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-why-b",
+            "type": "pylon-statement",
+            "props": {
+              "eyebrow": "Why now",
+              "tone": "solution",
+              "title": "The data finally exists — and the stakes finally matter.",
+              "points": [
+                "Renewable capacity is doubling, but skilled field crews aren't.",
+                "Modern turbines emit 100× the telemetry of a decade ago.",
+                "Grid-reliability penalties now make downtime a board-level number."
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-team",
+      "layout": "stage",
+      "notes": "Founding team with relevant pedigree.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-team-b",
+            "type": "pylon-team",
+            "props": {
+              "eyebrow": "Team",
+              "title": "Built by people who've run the grid.",
+              "members": [
+                { "name": "Maya Okonkwo", "role": "CEO", "prev": "ML lead, GE Renewable Energy" },
+                { "name": "Sam Reyes", "role": "CTO", "prev": "Staff engineer, Tesla Energy" },
+                { "name": "Lena Pärt", "role": "Head of Field", "prev": "Ops director, Ørsted" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-ask",
+      "layout": "stage",
+      "notes": "The ask + use of funds.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-ask-b",
+            "type": "pylon-ask",
+            "props": {
+              "eyebrow": "The ask",
+              "amount": "$12M",
+              "title": "Series A to reach 10 GW under management.",
+              "allocations": [
+                { "label": "Engineering & ML", "pct": 45 },
+                { "label": "Go-to-market", "pct": 30 },
+                { "label": "Field integrations", "pct": 15 },
+                { "label": "Operations", "pct": 10 }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "p-close",
+      "layout": "stage",
+      "notes": "Close on the line + contact.",
+      "slots": {
+        "main": [
+          {
+            "id": "p-close-b",
+            "type": "pylon-hero",
+            "props": {
+              "eyebrow": "Pylon",
+              "variant": "close",
+              "title": "The grid never sleeps. Neither does Pylon.",
+              "sub": "maya@pylon.energy · pylon.energy"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

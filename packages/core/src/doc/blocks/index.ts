@@ -1,7 +1,10 @@
 export { Bullets } from './bullets.tsx';
+export { Callout } from './callout.tsx';
 export { Code } from './code.tsx';
+export { Divider } from './divider.tsx';
 export { Heading } from './heading.tsx';
 export { ImageBlock } from './image.tsx';
 export { Quote } from './quote.tsx';
+export { Stat } from './stat.tsx';
 export { Text } from './text.tsx';
 export { UnknownBlock } from './unknown.tsx';

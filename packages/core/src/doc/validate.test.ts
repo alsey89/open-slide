@@ -49,8 +49,18 @@ describe('rejections', () => {
   });
 });
 
-test('rejects design that is missing palette/fonts/typeScale/radius', () => {
-  expect(() => validateDeck({ ...structuredClone(valid), design: {} })).toThrow(/design\.palette/);
+test('accepts an empty design (all fields optional)', () => {
+  expect(() => validateDeck({ ...structuredClone(valid), design: {} })).not.toThrow();
+});
+test('accepts a partial design with only some palette roles', () => {
+  expect(() =>
+    validateDeck({ ...structuredClone(valid), design: { palette: { accent: '#f00' } } }),
+  ).not.toThrow();
+});
+test('accepts a deck with no design key at all', () => {
+  const d = structuredClone(valid);
+  delete (d as Record<string, unknown>).design;
+  expect(() => validateDeck(d)).not.toThrow();
 });
 test('rejects non-string palette color', () => {
   const d = structuredClone(valid);
@@ -66,6 +76,16 @@ test('rejects non-number radius', () => {
   const d = structuredClone(valid);
   (d.design as Record<string, unknown>).radius = '8';
   expect(() => validateDeck(d)).toThrow(/radius must be a number/);
+});
+test('rejects non-number space when present', () => {
+  const d = structuredClone(valid);
+  (d.design as Record<string, unknown>).space = 'x';
+  expect(() => validateDeck(d)).toThrow(/space must be a number/);
+});
+test('rejects non-string shadow when present', () => {
+  const d = structuredClone(valid);
+  (d.design as Record<string, unknown>).shadow = 123;
+  expect(() => validateDeck(d)).toThrow(/shadow must be a string/);
 });
 test('rejects a block with missing props', () => {
   const d = structuredClone(valid);

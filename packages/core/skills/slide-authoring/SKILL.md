@@ -36,12 +36,16 @@ Slide = { id, layout, slots: { <slotName>: Block[] }, notes?, transition? }
 Block = { id, type, props }
 
 DesignSystem = {
-  palette: { bg, text, accent },
+  palette: { bg, surface, text, muted, accent, border },
   fonts: { display, body },
-  typeScale: { hero (px number), body (px number) },
-  radius (px number)
+  typeScale: { hero, heading, body, caption },   // all px numbers
+  space (px number),                              // base spacing unit
+  radius (px number),
+  shadow (CSS box-shadow string)
 }
 ```
+
+**Every `design` field is optional** — omitted tokens are filled from defaults at load. You can write `design: {}` or specify only the roles you care about (e.g. `design: { palette: { accent: "#f00" } }`).
 
 ### ID uniqueness
 
@@ -60,6 +64,9 @@ Must be an ISO 8601 string literal. Always set it when creating a new deck — *
 | `title-body` | `title`, `body` |
 | `two-col` | `title`, `left`, `right` |
 | `media-text` | `title`, `media`, `body` |
+| `full-bleed` | `media` (fills the slide), `content` (overlaid, bottom-anchored) |
+| `grid` | `title`, `items` (auto-fit N-up grid of blocks) |
+| `blank` | `content` (single centered freeform slot) |
 
 Only use slot names listed for the chosen layout. Extra slot names are ignored at render time.
 
@@ -73,6 +80,9 @@ Only use slot names listed for the chosen layout. Extra slot names are ignored a
 | `image` | `src` (path/URL), `alt` (string), `fit`? (`'cover'` or `'contain'`) |
 | `quote` | `text` (string), `attribution`? (string) |
 | `code` | `code` (string), `lang`? (string) |
+| `stat` | `value` (string, e.g. `"98%"`), `label`? (string), `caption`? (string) |
+| `callout` | `text` (string), `variant`? (`'accent'`, `'surface'`, or `'outline'`) |
+| `divider` | *(none)* — a hairline rule using the `border` token |
 
 An unknown `type` renders a visible fallback, not a crash. Only use the types listed above unless you have registered a custom block.
 
@@ -80,15 +90,26 @@ An unknown `type` renders a visible fallback, not a crash. Only use the types li
 
 ```json
 {
-  "palette": { "bg": "#0f1115", "text": "#f5f5f4", "accent": "#7c9cff" },
+  "palette": {
+    "bg": "#0f1115",
+    "surface": "#1a1d24",
+    "text": "#f5f5f4",
+    "muted": "#9aa0ab",
+    "accent": "#7c9cff",
+    "border": "#2b2f38"
+  },
   "fonts": {
     "display": "Georgia, serif",
     "body": "-apple-system, system-ui, sans-serif"
   },
-  "typeScale": { "hero": 150, "body": 40 },
-  "radius": 12
+  "typeScale": { "hero": 150, "heading": 56, "body": 40, "caption": 22 },
+  "space": 8,
+  "radius": 12,
+  "shadow": "0 8px 24px rgba(0,0,0,0.12)"
 }
 ```
+
+Blocks read these as CSS vars: `--osd-bg`, `--osd-surface`, `--osd-text`, `--osd-muted`, `--osd-accent`, `--osd-border`, `--osd-font-display`, `--osd-font-body`, `--osd-size-hero`, `--osd-size-heading`, `--osd-size-body`, `--osd-size-caption`, `--osd-space`, `--osd-radius`, `--osd-shadow`. Custom blocks should style themselves with these vars so they inherit the deck's theme.
 
 The canvas is **1920×1080**. Layouts handle spacing and positioning — you do not set pixel positions. Content auto-fits its slot (scales down if necessary). Keep slides focused: one idea per slide.
 
@@ -109,6 +130,21 @@ To use a block type not in the built-in list:
 1. Create `blocks/index.ts` in the project root (if it doesn't exist).
 2. Call `registerBlock('mytype', Component)` — `registerBlock` is imported from `@open-slide/core`.
 3. Use `"type": "mytype"` in `deck.json` exactly like a built-in block.
+
+To get **typed editor fields** for a custom block (instead of the generic JSON editor), pass an optional prop schema as the third argument:
+
+```ts
+registerBlock('mytype', Component, [
+  { key: 'title', type: 'text', label: 'Title' },
+  { key: 'body', type: 'textarea', label: 'Body' },
+  { key: 'count', type: 'number', label: 'Count' },
+  { key: 'pinned', type: 'boolean', label: 'Pinned' },
+  { key: 'size', type: 'select', label: 'Size', options: ['sm', 'lg'] },
+  { key: 'tags', type: 'string-list', label: 'Tags' },
+]);
+```
+
+Field types: `text`, `textarea`, `number`, `boolean`, `select` (needs `options`), `color`, `string-list`. Blocks without a schema fall back to a raw-JSON props editor.
 
 ## Editing existing decks
 

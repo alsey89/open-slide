@@ -26,12 +26,16 @@ Block = { id, type, props }
 
 ### DesignSystem shape
 
+All `design` fields are optional — omitted tokens fill from defaults.
+
 ```json
 {
-  "palette": { "bg": "#...", "text": "#...", "accent": "#..." },
+  "palette": { "bg": "#...", "surface": "#...", "text": "#...", "muted": "#...", "accent": "#...", "border": "#..." },
   "fonts": { "display": "<stack>", "body": "<stack>" },
-  "typeScale": { "hero": 150, "body": 40 },
-  "radius": 12
+  "typeScale": { "hero": 150, "heading": 56, "body": 40, "caption": 22 },
+  "space": 8,
+  "radius": 12,
+  "shadow": "0 8px 24px rgba(0,0,0,0.12)"
 }
 ```
 
@@ -44,6 +48,9 @@ Block = { id, type, props }
 | `title-body` | `title`, `body` |
 | `two-col` | `title`, `left`, `right` |
 | `media-text` | `title`, `media`, `body` |
+| `full-bleed` | `media`, `content` |
+| `grid` | `title`, `items` |
+| `blank` | `content` |
 
 ### Built-in block types
 
@@ -55,10 +62,13 @@ Block = { id, type, props }
 | `image` | `src`, `alt`, `fit` |
 | `quote` | `text`, `attribution` |
 | `code` | `code`, `lang` |
+| `stat` | `value`, `label`, `caption` |
+| `callout` | `text`, `variant` (`accent`/`surface`/`outline`) |
+| `divider` | *(none)* |
 
 ## Custom blocks
 
-Register custom React blocks in `blocks/index.ts` via `registerBlock(type, Component)` from `@open-slide/core`. Reference them by their registered `type` string in `deck.json` just like any built-in block.
+Register custom React blocks in `blocks/index.ts` via `registerBlock(type, Component, schema?)` from `@open-slide/core`. Reference them by their registered `type` string in `deck.json` just like any built-in block. The optional third argument is a prop schema — declare it and the block gets typed fields in the WYSIWYG editor. See the `slide-authoring` skill for the full field-type list. There's a commented example in `blocks/index.ts`.
 
 ## Which skill to use
 
