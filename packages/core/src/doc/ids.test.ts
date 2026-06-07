@@ -24,4 +24,21 @@ describe('cloneSlideWithFreshIds', () => {
     expect(clone.slots.title[0].props).toEqual({ text: 'Hi' });
     expect(clone.layout).toBe('title-body');
   });
+
+  it('clones all slots and leaves the original unmutated', () => {
+    const slide: Slide = {
+      id: 's1',
+      layout: 'two-col',
+      slots: {
+        left: [{ id: 'b1', type: 'text', props: { text: 'L' } }],
+        right: [{ id: 'b2', type: 'text', props: { text: 'R' } }],
+      },
+    };
+    const clone = cloneSlideWithFreshIds(slide);
+    expect(clone.slots.left[0].id).not.toBe('b1');
+    expect(clone.slots.right[0].id).not.toBe('b2');
+    expect(slide.id).toBe('s1');
+    expect(slide.slots.left[0].id).toBe('b1');
+    expect(slide.slots.right[0].id).toBe('b2');
+  });
 });
