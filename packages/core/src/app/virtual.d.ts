@@ -32,20 +32,12 @@ declare module 'virtual:open-slide/folders' {
 declare module 'virtual:open-slide/blocks';
 
 declare module 'virtual:open-slide/themes' {
-  import type { DesignSystem } from './lib/design';
-  import type { Page } from './lib/sdk';
-
   export type ThemeMeta = {
     id: string;
     name: string;
     description: string;
-    body: string;
-    hasDemo: boolean;
+    design: Record<string, unknown>;
   };
 
   export const themes: ThemeMeta[];
-  export function loadThemeDemo(id: string): Promise<{
-    default: Page[];
-    design?: DesignSystem;
-  }>;
 }
