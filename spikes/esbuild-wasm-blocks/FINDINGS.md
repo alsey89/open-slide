@@ -10,6 +10,9 @@
 ## Verdict
 11.36 MB wasm + 40 ms cold init is acceptable for a Tauri desktop webview (one-time load, not hot path); 68 ms per-block compile is workable for a dev-time authoring loop but should be parallelised for batch rebuilds. Go.
 
+## Note for M3
+The `initialize({ wasmModule })` form is browser-only — the default Node entry throws "The wasmModule option only works in the browser". This spike used the browser build (`esbuild-wasm/esm/browser.js`) under Node (with a `self` polyfill + `worker: false`) to measure the real wasm path. In the actual M3 target this is a non-issue: the Tauri webview IS a browser, so use `esbuild-wasm/esm/browser.js` with `initialize({ wasmURL })` (or `wasmModule`) directly. The 11.36 MB wasm should be bundled as a local asset, not fetched, so init stays ~40 ms with no network.
+
 ## Raw compiled output
 ```js
 // timeline.tsx
