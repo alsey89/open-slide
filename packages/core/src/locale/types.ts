@@ -404,19 +404,18 @@ export type Locale = {
     noThemesTitle: string;
     noThemesHintPrefix: string;
     noThemesHintSuffix: string;
-    noDemoYet: string;
-    noDemoHintPrefix: string;
-    noDemoHintSuffix: string;
     backToGallery: string;
-    /** template: "page {n}/{total}" */
-    pageOf: string;
-    nextPageAria: string;
-    prevPageAria: string;
     /** template: "Open theme {name}" */
     openThemeAria: string;
     usedBy: string;
     usedByEmpty: string;
-    expandPromptAria: string;
-    collapsePromptAria: string;
+    /** design-panel: section label for the theme picker */
+    pickTheme: string;
+    /** design-panel: apply a theme to the current deck */
+    applyTheme: string;
+    /** design-panel: save the current design as a new theme */
+    saveAsTheme: string;
+    /** prompt asking for a name when saving a theme */
+    saveThemePrompt: string;
   };
 };
