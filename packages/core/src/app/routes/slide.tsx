@@ -42,6 +42,7 @@ import { PptxProgressToast } from '../components/pptx-progress-toast';
 import { SlideCanvas } from '../components/slide-canvas';
 import { SlideTransitionLayer } from '../components/slide-transition-layer';
 import { ThumbnailRail } from '../components/thumbnail-rail';
+import { EditorRoot } from '../editor';
 import { exportSlideAsHtml } from '../lib/export-html';
 import { exportSlideAsPdf, isSafari } from '../lib/export-pdf';
 import { exportSlideAsImagePptx } from '../lib/export-pptx';
@@ -54,6 +55,7 @@ const { showSlideUi, showSlideBrowser, allowHtmlDownload } = config.build;
 export function Slide() {
   const { slideId = '' } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const nextEditor = import.meta.env.DEV && searchParams.get('editor') === 'next';
   const { slide, error } = useSlideModule(slideId);
   const [playMode, setPlayMode] = useState<'window' | 'fullscreen' | null>(null);
   const [editing, setEditing] = useState(false);
@@ -528,7 +530,9 @@ export function Slide() {
         </div>
       </header>
 
-      {view === 'assets' ? (
+      {nextEditor ? (
+        <EditorRoot slideId={slideId} />
+      ) : view === 'assets' ? (
         <div className="min-h-0 flex-1">
           <AssetView slideId={slideId} />
         </div>
