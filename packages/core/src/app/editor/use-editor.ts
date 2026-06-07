@@ -33,6 +33,13 @@ export function useEditor(
     };
   }, [host, deckId]);
 
+  useEffect(() => {
+    if (!store) return;
+    const onBeforeUnload = () => store.flushNow();
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [store]);
+
   const state = useSyncExternalStore<EditorState | null>(
     store ? store.subscribe : NOOP_SUBSCRIBE,
     store ? store.getState : NULL_SNAPSHOT,

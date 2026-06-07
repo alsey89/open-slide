@@ -70,6 +70,17 @@ test('dispose stops pending flush and does not auto-flush', async () => {
   expect(flush).not.toHaveBeenCalled();
 });
 
+test('clearPending() empties the queue so the scheduled flush never fires', async () => {
+  const flush = vi.fn<(ops: EditOp[]) => Promise<void>>(async () => {});
+  const states: string[] = [];
+  const f = createOpFlusher({ flush, onState: (s) => states.push(s), delayMs: 400 });
+  f.enqueue([{ kind: 'set-deck-title', title: 'a' }]);
+  f.clearPending();
+  await vi.advanceTimersByTimeAsync(400);
+  expect(flush).not.toHaveBeenCalled();
+  expect(states.every((s) => s !== 'saving')).toBe(true);
+});
+
 test('backoff resets after a success — second failure cycle also retries', async () => {
   let callCount = 0;
   const flush = vi.fn<(ops: EditOp[]) => Promise<void>>(async () => {
