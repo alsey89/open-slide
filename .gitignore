@@ -5,3 +5,6 @@ dist
 .vite
 *.tsbuildinfo
 .turbo
+
+# Brainstorming visual companion
+.superpowers/
