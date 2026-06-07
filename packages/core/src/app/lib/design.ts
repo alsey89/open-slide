@@ -78,7 +78,7 @@ export const defaultDesign: DesignSystem = {
   shadow: '0 8px 24px rgba(0,0,0,0.12)',
 };
 
-type DeepPartial<T> = {
+export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 
