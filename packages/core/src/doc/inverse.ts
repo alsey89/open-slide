@@ -26,7 +26,7 @@ function locateBlock(
 export function invertOp(before: Deck, op: EditOp): EditOp {
   switch (op.kind) {
     case 'set-deck-title':
-      return { kind: 'set-deck-title', title: before.meta.title ?? '' };
+      return { kind: 'set-deck-title', title: before.meta.title };
     case 'set-deck-theme':
       return { kind: 'set-deck-theme', theme: before.meta.theme };
     case 'set-design':
@@ -49,6 +49,7 @@ export function invertOp(before: Deck, op: EditOp): EditOp {
     }
     case 'set-slot-blocks': {
       const s = before.slides[slideIndex(before, op.slideId)];
+      // No op can delete a slot key, so undoing a set on a previously-absent slot leaves it as [].
       return {
         kind: 'set-slot-blocks',
         slideId: op.slideId,

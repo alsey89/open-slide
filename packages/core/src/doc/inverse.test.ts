@@ -77,3 +77,91 @@ describe('invertOp errors', () => {
     expect(() => invertOp(makeDeck(), { kind: 'remove-block', blockId: 'nope' })).toThrow();
   });
 });
+
+describe('invertOp restores under clamped indices', () => {
+  const CLAMPED_OPS: EditOp[] = [
+    { kind: 'add-slide', index: 999, slide: { id: 's4', layout: 'blank', slots: { content: [] } } },
+    {
+      kind: 'add-block',
+      slideId: 's1',
+      slot: 'title',
+      index: 999,
+      block: { id: 'b8', type: 'text', props: {} },
+    },
+    { kind: 'move-slide', slideId: 's1', toIndex: 999 },
+  ];
+  for (const op of CLAMPED_OPS) {
+    it(`restores original state after a clamped ${op.kind}`, () => {
+      const before = makeDeck();
+      const { deck: after, inverse } = applyOpWithInverse(before, op);
+      expect(applyOp(after, inverse)).toEqual(before);
+    });
+  }
+});
+
+describe('invertOp restores fields that were originally absent', () => {
+  function bareDeck(): Deck {
+    return {
+      schemaVersion: 1,
+      meta: { createdAt: '2026-01-01T00:00:00.000Z' },
+      design: defaultDesign,
+      slides: [{ id: 's1', layout: 'blank', slots: { content: [] } }],
+    };
+  }
+
+  it('removes a title that was not there before undo', () => {
+    const before = bareDeck();
+    const { deck: after, inverse } = applyOpWithInverse(before, {
+      kind: 'set-deck-title',
+      title: 'X',
+    });
+    expect(after.meta.title).toBe('X');
+    expect(applyOp(after, inverse)).toEqual(before);
+  });
+
+  it('removes a theme that was not there before undo', () => {
+    const before = bareDeck();
+    const { deck: after, inverse } = applyOpWithInverse(before, {
+      kind: 'set-deck-theme',
+      theme: 'coral',
+    });
+    expect(after.meta.theme).toBe('coral');
+    expect(applyOp(after, inverse)).toEqual(before);
+  });
+
+  it('removes slide notes that were not there before undo', () => {
+    const before = bareDeck();
+    const { deck: after, inverse } = applyOpWithInverse(before, {
+      kind: 'set-slide-notes',
+      slideId: 's1',
+      notes: 'hi',
+    });
+    expect(after.slides[0].notes).toBe('hi');
+    expect(applyOp(after, inverse)).toEqual(before);
+  });
+});
+
+describe('set-slot-blocks inverse leaves a previously-absent slot as []', () => {
+  it('documents the slot-key limitation', () => {
+    const before = makeDeck();
+    const op: EditOp = {
+      kind: 'set-slot-blocks',
+      slideId: 's2',
+      slot: 'extra',
+      blocks: [{ id: 'bx', type: 'text', props: { text: 'X' } }],
+    };
+    const { deck: after, inverse } = applyOpWithInverse(before, op);
+    expect(after.slides[1].slots.extra).toHaveLength(1);
+    const restored = applyOp(after, inverse);
+    // The slot key cannot be removed by any op, so it remains as [] rather than disappearing.
+    expect(restored.slides[1].slots.extra).toEqual([]);
+  });
+});
+
+describe('invertOp throws on a missing slide', () => {
+  it('throws for move-slide with an unknown slideId', () => {
+    expect(() =>
+      invertOp(makeDeck(), { kind: 'move-slide', slideId: 'nope', toIndex: 0 }),
+    ).toThrow();
+  });
+});
