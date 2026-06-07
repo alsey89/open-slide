@@ -1,0 +1,11 @@
+{
+  "name": "spike-esbuild-wasm-blocks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "spike": "node index.mjs"
+  },
+  "dependencies": {
+    "esbuild-wasm": "^0.24.0"
+  }
+}
