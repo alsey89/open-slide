@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocale } from '@/lib/use-locale';
 import type { DesignSystem } from '../../../app/lib/design.ts';
+import { type Theme, themes } from '../../lib/themes';
 
 function ColorField({
   id,
@@ -42,10 +44,15 @@ function ColorField({
 export function DesignPanel({
   design,
   onChange,
+  onApplyTheme,
+  onSaveTheme,
 }: {
   design: DesignSystem;
   onChange: (next: DesignSystem) => void;
+  onApplyTheme: (theme: Theme) => void;
+  onSaveTheme: (name: string) => void;
 }) {
+  const t = useLocale();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(design);
 
@@ -127,6 +134,52 @@ export function DesignPanel({
 
       {open && (
         <div className="flex flex-col gap-0 divide-y divide-hairline">
+          {/* Themes */}
+          <div className="flex flex-col gap-2.5 px-3 py-3">
+            <div className="flex items-center gap-2">
+              <span className="eyebrow">{t.themes.pickTheme}</span>
+              <span aria-hidden className="h-px flex-1 bg-hairline" />
+            </div>
+            {themes.length > 0 ? (
+              <div className="grid grid-cols-2 gap-1.5">
+                {themes.map((theme) => (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => onApplyTheme(theme)}
+                    title={theme.name}
+                    aria-label={`${t.themes.applyTheme}: ${theme.name}`}
+                    className="flex items-center gap-1.5 rounded-[4px] border border-border bg-background px-2 py-1.5 text-left hover:border-foreground/40"
+                  >
+                    <span className="flex shrink-0">
+                      {(['bg', 'accent', 'text'] as const).map((k) => (
+                        <span
+                          key={k}
+                          className="size-3 rounded-full ring-1 ring-foreground/10"
+                          style={{
+                            background: theme.design.palette[k],
+                            marginLeft: k === 'bg' ? 0 : -4,
+                          }}
+                        />
+                      ))}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[11px]">{theme.name}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                const name = window.prompt(t.themes.saveThemePrompt);
+                if (name?.trim()) onSaveTheme(name.trim());
+              }}
+              className="rounded-[4px] border border-dashed border-border px-2 py-1.5 text-[11px] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+            >
+              {t.themes.saveAsTheme}
+            </button>
+          </div>
+
           {/* Palette */}
           <div className="flex flex-col gap-2.5 px-3 py-3">
             <div className="flex items-center gap-2">

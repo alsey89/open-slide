@@ -5,7 +5,11 @@ describe('parseThemeFile', () => {
   it('reads id/name/description/design from json', () => {
     const t = parseThemeFile(
       'midnight',
-      JSON.stringify({ name: 'Midnight', description: 'Dark', design: { palette: { bg: '#000' } } }),
+      JSON.stringify({
+        name: 'Midnight',
+        description: 'Dark',
+        design: { palette: { bg: '#000' } },
+      }),
     );
     expect(t).toEqual({
       id: 'midnight',
@@ -29,7 +33,12 @@ describe('parseThemeFile', () => {
 describe('generateThemesModule', () => {
   it('emits a themes array with design and no demo loader', () => {
     const code = generateThemesModule([
-      { id: 'midnight', name: 'Midnight', description: 'Dark', design: { palette: { bg: '#000' } } },
+      {
+        id: 'midnight',
+        name: 'Midnight',
+        description: 'Dark',
+        design: { palette: { bg: '#000' } },
+      },
     ]);
     expect(code).toContain('export const themes =');
     expect(code).toContain('"midnight"');
