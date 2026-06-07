@@ -12,6 +12,12 @@ describe('buildSlide', () => {
     expect(slide.slots).toEqual({ title: [], left: [], right: [] });
   });
 
+  it('produces an empty slots object when given no slots', () => {
+    const slide = buildSlide('blank', []);
+    expect(slide.slots).toEqual({});
+    expect(slide.layout).toBe('blank');
+  });
+
   it('generates a fresh id when none is given', () => {
     const a = buildSlide('blank', ['content']);
     const b = buildSlide('blank', ['content']);
