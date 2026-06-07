@@ -3,6 +3,7 @@ import { validateDeck } from './validate.ts';
 
 export type EditOp =
   | { kind: 'set-deck-title'; title: string }
+  | { kind: 'set-deck-theme'; theme?: string }
   | { kind: 'set-design'; design: Deck['design'] }
   | { kind: 'add-slide'; index: number; slide: Slide }
   | { kind: 'remove-slide'; slideId: string }
@@ -37,6 +38,10 @@ function mutate(deck: Deck, op: EditOp): void {
   switch (op.kind) {
     case 'set-deck-title':
       deck.meta.title = op.title;
+      return;
+    case 'set-deck-theme':
+      if (op.theme === undefined) delete deck.meta.theme;
+      else deck.meta.theme = op.theme;
       return;
     case 'set-design':
       deck.design = op.design;
