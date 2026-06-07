@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { applyOpsToJson } from './deck.ts';
+import { applyOpsToDeck, applyOpsToJson } from './deck.ts';
 
 const RAW = JSON.stringify({
   schemaVersion: 1,
@@ -20,4 +20,10 @@ test('applies ops to raw deck json and returns updated json', () => {
 
 test('invalid ops throw', () => {
   expect(() => applyOpsToJson(RAW, [{ kind: 'remove-slide', slideId: 'nope' }])).toThrow();
+});
+
+test('applyOpsToDeck returns the applied deck object', () => {
+  const deck = applyOpsToDeck(RAW, [{ kind: 'set-deck-title', title: 'C' }]);
+  expect(deck.meta.title).toBe('C');
+  expect(deck.slides).toHaveLength(1);
 });
