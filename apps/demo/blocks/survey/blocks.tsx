@@ -213,7 +213,7 @@ function SurveyBars({ block }: { block: Block }) {
     value?: string;
     note?: string;
   }>;
-  const heights = [560, 360, 200];
+  const heights = [340, 220, 125];
   return (
     <div
       style={{
@@ -230,7 +230,7 @@ function SurveyBars({ block }: { block: Block }) {
           alignItems: 'flex-end',
           justifyContent: 'center',
           gap: 40,
-          height: 560,
+          height: 340,
         }}
       >
         {segments.slice(0, 3).map((seg, i) => (
