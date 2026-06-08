@@ -17,7 +17,9 @@ export function Bullets({ block }: { block: Block }) {
     >
       {items.map((item, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: bullet order is the identity
-        <li key={i}>{String(item)}</li>
+        <li key={i} data-osd-text={`items.${i}`}>
+          {String(item)}
+        </li>
       ))}
     </ul>
   );

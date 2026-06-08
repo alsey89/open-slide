@@ -6,24 +6,24 @@ import { getBlock, getLayout } from '../../doc/registry.ts';
 
 export type BlockViewProps = {
   block: Block;
-  editingField: string | null;
+  editingPath: string | null;
   onCommitEdit: (value: string) => void;
   onCancelEdit: () => void;
 };
 
 export const BlockView = memo(function BlockView({
   block,
-  editingField,
+  editingPath,
   onCommitEdit,
   onCancelEdit,
 }: BlockViewProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: block.id keys the editable target; onCommitEdit/onCancelEdit are stable store methods. We intentionally re-run only when the edited field or block identity changes — not on every block prop change (which would fight the caret).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: block.id keys the editable target; onCommitEdit/onCancelEdit are stable store methods. We intentionally re-run only when the edited path or block identity changes — not on every block prop change (which would fight the caret).
   useEffect(() => {
-    if (editingField === null) return;
+    if (editingPath === null) return;
     const el = ref.current?.querySelector(
-      `[data-osd-text="${CSS.escape(editingField)}"]`,
+      `[data-osd-text="${CSS.escape(editingPath)}"]`,
     ) as HTMLElement | null;
     if (!el) return;
 
@@ -67,7 +67,7 @@ export const BlockView = memo(function BlockView({
       el.removeEventListener('keydown', onKeyDown);
       finish();
     };
-  }, [editingField, block.id, onCommitEdit, onCancelEdit]);
+  }, [editingPath, block.id, onCommitEdit, onCancelEdit]);
 
   const Component = getBlock(block.type);
   return (
@@ -84,7 +84,7 @@ export function SlideView({
   onCancelEdit,
 }: {
   slide: Slide;
-  editing: { blockId: string; field: string } | null;
+  editing: { blockId: string; path: string } | null;
   onCommitEdit: (value: string) => void;
   onCancelEdit: () => void;
 }) {
@@ -96,7 +96,7 @@ export function SlideView({
       <BlockView
         key={b.id}
         block={b}
-        editingField={editing?.blockId === b.id ? editing.field : null}
+        editingPath={editing?.blockId === b.id ? editing.path : null}
         onCommitEdit={onCommitEdit}
         onCancelEdit={onCancelEdit}
       />

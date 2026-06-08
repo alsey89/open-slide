@@ -1,5 +1,5 @@
 import { cloneBlockWithFreshId } from '../../doc/ids.ts';
-import type { Deck } from '../../doc/model.ts';
+import type { Block, Deck } from '../../doc/model.ts';
 import type { EditOp } from '../../doc/ops.ts';
 
 export type BlockLocation = { slideId: string; slot: string; index: number };
@@ -12,6 +12,13 @@ export function findBlock(deck: Deck, blockId: string): BlockLocation | null {
     }
   }
   return null;
+}
+
+export function getBlockById(deck: Deck, blockId: string): Block | null {
+  const loc = findBlock(deck, blockId);
+  if (!loc) return null;
+  const slide = deck.slides.find((s) => s.id === loc.slideId);
+  return slide ? slide.slots[loc.slot][loc.index] : null;
 }
 
 export function moveBlockOp(deck: Deck, blockId: string, dir: 'up' | 'down'): EditOp | null {

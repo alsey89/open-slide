@@ -151,8 +151,9 @@ Field types: `text`, `textarea`, `number`, `boolean`, `select` (needs `options`)
 The editor also lets a user **double-click a block's text to edit it directly on the slide**. Make a custom block's text in-place-editable by tagging the element that renders it with `data-osd-text="<propKey>"`, where that element's text is **exactly** `String(block.props[propKey] ?? '')`. On commit the editor writes the new text back to `props[propKey]` as one undo step. **Always add this when authoring custom blocks** so they edit as fluidly as the built-ins.
 
 - Tag the **innermost** element that holds only that one prop's text — no labels, punctuation, or sibling content mixed in (the edit captures the element's entire text). If the text is decorated (e.g. wrapped in quote marks or an icon), wrap just the text in a tagged `<span>` and keep the decoration outside it.
-- One tag per **scalar string** prop; a block with several text props gets several tags (`data-osd-text="title"`, `data-osd-text="eyebrow"`, …).
-- Do **not** tag arrays, objects, numbers, or enums (`string[]`, nested `{…}`, counts, variant flags). Those edit through the typed schema / JSON fallback above — not in place.
+- One tag per text value; a block with several text props gets several tags (`data-osd-text="title"`, `data-osd-text="eyebrow"`, …).
+- The value can be a **dot-path** into `props`, not just a top-level key — so array items and nested object fields edit in place too: `data-osd-text="points.0"` (array item), `data-osd-text="figure.value"` (nested field), `data-osd-text="steps.1.title"` (array of objects). Inside a `.map`, tag each item with its index: `points.map((pt, i) => <span data-osd-text={`points.${i}`}>{pt}</span>)`. The tagged element's text must still be exactly the string at that path.
+- Tag **one element per path.** If a value renders twice (e.g. a chart and a legend), tag only one — otherwise the editor targets the wrong element. Don't tag SVG `<text>` (`contentEditable` is unreliable there); those edit through the schema / JSON fallback. Numbers and enums (counts, `variant` flags) also stay in the schema, not in place.
 
 ```tsx
 function Hero({ block }: { block: Block }) {
@@ -163,6 +164,25 @@ function Hero({ block }: { block: Block }) {
       <h1 data-osd-text="title">{String(p.title ?? '')}</h1>
       <p data-osd-text="sub">{String(p.sub ?? '')}</p>
     </section>
+  );
+}
+```
+
+For arrays and nested fields, tag each rendered value with its path:
+
+```tsx
+function Stats({ block }: { block: Block }) {
+  const p = block.props;
+  const stats = (p.stats ?? []) as Array<{ value?: string; label?: string }>;
+  return (
+    <ul>
+      {stats.map((s, i) => (
+        <li key={i}>
+          <span data-osd-text={`stats.${i}.value`}>{String(s.value ?? '')}</span>
+          <span data-osd-text={`stats.${i}.label`}>{String(s.label ?? '')}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 ```

@@ -26,10 +26,10 @@ export function EditorCanvas({
   const onDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
     const textEl = (e.target as HTMLElement).closest('[data-osd-text]');
     if (!textEl) return;
-    const field = textEl.getAttribute('data-osd-text');
+    const path = textEl.getAttribute('data-osd-text');
     const blockEl = textEl.closest('[data-osd-block-id]');
     const blockId = blockEl?.getAttribute('data-osd-block-id');
-    if (field && blockId) store.startEdit(blockId, field);
+    if (path && blockId) store.startEdit(blockId, path);
   };
 
   // Block wrappers are display:contents (no box), so outline the wrapper's
@@ -42,7 +42,7 @@ export function EditorCanvas({
       const selected = el.getAttribute('data-osd-block-id') === state.selectedBlockId;
       const target = (el.firstElementChild as HTMLElement | null) ?? (el as HTMLElement);
       target.style.outline = selected ? '2px solid var(--osd-accent, #4f7cff)' : '';
-      target.style.outlineOffset = selected ? '2px' : '';
+      target.style.outlineOffset = selected ? '-2px' : '';
     }
   }, [state.selectedBlockId, state.deck, index]);
 

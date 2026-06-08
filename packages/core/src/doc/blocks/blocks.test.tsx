@@ -24,6 +24,8 @@ test('bullets renders each item as <li>', () => {
   expect(html).toContain('<li');
   expect(html).toContain('a');
   expect(html).toContain('b');
+  expect(html).toContain('data-osd-text="items.0"');
+  expect(html).toContain('data-osd-text="items.1"');
 });
 test('image renders src and alt', () => {
   const html = renderToStaticMarkup(createElement(ImageBlock, b({ src: '/x.png', alt: 'pic' })));

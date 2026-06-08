@@ -14,6 +14,7 @@ const PURE_MODULES = [
   'history.ts',
   'editor-store.ts',
   'block-ops.ts',
+  'text-path.ts',
 ];
 
 function runtimeImports(src: string): string[] {
