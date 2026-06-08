@@ -114,4 +114,42 @@ describe('createEditorStore', () => {
     expect((await host.loadDeck('s1')).meta.title).toBe('Original');
     store.dispose();
   });
+
+  it('startEdit sets the editing field and selects the block', () => {
+    const host = createMemoryHost('s1', makeDeck());
+    const store = createEditorStore({ host, deckId: 's1', deck: makeDeck() });
+    store.startEdit('b1', 'text');
+    expect(store.getState().editing).toEqual({ blockId: 'b1', field: 'text' });
+    expect(store.getState().selectedBlockId).toBe('b1');
+    store.dispose();
+  });
+
+  it('commitEdit writes update-block-props for the edited field and clears editing', async () => {
+    const host = createMemoryHost('s1', makeDeck());
+    const store = createEditorStore({ host, deckId: 's1', deck: await host.loadDeck('s1') });
+    store.startEdit('b1', 'text');
+    store.commitEdit('Edited');
+    expect(store.getState().editing).toBeNull();
+    expect(store.getState().deck.slides[0].slots.title[0].props.text).toBe('Edited');
+    expect(store.getState().canUndo).toBe(true);
+    store.dispose();
+  });
+
+  it('commitEdit is a no-op when not editing', () => {
+    const host = createMemoryHost('s1', makeDeck());
+    const store = createEditorStore({ host, deckId: 's1', deck: makeDeck() });
+    store.commitEdit('x');
+    expect(store.getState().canUndo).toBe(false);
+    store.dispose();
+  });
+
+  it('cancelEdit clears editing without applying an op', () => {
+    const host = createMemoryHost('s1', makeDeck());
+    const store = createEditorStore({ host, deckId: 's1', deck: makeDeck() });
+    store.startEdit('b1', 'text');
+    store.cancelEdit();
+    expect(store.getState().editing).toBeNull();
+    expect(store.getState().canUndo).toBe(false);
+    store.dispose();
+  });
 });

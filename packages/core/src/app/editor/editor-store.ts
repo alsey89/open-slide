@@ -7,6 +7,7 @@ import { canRedo, canUndo, initHistory, pushOp, redo, undo } from './history.ts'
 export type EditorState = {
   deck: Deck;
   selectedBlockId: string | null;
+  editing: { blockId: string; field: string } | null;
   saveState: FlushState;
   error: string | null;
   canUndo: boolean;
@@ -18,6 +19,9 @@ export type EditorStore = {
   subscribe: (listener: () => void) => () => void;
   apply: (ops: EditOp | EditOp[]) => void;
   select: (blockId: string | null) => void;
+  startEdit: (blockId: string, field: string) => void;
+  commitEdit: (value: string) => void;
+  cancelEdit: () => void;
   undo: () => void;
   redo: () => void;
   flushNow: () => void;
@@ -34,6 +38,7 @@ export type CreateEditorStoreOptions = {
 export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
   let history = initHistory(opts.deck);
   let selectedBlockId: string | null = null;
+  let editing: { blockId: string; field: string } | null = null;
   let saveState: FlushState = 'idle';
   let error: string | null = null;
   let disposed = false;
@@ -42,6 +47,7 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
   const snapshot = (): EditorState => ({
     deck: history.deck,
     selectedBlockId,
+    editing,
     saveState,
     error,
     canUndo: canUndo(history),
@@ -66,6 +72,22 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
     delayMs: opts.flusherDelayMs,
   });
 
+  const applyEditOps = (ops: EditOp | EditOp[]) => {
+    const list = Array.isArray(ops) ? ops : [ops];
+    if (list.length === 0) return;
+    let next = history;
+    try {
+      for (const op of list) next = pushOp(next, op);
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e);
+      emit();
+      return;
+    }
+    history = next;
+    flusher.enqueue(list);
+    emit();
+  };
+
   const unsubscribeHost = opts.host.subscribe(opts.deckId, (deck) => {
     // v1 last-writer-wins: the external writer wins, so adopt its deck and drop
     // our un-persisted local ops + history (else they would flush on top of the
@@ -73,6 +95,7 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
     flusher.clearPending();
     history = initHistory(deck);
     selectedBlockId = null;
+    editing = null;
     emit();
   });
 
@@ -82,24 +105,28 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
-    apply(ops) {
-      const list = Array.isArray(ops) ? ops : [ops];
-      if (list.length === 0) return;
-      let next = history;
-      try {
-        for (const op of list) next = pushOp(next, op);
-      } catch (e) {
-        error = e instanceof Error ? e.message : String(e);
-        emit();
-        return;
-      }
-      history = next;
-      flusher.enqueue(list);
-      emit();
-    },
+    apply: applyEditOps,
     select(blockId) {
       if (blockId === selectedBlockId) return;
       selectedBlockId = blockId;
+      emit();
+    },
+    startEdit(blockId, field) {
+      selectedBlockId = blockId;
+      editing = { blockId, field };
+      emit();
+    },
+    commitEdit(value) {
+      const e = editing;
+      editing = null;
+      if (!e) {
+        emit();
+        return;
+      }
+      applyEditOps({ kind: 'update-block-props', blockId: e.blockId, props: { [e.field]: value } });
+    },
+    cancelEdit() {
+      editing = null;
       emit();
     },
     undo() {
