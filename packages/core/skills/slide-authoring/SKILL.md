@@ -189,6 +189,14 @@ function Stats({ block }: { block: Block }) {
 
 The prop schema (typed inspector fields for **all** props) and `data-osd-text` (in-place WYSIWYG for scalar text) are complementary — provide both.
 
+### Compose, don't monolith
+
+Prefer **many small custom blocks** over one big block that fills the slide. The editor selects, moves, and edits at the **block** level, so the granularity of your blocks is the granularity a user can manipulate. A single full-bleed block (`position:absolute; inset:0`) is one selectable unit with no editable internals — reserve it for genuinely single-unit slides (a cover, a section divider). Never stack two full-bleed blocks in one slot; they overlap invisibly.
+
+- **Put cohesive backdrops/chrome in a custom *layout*, not a block.** Register a layout (`registerLayout(name, Component, slots)`) that renders the ambient art (background, grid, footer, shared fonts/keyframes) and exposes named slots; place the editable pieces as small blocks in those slots. The backdrop can't be selected or stacked, and every content piece stays individually editable.
+- **One block = one idea.** A metric card, a step card, a chart — each its own block. Arrays of cards become N sibling blocks in a slot (selectable individually); a chart that needs a shared scale (bars, a sparkline) stays one block.
+- **Share fonts/animations once.** Inject `@font-face`/`@keyframes` from the layout (or a small shared `<style>` helper) so decomposed blocks still share the look.
+
 ## Editing existing decks
 
 Edit `slides/<id>/deck.json` directly — it hot-reloads in the dev server. For programmatic or batch edits you can also POST to the dev server:
