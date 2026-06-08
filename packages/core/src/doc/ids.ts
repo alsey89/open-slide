@@ -1,4 +1,4 @@
-import type { Slide } from './model.ts';
+import type { Block, Slide } from './model.ts';
 
 export function freshId(prefix = 'x'): string {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -10,5 +10,11 @@ export function cloneSlideWithFreshIds(slide: Slide): Slide {
   for (const name of Object.keys(copy.slots)) {
     for (const block of copy.slots[name]) block.id = freshId('b');
   }
+  return copy;
+}
+
+export function cloneBlockWithFreshId(block: Block): Block {
+  const copy = structuredClone(block);
+  copy.id = freshId('b');
   return copy;
 }

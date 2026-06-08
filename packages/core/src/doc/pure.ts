@@ -11,7 +11,7 @@ export {
   designToCssVars,
   normalizeDesign,
 } from './design.ts';
-export { cloneSlideWithFreshIds, freshId } from './ids.ts';
+export { cloneBlockWithFreshId, cloneSlideWithFreshIds, freshId } from './ids.ts';
 export { applyOpWithInverse, invertOp } from './inverse.ts';
 export type { Block, Deck, DeckMeta, Slide } from './model.ts';
 export { SCHEMA_VERSION } from './model.ts';
