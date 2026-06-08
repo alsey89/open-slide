@@ -6,6 +6,10 @@
 // server) instead of a raw-JSON editor. Field types: text, textarea, number,
 // boolean, select (needs `options`), color, string-list.
 //
+// Tag each text element with data-osd-text="<propKey>" (where the element's text
+// is exactly String(block.props[propKey] ?? '')) so it edits in place on the
+// slide. See the slide-authoring skill for the full contract.
+//
 // Style with the deck's design tokens (CSS vars) so custom blocks inherit the
 // theme: --osd-bg, --osd-surface, --osd-text, --osd-muted, --osd-accent,
 // --osd-border, --osd-font-display, --osd-font-body, --osd-size-hero/-heading/
@@ -19,6 +23,7 @@
 // function Badge({ block }: { block: Block }) {
 //   return (
 //     <span
+//       data-osd-text="text"
 //       style={{
 //         display: 'inline-flex',
 //         background: 'var(--osd-accent)',

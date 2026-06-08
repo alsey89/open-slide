@@ -68,7 +68,7 @@ All `design` fields are optional — omitted tokens fill from defaults.
 
 ## Custom blocks
 
-Register custom React blocks in `blocks/index.ts` via `registerBlock(type, Component, schema?)` from `@open-slide/core`. Reference them by their registered `type` string in `deck.json` just like any built-in block. The optional third argument is a prop schema — declare it and the block gets typed fields in the WYSIWYG editor. See the `slide-authoring` skill for the full field-type list. There's a commented example in `blocks/index.ts`.
+Register custom React blocks in `blocks/index.ts` via `registerBlock(type, Component, schema?)` from `@open-slide/core`. Reference them by their registered `type` string in `deck.json` just like any built-in block. The optional third argument is a prop schema — declare it and the block gets typed fields in the WYSIWYG editor. Also tag each text element with `data-osd-text="<propKey>"` so it edits in place on the slide. See the `slide-authoring` skill for both (field types + the `data-osd-text` contract). There's a commented example in `blocks/index.ts`.
 
 ## Which skill to use
 

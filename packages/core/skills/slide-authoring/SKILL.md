@@ -146,6 +146,29 @@ registerBlock('mytype', Component, [
 
 Field types: `text`, `textarea`, `number`, `boolean`, `select` (needs `options`), `color`, `string-list`. Blocks without a schema fall back to a raw-JSON props editor.
 
+### In-place editing (`data-osd-text`)
+
+The editor also lets a user **double-click a block's text to edit it directly on the slide**. Make a custom block's text in-place-editable by tagging the element that renders it with `data-osd-text="<propKey>"`, where that element's text is **exactly** `String(block.props[propKey] ?? '')`. On commit the editor writes the new text back to `props[propKey]` as one undo step. **Always add this when authoring custom blocks** so they edit as fluidly as the built-ins.
+
+- Tag the **innermost** element that holds only that one prop's text — no labels, punctuation, or sibling content mixed in (the edit captures the element's entire text). If the text is decorated (e.g. wrapped in quote marks or an icon), wrap just the text in a tagged `<span>` and keep the decoration outside it.
+- One tag per **scalar string** prop; a block with several text props gets several tags (`data-osd-text="title"`, `data-osd-text="eyebrow"`, …).
+- Do **not** tag arrays, objects, numbers, or enums (`string[]`, nested `{…}`, counts, variant flags). Those edit through the typed schema / JSON fallback above — not in place.
+
+```tsx
+function Hero({ block }: { block: Block }) {
+  const p = block.props;
+  return (
+    <section>
+      <span data-osd-text="eyebrow">{String(p.eyebrow ?? '')}</span>
+      <h1 data-osd-text="title">{String(p.title ?? '')}</h1>
+      <p data-osd-text="sub">{String(p.sub ?? '')}</p>
+    </section>
+  );
+}
+```
+
+The prop schema (typed inspector fields for **all** props) and `data-osd-text` (in-place WYSIWYG for scalar text) are complementary — provide both.
+
 ## Editing existing decks
 
 Edit `slides/<id>/deck.json` directly — it hot-reloads in the dev server. For programmatic or batch edits you can also POST to the dev server:
