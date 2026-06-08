@@ -1,7 +1,8 @@
-import { type MouseEvent, useEffect, useMemo, useRef } from 'react';
+import { type MouseEvent, useEffect, useRef } from 'react';
 import { SlideCanvas } from '@/components/slide-canvas';
-import { renderDeck } from '../../doc/render.tsx';
+import { normalizeDesign } from '../../doc/design.ts';
 import type { EditorState, EditorStore } from './editor-store.ts';
+import { SlideView } from './slide-view.tsx';
 
 export function EditorCanvas({
   store,
@@ -12,11 +13,7 @@ export function EditorCanvas({
   state: EditorState;
   index: number;
 }) {
-  // renderDeck allocates fresh Page function identities each call, so an edit remounts
-  // the canvas subtree. Harmless in M1a (nothing focusable renders inside the canvas);
-  // M1b's in-canvas text editing must memoize Page identity per slide.id to keep caret.
-  const mod = useMemo(() => renderDeck(state.deck), [state.deck]);
-  const Page = mod.default[index];
+  const slide = state.deck.slides[index];
   const rootRef = useRef<HTMLDivElement>(null);
 
   const onClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -24,10 +21,18 @@ export function EditorCanvas({
     store.select(el?.getAttribute('data-osd-block-id') ?? null);
   };
 
-  // Block wrappers are `display:contents`, so the visible box is their child —
-  // outline the firstElementChild to show a basic selection ring (M1b replaces
-  // this with a real selection ring + toolbar).
-  // biome-ignore lint/correctness/useExhaustiveDependencies: state.deck and index re-render the canvas DOM the effect queries, so the highlight must re-apply when they change.
+  const onDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
+    const textEl = (e.target as HTMLElement).closest('[data-osd-text]');
+    if (!textEl) return;
+    const field = textEl.getAttribute('data-osd-text');
+    const blockEl = textEl.closest('[data-osd-block-id]');
+    const blockId = blockEl?.getAttribute('data-osd-block-id');
+    if (field && blockId) store.startEdit(blockId, field);
+  };
+
+  // Block wrappers are display:contents (no box), so outline the wrapper's
+  // firstElementChild. Cleared/re-applied whenever selection or content changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: state.deck and index re-render the canvas DOM the effect queries, so the ring must re-apply when they change.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -39,12 +44,24 @@ export function EditorCanvas({
     }
   }, [state.selectedBlockId, state.deck, index]);
 
+  if (!slide) return null;
+
   return (
-    <SlideCanvas design={mod.design}>
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: canvas click-to-select is intentionally a plain div — no semantic role fits this pattern */}
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard block selection via shell keydown handler; click-to-select on canvas is a pointer convenience */}
-      <div ref={rootRef} onClick={onClick} style={{ width: '100%', height: '100%' }}>
-        {Page ? <Page /> : null}
+    <SlideCanvas design={normalizeDesign(state.deck.design)}>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: canvas click/double-click to select/edit is intentionally a plain div — no semantic role fits this pattern */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard editing is handled by the shell keydown handler + contentEditable; canvas pointer handlers are a convenience */}
+      <div
+        ref={rootRef}
+        onClick={onClick}
+        onDoubleClick={onDoubleClick}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <SlideView
+          slide={slide}
+          editing={state.editing}
+          onCommitEdit={store.commitEdit}
+          onCancelEdit={store.cancelEdit}
+        />
       </div>
     </SlideCanvas>
   );
