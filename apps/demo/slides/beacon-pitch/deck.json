@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "Beacon",
+    "createdAt": "2026-06-08T05:22:15.905Z"
+  },
+  "design": {
+    "palette": {
+      "bg": "#f3efe6",
+      "surface": "#ece6d9",
+      "text": "#1b1a17",
+      "muted": "#8a8270",
+      "accent": "#e2562a",
+      "border": "#d8d2c4"
+    },
+    "fonts": {
+      "display": "'Fraunces', Georgia, serif",
+      "body": "'Fraunces', Georgia, serif"
+    },
+    "typeScale": {
+      "hero": 138,
+      "heading": 66,
+      "body": 32,
+      "caption": 20
+    },
+    "space": 10,
+    "radius": 6,
+    "shadow": "0 24px 60px -28px rgba(27,26,23,0.28)"
+  },
+  "slides": [
+    {
+      "id": "b-cover",
+      "layout": "stage",
+      "notes": "Open on the promise. Beacon detects wildfire ignitions in under 3 minutes.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-cover-block",
+            "type": "beacon-cover",
+            "props": {
+              "eyebrow": "AI wildfire early-detection",
+              "title": "See the first ember.",
+              "sub": "Beacon fuses satellite thermal imagery with a mesh of edge sensors to confirm a new ignition in under three minutes — while it's still a campfire, not a catastrophe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-problem",
+      "layout": "stage",
+      "notes": "The pain + the dollar figure. Detection today is too slow.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-problem-block",
+            "type": "beacon-statement",
+            "props": {
+              "eyebrow": "The problem",
+              "tone": "problem",
+              "title": "By the time a wildfire is reported, it has already won.",
+              "points": [
+                "The average ignition burns undetected for 45+ minutes before a 911 call.",
+                "Once a fire crowns, every minute of delay multiplies the acres lost.",
+                "Lookout towers and citizen reports miss the remote ignitions that grow worst."
+              ],
+              "figure": {
+                "value": "$394B",
+                "label": "in annual U.S. wildfire losses — property, suppression, health, and lost output"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-solution",
+      "layout": "stage",
+      "notes": "What Beacon does + the headline result: sub-3-minute detection.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-solution-block",
+            "type": "beacon-statement",
+            "props": {
+              "eyebrow": "The solution",
+              "tone": "solution",
+              "title": "A detection network that never blinks.",
+              "points": [
+                "Geostationary thermal feeds scan the wildland every 30 seconds.",
+                "Solar edge sensors corroborate heat, smoke, and gas at ground level.",
+                "A confirmed ignition with GPS coordinates lands on the dispatcher's screen."
+              ],
+              "figure": {
+                "value": "2:47",
+                "label": "median time from ignition to a verified, located alert"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-how",
+      "layout": "stage",
+      "notes": "Four steps: sense, detect, verify, alert.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-how-block",
+            "type": "beacon-steps",
+            "props": {
+              "eyebrow": "How it works",
+              "title": "From the first photon of heat to boots on the ground.",
+              "steps": [
+                {
+                  "title": "Sense",
+                  "desc": "Satellite thermal bands and solar-powered edge nodes watch every acre, day and night."
+                },
+                {
+                  "title": "Detect",
+                  "desc": "On-device models flag a thermal anomaly the instant it breaks from the landscape's baseline."
+                },
+                {
+                  "title": "Verify",
+                  "desc": "Cross-sensor fusion rejects flares, glint, and equipment heat — driving false alarms toward zero."
+                },
+                {
+                  "title": "Alert",
+                  "desc": "A geolocated ignition alert routes to agencies and crews through the channels they already use."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-market",
+      "layout": "stage",
+      "notes": "TAM / SAM / SOM as stacked survey bars.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-market-block",
+            "type": "beacon-market",
+            "props": {
+              "eyebrow": "Market",
+              "title": "Climate has made early detection a line item, not a luxury.",
+              "segments": [
+                {
+                  "label": "TAM",
+                  "value": "$28B",
+                  "note": "Global wildfire detection, monitoring & resilience spend by 2030"
+                },
+                {
+                  "label": "SAM",
+                  "value": "$6.2B",
+                  "note": "Utilities, insurers & land agencies in fire-prone regions"
+                },
+                {
+                  "label": "SOM",
+                  "value": "$310M",
+                  "note": "Western U.S. utilities & state agencies, 3-year reachable"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-traction",
+      "layout": "stage",
+      "notes": "Coverage growth curve + headline metrics.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-traction-block",
+            "type": "beacon-traction",
+            "props": {
+              "eyebrow": "Traction",
+              "title": "Every deployment makes the next ignition easier to catch.",
+              "series": [3, 7, 14, 23, 38, 61],
+              "metrics": [
+                {
+                  "value": "61M",
+                  "label": "acres under continuous watch"
+                },
+                {
+                  "value": "$2.8M",
+                  "label": "ARR · +22% MoM"
+                },
+                {
+                  "value": "11",
+                  "label": "utility & agency customers"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-team",
+      "layout": "stage",
+      "notes": "Founding team with wildfire, space, and ML pedigree.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-team-block",
+            "type": "beacon-team",
+            "props": {
+              "eyebrow": "Team",
+              "title": "Built by people who've fought fire and flown the sensors.",
+              "members": [
+                {
+                  "name": "Dr. Ines Calderón",
+                  "role": "CEO",
+                  "prev": "Wildfire science lead, USFS Missoula Fire Lab"
+                },
+                {
+                  "name": "Tomas Bauer",
+                  "role": "CTO",
+                  "prev": "Thermal payload engineer, Planet Labs"
+                },
+                {
+                  "name": "Riya Anand",
+                  "role": "Head of Deployment",
+                  "prev": "Grid resilience lead, PG&E"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "b-ask",
+      "layout": "stage",
+      "notes": "The ask + use of funds: scale the sensor mesh.",
+      "slots": {
+        "main": [
+          {
+            "id": "b-ask-block",
+            "type": "beacon-ask",
+            "props": {
+              "eyebrow": "The ask",
+              "amount": "$15M",
+              "title": "Series A to blanket the American West before the next fire season.",
+              "allocations": [
+                {
+                  "label": "Sensor mesh & manufacturing",
+                  "pct": 40
+                },
+                {
+                  "label": "Detection ML & satellite ops",
+                  "pct": 30
+                },
+                {
+                  "label": "Go-to-market & agency partnerships",
+                  "pct": 20
+                },
+                {
+                  "label": "Operations",
+                  "pct": 10
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
