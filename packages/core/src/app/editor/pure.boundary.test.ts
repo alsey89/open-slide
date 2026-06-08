@@ -8,7 +8,13 @@ const editorDir = dirname(fileURLToPath(import.meta.url));
 // These modules are node-tested under vitest (no `@` alias, node env), so they
 // MUST stay React-free and alias-free. The browser-only files (dev-host,
 // use-editor, *.tsx) are exempt — they are covered by tsc + the browser pass.
-const PURE_MODULES = ['deck-host.ts', 'memory-host.ts', 'history.ts', 'editor-store.ts'];
+const PURE_MODULES = [
+  'deck-host.ts',
+  'memory-host.ts',
+  'history.ts',
+  'editor-store.ts',
+  'block-ops.ts',
+];
 
 function runtimeImports(src: string): string[] {
   const out: string[] = [];
