@@ -65,8 +65,8 @@ function SurveyPoints({ block }: { block: Block }) {
   return (
     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 18 }}>
       {items.map((pt, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: deck content order is identity
         <li
+          // biome-ignore lint/suspicious/noArrayIndexKey: deck content order is identity
           key={i}
           style={{
             display: 'flex',
@@ -259,8 +259,8 @@ function SurveyBars({ block }: { block: Block }) {
       </div>
       <div style={{ display: 'grid', gap: 22 }}>
         {segments.map((seg, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: legend order is identity
           <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: legend order is identity
             key={i}
             style={{
               display: 'grid',
@@ -332,8 +332,8 @@ function SurveySpark({ block }: { block: Block }) {
         style={{ animation: 'bcn-trace 1.7s ease forwards' }}
       />
       {pts.map(([x, y], i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: point order is identity
         <circle
+          // biome-ignore lint/suspicious/noArrayIndexKey: point order is identity
           key={i}
           cx={x}
           cy={y}
