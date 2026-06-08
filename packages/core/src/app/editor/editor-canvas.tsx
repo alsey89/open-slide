@@ -42,7 +42,7 @@ export function EditorCanvas({
       const selected = el.getAttribute('data-osd-block-id') === state.selectedBlockId;
       const target = (el.firstElementChild as HTMLElement | null) ?? (el as HTMLElement);
       target.style.outline = selected ? '2px solid var(--osd-accent, #4f7cff)' : '';
-      target.style.outlineOffset = selected ? '2px' : '';
+      target.style.outlineOffset = selected ? '-2px' : '';
     }
   }, [state.selectedBlockId, state.deck, index]);
 
