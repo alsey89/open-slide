@@ -37,10 +37,16 @@ export const BlockView = memo(function BlockView({
       sel.addRange(range);
     }
 
+    const initial = el.innerText;
+    let finished = false;
     let cancelled = false;
+    // Commit/cancel exactly once. Also called from cleanup so navigating away
+    // mid-edit (unmount before blur fires) doesn't silently drop typed text.
     const finish = () => {
+      if (finished) return;
+      finished = true;
       el.contentEditable = 'inherit';
-      if (cancelled) onCancelEdit();
+      if (cancelled || el.innerText === initial) onCancelEdit();
       else onCommitEdit(el.innerText);
     };
     const onBlur = () => finish();
@@ -59,7 +65,7 @@ export const BlockView = memo(function BlockView({
     return () => {
       el.removeEventListener('blur', onBlur);
       el.removeEventListener('keydown', onKeyDown);
-      el.contentEditable = 'inherit';
+      finish();
     };
   }, [editingField, block.id, onCommitEdit, onCancelEdit]);
 

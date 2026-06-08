@@ -22,7 +22,7 @@ export function EditorShell({ host, deckId }: { host: DeckHost; deckId: string }
         target?.tagName === 'TEXTAREA' ||
         !!target?.isContentEditable;
       const mod = e.metaKey || e.ctrlKey;
-      if (mod && (e.key === 'z' || e.key === 'Z')) {
+      if (!typing && mod && (e.key === 'z' || e.key === 'Z')) {
         e.preventDefault();
         if (e.shiftKey) store.redo();
         else store.undo();
