@@ -97,7 +97,10 @@ export function EditorShell({ host, deckId }: { host: DeckHost; deckId: string }
             <button
               type="button"
               key={slide.id}
-              onClick={() => setIndex(i)}
+              onClick={() => {
+                setIndex(i);
+                store.select(null);
+              }}
               className={`mb-1 block w-full rounded-md px-2 py-1 text-left text-xs ${
                 i === safeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
               }`}
