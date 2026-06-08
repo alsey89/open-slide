@@ -24,6 +24,7 @@ export function Callout({ block }: { block: Block }) {
   const variant = String(block.props.variant ?? 'accent');
   return (
     <span
+      data-osd-text="text"
       style={{
         display: 'inline-flex',
         alignItems: 'center',

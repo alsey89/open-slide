@@ -15,7 +15,7 @@ export function Code({ block }: { block: Block }) {
         lineHeight: 1.5,
       }}
     >
-      <code>{String(block.props.code ?? '')}</code>
+      <code data-osd-text="code">{String(block.props.code ?? '')}</code>
     </pre>
   );
 }

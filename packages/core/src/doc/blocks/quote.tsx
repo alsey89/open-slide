@@ -14,7 +14,9 @@ export function Quote({ block }: { block: Block }) {
           margin: 0,
         }}
       >
-        “{text}”
+        {'“'}
+        <span data-osd-text="text">{text}</span>
+        {'”'}
       </blockquote>
       {attribution && (
         <figcaption

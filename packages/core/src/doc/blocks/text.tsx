@@ -3,6 +3,7 @@ import type { Block } from '../model.ts';
 export function Text({ block }: { block: Block }) {
   return (
     <p
+      data-osd-text="text"
       style={{
         fontFamily: 'var(--osd-font-body)',
         fontSize: 'var(--osd-size-body)',

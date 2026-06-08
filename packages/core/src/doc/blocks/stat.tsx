@@ -7,6 +7,7 @@ export function Stat({ block }: { block: Block }) {
   return (
     <div style={{ display: 'grid', gap: 'calc(var(--osd-space) * 1.5)', justifyItems: 'start' }}>
       <div
+        data-osd-text="value"
         style={{
           fontFamily: 'var(--osd-font-display)',
           fontSize: 'var(--osd-size-hero)',
@@ -19,6 +20,7 @@ export function Stat({ block }: { block: Block }) {
       </div>
       {label && (
         <div
+          data-osd-text="label"
           style={{
             fontFamily: 'var(--osd-font-body)',
             fontSize: 'var(--osd-size-heading)',
@@ -31,6 +33,7 @@ export function Stat({ block }: { block: Block }) {
       )}
       {caption && (
         <div
+          data-osd-text="caption"
           style={{
             fontFamily: 'var(--osd-font-body)',
             fontSize: 'var(--osd-size-caption)',
