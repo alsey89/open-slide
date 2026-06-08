@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { defaultDesign } from '../../doc/design.ts';
 import type { Deck } from '../../doc/model.ts';
-import { duplicateBlockOp, findBlock, moveBlockOp } from './block-ops.ts';
+import { duplicateBlockOp, findBlock, getBlockById, moveBlockOp } from './block-ops.ts';
 
 function makeDeck(): Deck {
   return {
@@ -30,6 +30,19 @@ describe('findBlock', () => {
   });
   it('returns null for an unknown id', () => {
     expect(findBlock(makeDeck(), 'nope')).toBeNull();
+  });
+});
+
+describe('getBlockById', () => {
+  it('returns the block object by id', () => {
+    expect(getBlockById(makeDeck(), 'b2')).toEqual({
+      id: 'b2',
+      type: 'text',
+      props: { text: 'one' },
+    });
+  });
+  it('returns null for an unknown id', () => {
+    expect(getBlockById(makeDeck(), 'nope')).toBeNull();
   });
 });
 
