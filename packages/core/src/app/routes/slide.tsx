@@ -142,6 +142,14 @@ export function Slide() {
     return () => window.removeEventListener('keydown', onKey);
   }, [index, goTo, playMode, slideId]);
 
+  if (nextEditor) {
+    return (
+      <div className="flex h-dvh min-h-0 flex-col">
+        <EditorRoot slideId={slideId} />
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="mx-auto max-w-3xl px-8 py-16 text-muted-foreground">
@@ -530,9 +538,7 @@ export function Slide() {
         </div>
       </header>
 
-      {nextEditor ? (
-        <EditorRoot slideId={slideId} />
-      ) : view === 'assets' ? (
+      {view === 'assets' ? (
         <div className="min-h-0 flex-1">
           <AssetView slideId={slideId} />
         </div>
