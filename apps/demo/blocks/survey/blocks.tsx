@@ -207,6 +207,185 @@ function SurveyPerson({ block }: { block: Block }) {
   );
 }
 
+function SurveyBars({ block }: { block: Block }) {
+  const segments = (Array.isArray(block.props.segments) ? block.props.segments : []) as Array<{
+    label?: string;
+    value?: string;
+    note?: string;
+  }>;
+  const heights = [560, 360, 200];
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1.05fr',
+        alignItems: 'center',
+        gap: 90,
+        height: '100%',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          gap: 40,
+          height: 560,
+        }}
+      >
+        {segments.slice(0, 3).map((seg, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: chart order is identity
+          <div key={i} style={{ display: 'grid', gap: 18, justifyItems: 'center', width: 150 }}>
+            <div style={{ ...display(40, 700), color: EMBER, fontVariantNumeric: 'tabular-nums' }}>
+              {str(seg.value)}
+            </div>
+            <div
+              style={{
+                width: 150,
+                height: heights[i] ?? 160,
+                borderRadius: '10px 10px 0 0',
+                background: i === 0 ? EMBER : 'transparent',
+                border: `1.5px solid ${EMBER}`,
+                opacity: i === 0 ? 1 : 0.45,
+                transformOrigin: 'bottom',
+                animation: `bcn-rise .7s ease ${i * 0.12}s both`,
+              }}
+            />
+            <div style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER }}>
+              {str(seg.label)}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gap: 22 }}>
+        {segments.map((seg, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: legend order is identity
+          <div
+            key={i}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'auto auto 1fr',
+              gap: 18,
+              alignItems: 'baseline',
+              borderBottom: '1px solid var(--osd-border)',
+              paddingBottom: 18,
+            }}
+          >
+            <span
+              style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, width: 64 }}
+              data-osd-text={`segments.${i}.label`}
+            >
+              {str(seg.label)}
+            </span>
+            <span
+              style={{ ...display(30, 700), fontVariantNumeric: 'tabular-nums' }}
+              data-osd-text={`segments.${i}.value`}
+            >
+              {str(seg.value)}
+            </span>
+            <span
+              style={{ fontSize: 25, color: 'var(--osd-muted)', lineHeight: 1.35 }}
+              data-osd-text={`segments.${i}.note`}
+            >
+              {str(seg.note)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SurveySpark({ block }: { block: Block }) {
+  const series = (
+    Array.isArray(block.props.series) ? block.props.series : [2, 6, 11, 19, 34, 58]
+  ) as number[];
+  const W = 1680;
+  const H = 360;
+  const max = Math.max(...series, 1);
+  const pts = series.map(
+    (v, i) => [(i / Math.max(series.length - 1, 1)) * W, H - (v / max) * (H - 30)] as const,
+  );
+  const line = pts
+    .map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
+    .join(' ');
+  const area = `${line} L${W},${H} L0,${H} Z`;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }} preserveAspectRatio="none">
+      <title>Coverage growth over time</title>
+      <defs>
+        <linearGradient id="survey-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--osd-accent)" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="var(--osd-accent)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill="url(#survey-area)" />
+      <path
+        d={line}
+        fill="none"
+        stroke="var(--osd-accent)"
+        strokeWidth={4}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        strokeDasharray={4200}
+        strokeDashoffset={4200}
+        style={{ animation: 'bcn-trace 1.7s ease forwards' }}
+      />
+      {pts.map(([x, y], i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: point order is identity
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={6}
+          fill="var(--osd-bg)"
+          stroke="var(--osd-accent)"
+          strokeWidth={3}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function SurveyPing({ block }: { block: Block }) {
+  const size = typeof block.props.size === 'number' ? block.props.size : 300;
+  const core = Math.round(size * 0.16);
+  return (
+    <span
+      aria-hidden
+      style={{ position: 'relative', width: size, height: size, display: 'inline-block' }}
+    >
+      {[0, 0.9, 1.8].map((delay) => (
+        <span
+          key={delay}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            border: `1.5px solid ${EMBER}`,
+            animation: `bcn-ping 2.7s ${delay}s ease-out infinite`,
+          }}
+        />
+      ))}
+      <span
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          width: core,
+          height: core,
+          marginTop: -core / 2,
+          marginLeft: -core / 2,
+          borderRadius: '50%',
+          background: EMBER,
+          boxShadow: `0 0 ${core}px ${EMBER}`,
+          animation: 'bcn-core 2.1s ease-in-out infinite',
+        }}
+      />
+    </span>
+  );
+}
+
 registerBlock('survey-kicker', SurveyKicker, [{ key: 'text', type: 'text', label: 'Text' }]);
 registerBlock('survey-headline', SurveyHeadline, [
   { key: 'text', type: 'textarea', label: 'Text' },
@@ -232,3 +411,6 @@ registerBlock('survey-person', SurveyPerson, [
   { key: 'role', type: 'text', label: 'Role' },
   { key: 'prev', type: 'textarea', label: 'Background' },
 ]);
+registerBlock('survey-bars', SurveyBars);
+registerBlock('survey-spark', SurveySpark, [{ key: 'caption', type: 'text', label: 'Caption' }]);
+registerBlock('survey-ping', SurveyPing, [{ key: 'size', type: 'number', label: 'Size' }]);
