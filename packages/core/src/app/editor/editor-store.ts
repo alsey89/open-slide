@@ -1,13 +1,15 @@
 import type { Deck } from '../../doc/model.ts';
 import type { EditOp } from '../../doc/ops.ts';
 import { createOpFlusher, type FlushState } from '../lib/editor/op-flusher.ts';
+import { getBlockById } from './block-ops.ts';
 import type { DeckHost } from './deck-host.ts';
 import { canRedo, canUndo, initHistory, pushOp, redo, undo } from './history.ts';
+import { buildTextUpdateOp } from './text-path.ts';
 
 export type EditorState = {
   deck: Deck;
   selectedBlockId: string | null;
-  editing: { blockId: string; field: string } | null;
+  editing: { blockId: string; path: string } | null;
   saveState: FlushState;
   error: string | null;
   canUndo: boolean;
@@ -19,7 +21,7 @@ export type EditorStore = {
   subscribe: (listener: () => void) => () => void;
   apply: (ops: EditOp | EditOp[]) => void;
   select: (blockId: string | null) => void;
-  startEdit: (blockId: string, field: string) => void;
+  startEdit: (blockId: string, path: string) => void;
   commitEdit: (value: string) => void;
   cancelEdit: () => void;
   undo: () => void;
@@ -38,7 +40,7 @@ export type CreateEditorStoreOptions = {
 export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
   let history = initHistory(opts.deck);
   let selectedBlockId: string | null = null;
-  let editing: { blockId: string; field: string } | null = null;
+  let editing: { blockId: string; path: string } | null = null;
   let saveState: FlushState = 'idle';
   let error: string | null = null;
   let disposed = false;
@@ -111,9 +113,9 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
       selectedBlockId = blockId;
       emit();
     },
-    startEdit(blockId, field) {
+    startEdit(blockId, path) {
       selectedBlockId = blockId;
-      editing = { blockId, field };
+      editing = { blockId, path };
       emit();
     },
     commitEdit(value) {
@@ -123,7 +125,20 @@ export function createEditorStore(opts: CreateEditorStoreOptions): EditorStore {
         emit();
         return;
       }
-      applyEditOps({ kind: 'update-block-props', blockId: e.blockId, props: { [e.field]: value } });
+      const block = getBlockById(history.deck, e.blockId);
+      if (!block) {
+        emit();
+        return;
+      }
+      let op: EditOp;
+      try {
+        op = buildTextUpdateOp(block, e.path, value);
+      } catch (err) {
+        error = err instanceof Error ? err.message : String(err);
+        emit();
+        return;
+      }
+      applyEditOps(op);
     },
     cancelEdit() {
       editing = null;

@@ -115,11 +115,11 @@ describe('createEditorStore', () => {
     store.dispose();
   });
 
-  it('startEdit sets the editing field and selects the block', () => {
+  it('startEdit sets the editing path and selects the block', () => {
     const host = createMemoryHost('s1', makeDeck());
     const store = createEditorStore({ host, deckId: 's1', deck: makeDeck() });
     store.startEdit('b1', 'text');
-    expect(store.getState().editing).toEqual({ blockId: 'b1', field: 'text' });
+    expect(store.getState().editing).toEqual({ blockId: 'b1', path: 'text' });
     expect(store.getState().selectedBlockId).toBe('b1');
     store.dispose();
   });
@@ -132,6 +132,23 @@ describe('createEditorStore', () => {
     expect(store.getState().editing).toBeNull();
     expect(store.getState().deck.slides[0].slots.title[0].props.text).toBe('Edited');
     expect(store.getState().canUndo).toBe(true);
+    store.dispose();
+  });
+
+  it('commitEdit writes a nested array value via update-block-props', async () => {
+    const host = createMemoryHost('s1', makeDeck());
+    const store = createEditorStore({ host, deckId: 's1', deck: await host.loadDeck('s1') });
+    store.apply({
+      kind: 'add-block',
+      slideId: 's1',
+      slot: 'body',
+      index: 0,
+      block: { id: 'b2', type: 'bullets', props: { items: ['a', 'b', 'c'] } },
+    });
+    store.startEdit('b2', 'items.1');
+    store.commitEdit('B');
+    expect(store.getState().editing).toBeNull();
+    expect(store.getState().deck.slides[0].slots.body[0].props.items).toEqual(['a', 'B', 'c']);
     store.dispose();
   });
 
