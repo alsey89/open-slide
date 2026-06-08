@@ -88,6 +88,125 @@ function SurveyPoints({ block }: { block: Block }) {
   );
 }
 
+function SurveyMetric({ block }: { block: Block }) {
+  const p = block.props;
+  return (
+    <div style={{ display: 'grid', gap: 10 }}>
+      <div
+        style={{ ...display(120, 700), color: EMBER, fontVariantNumeric: 'tabular-nums' }}
+        data-osd-text="value"
+      >
+        {str(p.value)}
+      </div>
+      {p.label != null && (
+        <div
+          style={{ fontFamily: SURVEY_MONO, fontSize: 24, color: 'var(--osd-text)' }}
+          data-osd-text="label"
+        >
+          {str(p.label)}
+        </div>
+      )}
+      {p.caption != null && (
+        <div
+          style={{ fontSize: 24, color: 'var(--osd-muted)', lineHeight: 1.4, maxWidth: 440 }}
+          data-osd-text="caption"
+        >
+          {str(p.caption)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SurveyStep({ block }: { block: Block }) {
+  const p = block.props;
+  return (
+    <div
+      style={{
+        background: 'var(--osd-surface)',
+        border: '1px solid var(--osd-border)',
+        borderRadius: 'var(--osd-radius)',
+        padding: 44,
+        display: 'grid',
+        gap: 22,
+      }}
+    >
+      <div
+        style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, letterSpacing: '0.14em' }}
+        data-osd-text="n"
+      >
+        {str(p.n, '01')}
+      </div>
+      <div style={display(42, 600)} data-osd-text="title">
+        {str(p.title)}
+      </div>
+      <div
+        style={{ fontSize: 26, lineHeight: 1.46, color: 'var(--osd-muted)' }}
+        data-osd-text="desc"
+      >
+        {str(p.desc)}
+      </div>
+    </div>
+  );
+}
+
+function SurveyPerson({ block }: { block: Block }) {
+  const p = block.props;
+  const initials = (n: string) =>
+    n
+      .split(' ')
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join('');
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gap: 24,
+        padding: 40,
+        background: 'var(--osd-surface)',
+        border: '1px solid var(--osd-border)',
+        borderRadius: 'var(--osd-radius)',
+      }}
+    >
+      <div
+        style={{
+          width: 128,
+          height: 128,
+          borderRadius: '50%',
+          background: 'var(--osd-bg)',
+          border: `1.5px solid ${EMBER}`,
+          display: 'grid',
+          placeItems: 'center',
+          fontFamily: 'var(--osd-font-display)',
+          fontWeight: 700,
+          fontSize: 50,
+          color: EMBER,
+        }}
+      >
+        {initials(str(p.name, '–'))}
+      </div>
+      <div>
+        <div style={display(38, 600)} data-osd-text="name">
+          {str(p.name)}
+        </div>
+        <div
+          style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, marginTop: 8 }}
+          data-osd-text="role"
+        >
+          {str(p.role)}
+        </div>
+        <div
+          style={{ fontSize: 23, color: 'var(--osd-muted)', marginTop: 12, lineHeight: 1.42 }}
+          data-osd-text="prev"
+        >
+          {str(p.prev)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 registerBlock('survey-kicker', SurveyKicker, [{ key: 'text', type: 'text', label: 'Text' }]);
 registerBlock('survey-headline', SurveyHeadline, [
   { key: 'text', type: 'textarea', label: 'Text' },
@@ -97,4 +216,19 @@ registerBlock('survey-text', SurveyText, [{ key: 'text', type: 'textarea', label
 registerBlock('survey-points', SurveyPoints, [
   { key: 'items', type: 'string-list', label: 'Items' },
   { key: 'tone', type: 'select', label: 'Tone', options: ['problem', 'solution'] },
+]);
+registerBlock('survey-metric', SurveyMetric, [
+  { key: 'value', type: 'text', label: 'Value' },
+  { key: 'label', type: 'text', label: 'Label' },
+  { key: 'caption', type: 'textarea', label: 'Caption' },
+]);
+registerBlock('survey-step', SurveyStep, [
+  { key: 'n', type: 'text', label: 'Number' },
+  { key: 'title', type: 'text', label: 'Title' },
+  { key: 'desc', type: 'textarea', label: 'Description' },
+]);
+registerBlock('survey-person', SurveyPerson, [
+  { key: 'name', type: 'text', label: 'Name' },
+  { key: 'role', type: 'text', label: 'Role' },
+  { key: 'prev', type: 'textarea', label: 'Background' },
 ]);
