@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "meta": {
     "title": "Beacon",
-    "createdAt": "2026-06-08T05:22:15.905Z"
+    "createdAt": "2026-06-08T10:11:58.473Z"
   },
   "design": {
     "palette": {
@@ -15,12 +15,12 @@
     },
     "fonts": {
       "display": "'Fraunces', Georgia, serif",
-      "body": "'Fraunces', Georgia, serif"
+      "body": "system-ui, -apple-system, 'Segoe UI', sans-serif"
     },
     "typeScale": {
-      "hero": 138,
-      "heading": 66,
-      "body": 32,
+      "hero": 120,
+      "heading": 58,
+      "body": 30,
       "caption": 20
     },
     "space": 10,
@@ -30,44 +30,62 @@
   "slides": [
     {
       "id": "b-cover",
-      "layout": "stage",
+      "layout": "survey-stage",
       "notes": "Open on the promise. Beacon detects wildfire ignitions in under 3 minutes.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "cover-kicker", "type": "survey-kicker", "props": { "text": "AI wildfire early-detection" } }
+        ],
+        "headline": [
+          { "id": "cover-headline", "type": "survey-headline", "props": { "text": "See the first ember.", "scale": "hero" } }
+        ],
+        "body": [
           {
-            "id": "b-cover-block",
-            "type": "beacon-cover",
+            "id": "cover-sub",
+            "type": "survey-text",
             "props": {
-              "eyebrow": "AI wildfire early-detection",
-              "title": "See the first ember.",
-              "sub": "Beacon fuses satellite thermal imagery with a mesh of edge sensors to confirm a new ignition in under three minutes — while it's still a campfire, not a catastrophe."
+              "text": "Beacon fuses satellite thermal imagery with a mesh of edge sensors to confirm a new ignition in under three minutes — while it's still a campfire, not a catastrophe."
             }
           }
+        ],
+        "aside": [
+          { "id": "cover-ping", "type": "survey-ping", "props": { "size": 300 } }
         ]
       }
     },
     {
       "id": "b-problem",
-      "layout": "stage",
+      "layout": "survey-stage",
       "notes": "The pain + the dollar figure. Detection today is too slow.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "problem-kicker", "type": "survey-kicker", "props": { "text": "The problem" } }
+        ],
+        "headline": [
+          { "id": "problem-headline", "type": "survey-headline", "props": { "text": "By the time a wildfire is reported, it has already won." } }
+        ],
+        "body": [
           {
-            "id": "b-problem-block",
-            "type": "beacon-statement",
+            "id": "problem-points",
+            "type": "survey-points",
             "props": {
-              "eyebrow": "The problem",
               "tone": "problem",
-              "title": "By the time a wildfire is reported, it has already won.",
-              "points": [
+              "items": [
                 "The average ignition burns undetected for 45+ minutes before a 911 call.",
-                "Once a fire crowns, every minute of delay multiplies the acres lost.",
+                "Once a fire crowns, every minute multiplies the acreage and the cost.",
                 "Lookout towers and citizen reports miss the remote ignitions that grow worst."
-              ],
-              "figure": {
-                "value": "$394B",
-                "label": "in annual U.S. wildfire losses — property, suppression, health, and lost output"
-              }
+              ]
+            }
+          }
+        ],
+        "aside": [
+          {
+            "id": "problem-stat",
+            "type": "survey-metric",
+            "props": {
+              "value": "$394B",
+              "label": "annual U.S. wildfire losses",
+              "caption": "property, suppression, health, and lost output"
             }
           }
         ]
@@ -75,26 +93,37 @@
     },
     {
       "id": "b-solution",
-      "layout": "stage",
+      "layout": "survey-stage",
       "notes": "What Beacon does + the headline result: sub-3-minute detection.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "solution-kicker", "type": "survey-kicker", "props": { "text": "The solution" } }
+        ],
+        "headline": [
+          { "id": "solution-headline", "type": "survey-headline", "props": { "text": "A detection network that never blinks." } }
+        ],
+        "body": [
           {
-            "id": "b-solution-block",
-            "type": "beacon-statement",
+            "id": "solution-points",
+            "type": "survey-points",
             "props": {
-              "eyebrow": "The solution",
               "tone": "solution",
-              "title": "A detection network that never blinks.",
-              "points": [
+              "items": [
                 "Geostationary thermal feeds scan the wildland every 30 seconds.",
                 "Solar edge sensors corroborate heat, smoke, and gas at ground level.",
                 "A confirmed ignition with GPS coordinates lands on the dispatcher's screen."
-              ],
-              "figure": {
-                "value": "2:47",
-                "label": "median time from ignition to a verified, located alert"
-              }
+              ]
+            }
+          }
+        ],
+        "aside": [
+          {
+            "id": "solution-stat",
+            "type": "survey-metric",
+            "props": {
+              "value": "2:47",
+              "label": "median time to alert",
+              "caption": "a verified, geolocated ignition"
             }
           }
         ]
@@ -102,67 +131,59 @@
     },
     {
       "id": "b-how",
-      "layout": "stage",
+      "layout": "survey-grid",
       "notes": "Four steps: sense, detect, verify, alert.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "how-kicker", "type": "survey-kicker", "props": { "text": "How it works" } }
+        ],
+        "headline": [
+          { "id": "how-headline", "type": "survey-headline", "props": { "text": "From the first photon of heat to boots on the ground." } }
+        ],
+        "items": [
           {
-            "id": "b-how-block",
-            "type": "beacon-steps",
-            "props": {
-              "eyebrow": "How it works",
-              "title": "From the first photon of heat to boots on the ground.",
-              "steps": [
-                {
-                  "title": "Sense",
-                  "desc": "Satellite thermal bands and solar-powered edge nodes watch every acre, day and night."
-                },
-                {
-                  "title": "Detect",
-                  "desc": "On-device models flag a thermal anomaly the instant it breaks from the landscape's baseline."
-                },
-                {
-                  "title": "Verify",
-                  "desc": "Cross-sensor fusion rejects flares, glint, and equipment heat — driving false alarms toward zero."
-                },
-                {
-                  "title": "Alert",
-                  "desc": "A geolocated ignition alert routes to agencies and crews through the channels they already use."
-                }
-              ]
-            }
+            "id": "how-sense",
+            "type": "survey-step",
+            "props": { "n": "01", "title": "Sense", "desc": "Satellite thermal bands and solar-powered edge nodes watch every acre, day and night." }
+          },
+          {
+            "id": "how-detect",
+            "type": "survey-step",
+            "props": { "n": "02", "title": "Detect", "desc": "On-device models flag a thermal anomaly the instant it breaks from the landscape's baseline." }
+          },
+          {
+            "id": "how-verify",
+            "type": "survey-step",
+            "props": { "n": "03", "title": "Verify", "desc": "Cross-sensor fusion rejects flares, glint, and equipment heat — driving false alarms toward zero." }
+          },
+          {
+            "id": "how-alert",
+            "type": "survey-step",
+            "props": { "n": "04", "title": "Alert", "desc": "A geolocated ignition alert routes to agencies and crews through the channels they already use." }
           }
         ]
       }
     },
     {
       "id": "b-market",
-      "layout": "stage",
-      "notes": "TAM / SAM / SOM as stacked survey bars.",
+      "layout": "survey-feature",
+      "notes": "TAM / SAM / SOM as survey bars.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "market-kicker", "type": "survey-kicker", "props": { "text": "Market" } }
+        ],
+        "headline": [
+          { "id": "market-headline", "type": "survey-headline", "props": { "text": "Climate has made early detection a line item, not a luxury." } }
+        ],
+        "feature": [
           {
-            "id": "b-market-block",
-            "type": "beacon-market",
+            "id": "market-bars",
+            "type": "survey-bars",
             "props": {
-              "eyebrow": "Market",
-              "title": "Climate has made early detection a line item, not a luxury.",
               "segments": [
-                {
-                  "label": "TAM",
-                  "value": "$28B",
-                  "note": "Global wildfire detection, monitoring & resilience spend by 2030"
-                },
-                {
-                  "label": "SAM",
-                  "value": "$6.2B",
-                  "note": "Utilities, insurers & land agencies in fire-prone regions"
-                },
-                {
-                  "label": "SOM",
-                  "value": "$310M",
-                  "note": "Western U.S. utilities & state agencies, 3-year reachable"
-                }
+                { "label": "TAM", "value": "$28B", "note": "Global wildfire detection, monitoring & resilience spend by 2030" },
+                { "label": "SAM", "value": "$6.2B", "note": "Utilities, insurers & land agencies in fire-prone regions" },
+                { "label": "SOM", "value": "$310M", "note": "Western U.S. utilities & state agencies, 3-year reachable" }
               ]
             }
           }
@@ -171,101 +192,89 @@
     },
     {
       "id": "b-traction",
-      "layout": "stage",
+      "layout": "survey-feature",
       "notes": "Coverage growth curve + headline metrics.",
       "slots": {
-        "main": [
-          {
-            "id": "b-traction-block",
-            "type": "beacon-traction",
-            "props": {
-              "eyebrow": "Traction",
-              "title": "Every deployment makes the next ignition easier to catch.",
-              "series": [3, 7, 14, 23, 38, 61],
-              "metrics": [
-                {
-                  "value": "61M",
-                  "label": "acres under continuous watch"
-                },
-                {
-                  "value": "$2.8M",
-                  "label": "ARR · +22% MoM"
-                },
-                {
-                  "value": "11",
-                  "label": "utility & agency customers"
-                }
-              ]
-            }
-          }
+        "kicker": [
+          { "id": "traction-kicker", "type": "survey-kicker", "props": { "text": "Traction" } }
+        ],
+        "headline": [
+          { "id": "traction-headline", "type": "survey-headline", "props": { "text": "Every deployment makes the next ignition easier to catch." } }
+        ],
+        "feature": [
+          { "id": "traction-spark", "type": "survey-spark", "props": { "series": [3, 7, 14, 23, 38, 61] } }
+        ],
+        "metrics": [
+          { "id": "traction-acres", "type": "survey-metric", "props": { "value": "61M", "label": "acres under continuous watch" } },
+          { "id": "traction-arr", "type": "survey-metric", "props": { "value": "$2.8M", "label": "ARR", "caption": "+22% month over month" } },
+          { "id": "traction-customers", "type": "survey-metric", "props": { "value": "11", "label": "utility & agency customers" } }
         ]
       }
     },
     {
       "id": "b-team",
-      "layout": "stage",
+      "layout": "survey-grid",
       "notes": "Founding team with wildfire, space, and ML pedigree.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "team-kicker", "type": "survey-kicker", "props": { "text": "Team" } }
+        ],
+        "headline": [
+          { "id": "team-headline", "type": "survey-headline", "props": { "text": "Built by people who've fought fire and flown the sensors." } }
+        ],
+        "items": [
           {
-            "id": "b-team-block",
-            "type": "beacon-team",
-            "props": {
-              "eyebrow": "Team",
-              "title": "Built by people who've fought fire and flown the sensors.",
-              "members": [
-                {
-                  "name": "Dr. Ines Calderón",
-                  "role": "CEO",
-                  "prev": "Wildfire science lead, USFS Missoula Fire Lab"
-                },
-                {
-                  "name": "Tomas Bauer",
-                  "role": "CTO",
-                  "prev": "Thermal payload engineer, Planet Labs"
-                },
-                {
-                  "name": "Riya Anand",
-                  "role": "Head of Deployment",
-                  "prev": "Grid resilience lead, PG&E"
-                }
-              ]
-            }
+            "id": "team-ines",
+            "type": "survey-person",
+            "props": { "name": "Dr. Ines Calderón", "role": "CEO", "prev": "Wildfire science lead, USFS Missoula Fire Lab" }
+          },
+          {
+            "id": "team-tomas",
+            "type": "survey-person",
+            "props": { "name": "Tomas Bauer", "role": "CTO", "prev": "Thermal payload engineer, Planet Labs" }
+          },
+          {
+            "id": "team-riya",
+            "type": "survey-person",
+            "props": { "name": "Riya Anand", "role": "Head of Deployment", "prev": "Grid resilience lead, PG&E" }
           }
         ]
       }
     },
     {
       "id": "b-ask",
-      "layout": "stage",
+      "layout": "survey-stage",
       "notes": "The ask + use of funds: scale the sensor mesh.",
       "slots": {
-        "main": [
+        "kicker": [
+          { "id": "ask-kicker", "type": "survey-kicker", "props": { "text": "The ask" } }
+        ],
+        "headline": [
+          { "id": "ask-headline", "type": "survey-headline", "props": { "text": "Series A to blanket the American West before the next fire season." } }
+        ],
+        "body": [
           {
-            "id": "b-ask-block",
-            "type": "beacon-ask",
+            "id": "ask-allocations",
+            "type": "survey-points",
             "props": {
-              "eyebrow": "The ask",
-              "amount": "$15M",
-              "title": "Series A to blanket the American West before the next fire season.",
-              "allocations": [
-                {
-                  "label": "Sensor mesh & manufacturing",
-                  "pct": 40
-                },
-                {
-                  "label": "Detection ML & satellite ops",
-                  "pct": 30
-                },
-                {
-                  "label": "Go-to-market & agency partnerships",
-                  "pct": 20
-                },
-                {
-                  "label": "Operations",
-                  "pct": 10
-                }
+              "tone": "solution",
+              "items": [
+                "Sensor mesh & manufacturing — 40%",
+                "Detection ML & satellite ops — 30%",
+                "Go-to-market & agency partnerships — 20%",
+                "Operations — 10%"
               ]
+            }
+          }
+        ],
+        "aside": [
+          {
+            "id": "ask-amount",
+            "type": "survey-metric",
+            "props": {
+              "value": "$15M",
+              "label": "Series A",
+              "caption": "to scale the sensor mesh before the next fire season"
             }
           }
         ]
