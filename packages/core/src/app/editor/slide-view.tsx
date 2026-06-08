@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { UnknownBlock } from '../../doc/blocks/index.ts';
 import { MissingLayout } from '../../doc/layouts/index.ts';
 import type { Block, Slide } from '../../doc/model.ts';
@@ -11,10 +11,61 @@ export type BlockViewProps = {
   onCancelEdit: () => void;
 };
 
-export const BlockView = memo(function BlockView({ block }: BlockViewProps) {
+export const BlockView = memo(function BlockView({
+  block,
+  editingField,
+  onCommitEdit,
+  onCancelEdit,
+}: BlockViewProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: block.id keys the editable target; onCommitEdit/onCancelEdit are stable store methods. We intentionally re-run only when the edited field or block identity changes — not on every block prop change (which would fight the caret).
+  useEffect(() => {
+    if (editingField === null) return;
+    const el = ref.current?.querySelector(
+      `[data-osd-text="${CSS.escape(editingField)}"]`,
+    ) as HTMLElement | null;
+    if (!el) return;
+
+    el.contentEditable = 'plaintext-only';
+    el.focus();
+    const sel = window.getSelection();
+    if (sel) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    let cancelled = false;
+    const finish = () => {
+      el.contentEditable = 'inherit';
+      if (cancelled) onCancelEdit();
+      else onCommitEdit(el.innerText);
+    };
+    const onBlur = () => finish();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        el.blur();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelled = true;
+        el.blur();
+      }
+    };
+    el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKeyDown);
+    return () => {
+      el.removeEventListener('blur', onBlur);
+      el.removeEventListener('keydown', onKeyDown);
+      el.contentEditable = 'inherit';
+    };
+  }, [editingField, block.id, onCommitEdit, onCancelEdit]);
+
   const Component = getBlock(block.type);
   return (
-    <div data-osd-block-id={block.id} style={{ display: 'contents' }}>
+    <div ref={ref} data-osd-block-id={block.id} style={{ display: 'contents' }}>
       {Component ? <Component block={block} /> : <UnknownBlock type={block.type} />}
     </div>
   );
