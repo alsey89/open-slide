@@ -158,7 +158,11 @@ function PylonHero({ block }: { block: Block }) {
         style={{ height: '100%', display: 'grid', alignContent: 'center', gap: 30, maxWidth: 1480 }}
       >
         <div style={{ animation: 'pylon-rise .7s ease both' }}>
-          <Eyebrow>{str(p.eyebrow, 'Predictive maintenance for the grid')}</Eyebrow>
+          <Eyebrow>
+            <span data-osd-text="eyebrow">
+              {str(p.eyebrow, 'Predictive maintenance for the grid')}
+            </span>
+          </Eyebrow>
         </div>
         <h1
           style={{
@@ -171,6 +175,7 @@ function PylonHero({ block }: { block: Block }) {
             WebkitBackgroundClip: close ? 'text' : undefined,
             color: close ? 'transparent' : 'var(--osd-text)',
           }}
+          data-osd-text="title"
         >
           {str(p.title, 'Keep the grid online.')}
         </h1>
@@ -183,6 +188,7 @@ function PylonHero({ block }: { block: Block }) {
             margin: 0,
             animation: 'pylon-rise .7s ease .16s both',
           }}
+          data-osd-text="sub"
         >
           {str(p.sub)}
         </p>
@@ -199,7 +205,11 @@ function PylonStatement({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 44 }}>
-        <Eyebrow>{str(p.eyebrow, problem ? 'The problem' : 'The solution')}</Eyebrow>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">
+            {str(p.eyebrow, problem ? 'The problem' : 'The solution')}
+          </span>
+        </Eyebrow>
         <div
           style={{
             display: 'grid',
@@ -210,7 +220,9 @@ function PylonStatement({ block }: { block: Block }) {
           }}
         >
           <div style={{ display: 'grid', gap: 36 }}>
-            <h2 style={{ ...display(figure ? 68 : 76, 700), maxWidth: 1080 }}>{str(p.title)}</h2>
+            <h2 style={{ ...display(figure ? 68 : 76, 700), maxWidth: 1080 }} data-osd-text="title">
+              {str(p.title)}
+            </h2>
             {points.length > 0 && (
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 16 }}>
                 {points.map((pt, i) => (
@@ -228,7 +240,9 @@ function PylonStatement({ block }: { block: Block }) {
                     <span style={{ color: ACCENT, fontFamily: MONO, fontSize: 24 }}>
                       {problem ? '×' : '→'}
                     </span>
-                    <span style={{ color: 'var(--osd-muted)' }}>{pt}</span>
+                    <span style={{ color: 'var(--osd-muted)' }} data-osd-text={`points.${i}`}>
+                      {pt}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -249,10 +263,14 @@ function PylonStatement({ block }: { block: Block }) {
                   color: problem ? '#ff6b5e' : ACCENT,
                   textShadow: problem ? 'none' : `0 0 60px ${ACCENT}55`,
                 }}
+                data-osd-text="figure.value"
               >
                 {str(figure.value)}
               </div>
-              <div style={{ fontSize: 26, color: 'var(--osd-muted)', maxWidth: 420 }}>
+              <div
+                style={{ fontSize: 26, color: 'var(--osd-muted)', maxWidth: 420 }}
+                data-osd-text="figure.label"
+              >
                 {str(figure.label)}
               </div>
             </div>
@@ -269,8 +287,12 @@ function PylonSteps({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto auto 1fr', gap: 56 }}>
-        <Eyebrow>{str(p.eyebrow, 'How it works')}</Eyebrow>
-        <h2 style={{ ...display(64, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">{str(p.eyebrow, 'How it works')}</span>
+        </Eyebrow>
+        <h2 style={{ ...display(64, 700), maxWidth: 1200 }} data-osd-text="title">
+          {str(p.title)}
+        </h2>
         <div
           style={{
             display: 'grid',
@@ -299,8 +321,13 @@ function PylonSteps({ block }: { block: Block }) {
               >
                 {String(i + 1).padStart(2, '0')}
               </div>
-              <div style={display(46, 700)}>{str(s.title)}</div>
-              <div style={{ fontSize: 28, lineHeight: 1.45, color: 'var(--osd-muted)' }}>
+              <div style={display(46, 700)} data-osd-text={`steps.${i}.title`}>
+                {str(s.title)}
+              </div>
+              <div
+                style={{ fontSize: 28, lineHeight: 1.45, color: 'var(--osd-muted)' }}
+                data-osd-text={`steps.${i}.desc`}
+              >
                 {str(s.desc)}
               </div>
               {i < steps.length - 1 && (
@@ -338,7 +365,9 @@ function PylonMarket({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 56 }}>
-        <Eyebrow>{str(p.eyebrow, 'Market')}</Eyebrow>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">{str(p.eyebrow, 'Market')}</span>
+        </Eyebrow>
         <div
           style={{
             display: 'grid',
@@ -378,7 +407,9 @@ function PylonMarket({ block }: { block: Block }) {
             ))}
           </svg>
           <div style={{ display: 'grid', gap: 30 }}>
-            <h2 style={{ ...display(60, 700), maxWidth: 640 }}>{str(p.title)}</h2>
+            <h2 style={{ ...display(60, 700), maxWidth: 640 }} data-osd-text="title">
+              {str(p.title)}
+            </h2>
             <div style={{ display: 'grid', gap: 18 }}>
               {rings.map((ring, i) => (
                 <div
@@ -395,10 +426,18 @@ function PylonMarket({ block }: { block: Block }) {
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontFamily: MONO, fontSize: 24, color: ACCENT, width: 70 }}>
+                  <span
+                    style={{ fontFamily: MONO, fontSize: 24, color: ACCENT, width: 70 }}
+                    data-osd-text={`rings.${i}.label`}
+                  >
                     {str(ring.label)}
                   </span>
-                  <span style={{ fontSize: 28, color: 'var(--osd-muted)' }}>{str(ring.note)}</span>
+                  <span
+                    style={{ fontSize: 28, color: 'var(--osd-muted)' }}
+                    data-osd-text={`rings.${i}.note`}
+                  >
+                    {str(ring.note)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -431,9 +470,13 @@ function PylonTraction({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 48 }}>
-        <Eyebrow>{str(p.eyebrow, 'Traction')}</Eyebrow>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">{str(p.eyebrow, 'Traction')}</span>
+        </Eyebrow>
         <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 30, minHeight: 0 }}>
-          <h2 style={{ ...display(62, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+          <h2 style={{ ...display(62, 700), maxWidth: 1200 }} data-osd-text="title">
+            {str(p.title)}
+          </h2>
           <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }} preserveAspectRatio="none">
             <title>Traction over time</title>
             <defs>
@@ -481,7 +524,12 @@ function PylonTraction({ block }: { block: Block }) {
               key={i}
               style={{ display: 'grid', gap: 8 }}
             >
-              <div style={{ ...display(78, 800), color: ACCENT }}>{str(m.value)}</div>
+              <div
+                style={{ ...display(78, 800), color: ACCENT }}
+                data-osd-text={`metrics.${i}.value`}
+              >
+                {str(m.value)}
+              </div>
               <div
                 style={{
                   fontSize: 26,
@@ -489,6 +537,7 @@ function PylonTraction({ block }: { block: Block }) {
                   fontFamily: MONO,
                   letterSpacing: '0.06em',
                 }}
+                data-osd-text={`metrics.${i}.label`}
               >
                 {str(m.label)}
               </div>
@@ -516,8 +565,12 @@ function PylonTeam({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto auto 1fr', gap: 56 }}>
-        <Eyebrow>{str(p.eyebrow, 'Team')}</Eyebrow>
-        <h2 style={{ ...display(64, 700), maxWidth: 1200 }}>{str(p.title)}</h2>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">{str(p.eyebrow, 'Team')}</span>
+        </Eyebrow>
+        <h2 style={{ ...display(64, 700), maxWidth: 1200 }} data-osd-text="title">
+          {str(p.title)}
+        </h2>
         <div
           style={{
             display: 'grid',
@@ -554,8 +607,15 @@ function PylonTeam({ block }: { block: Block }) {
                 {initials(str(m.name, '–'))}
               </div>
               <div>
-                <div style={display(40, 700)}>{str(m.name)}</div>
-                <div style={{ fontSize: 26, color: ACCENT, marginTop: 6 }}>{str(m.role)}</div>
+                <div style={display(40, 700)} data-osd-text={`members.${i}.name`}>
+                  {str(m.name)}
+                </div>
+                <div
+                  style={{ fontSize: 26, color: ACCENT, marginTop: 6 }}
+                  data-osd-text={`members.${i}.role`}
+                >
+                  {str(m.role)}
+                </div>
                 <div
                   style={{
                     fontSize: 24,
@@ -563,6 +623,7 @@ function PylonTeam({ block }: { block: Block }) {
                     marginTop: 10,
                     lineHeight: 1.4,
                   }}
+                  data-osd-text={`members.${i}.prev`}
                 >
                   {str(m.prev)}
                 </div>
@@ -585,7 +646,9 @@ function PylonAsk({ block }: { block: Block }) {
   return (
     <Stage>
       <div style={{ height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr', gap: 64 }}>
-        <Eyebrow>{str(p.eyebrow, 'The ask')}</Eyebrow>
+        <Eyebrow>
+          <span data-osd-text="eyebrow">{str(p.eyebrow, 'The ask')}</span>
+        </Eyebrow>
         <div
           style={{
             display: 'grid',
@@ -595,10 +658,15 @@ function PylonAsk({ block }: { block: Block }) {
           }}
         >
           <div style={{ display: 'grid', gap: 28 }}>
-            <div style={{ ...display(148, 800), color: ACCENT, textShadow: '0 0 70px #c4f04244' }}>
+            <div
+              style={{ ...display(148, 800), color: ACCENT, textShadow: '0 0 70px #c4f04244' }}
+              data-osd-text="amount"
+            >
               {str(p.amount, '$12M')}
             </div>
-            <h2 style={{ ...display(46, 700), maxWidth: 620 }}>{str(p.title)}</h2>
+            <h2 style={{ ...display(46, 700), maxWidth: 620 }} data-osd-text="title">
+              {str(p.title)}
+            </h2>
           </div>
           <div style={{ display: 'grid', gap: 36 }}>
             <div
@@ -636,7 +704,12 @@ function PylonAsk({ block }: { block: Block }) {
                     }}
                   />
                   <span style={{ fontFamily: MONO, color: ACCENT, width: 90 }}>{a.pct ?? 0}%</span>
-                  <span style={{ color: 'var(--osd-muted)' }}>{str(a.label)}</span>
+                  <span
+                    style={{ color: 'var(--osd-muted)' }}
+                    data-osd-text={`allocations.${i}.label`}
+                  >
+                    {str(a.label)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -996,7 +1069,9 @@ function BeaconStatement({ block }: { block: Block }) {
                     >
                       {problem ? '✕' : '◆'}
                     </span>
-                    <span style={{ color: 'var(--osd-text)' }}>{pt}</span>
+                    <span style={{ color: 'var(--osd-text)' }} data-osd-text={`points.${i}`}>
+                      {pt}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -1018,11 +1093,13 @@ function BeaconStatement({ block }: { block: Block }) {
                   fontVariantNumeric: 'tabular-nums',
                   textShadow: problem ? 'none' : `0 0 60px ${EMBER}33`,
                 }}
+                data-osd-text="figure.value"
               >
                 {str(figure.value)}
               </div>
               <div
                 style={{ fontSize: 25, color: 'var(--osd-muted)', maxWidth: 420, lineHeight: 1.4 }}
+                data-osd-text="figure.label"
               >
                 {str(figure.label)}
               </div>
@@ -1091,8 +1168,13 @@ function BeaconSteps({ block }: { block: Block }) {
                 />
                 {String(i + 1).padStart(2, '0')}
               </div>
-              <div style={surveyDisplay(42, 600)}>{str(s.title)}</div>
-              <div style={{ fontSize: 26, lineHeight: 1.46, color: 'var(--osd-muted)' }}>
+              <div style={surveyDisplay(42, 600)} data-osd-text={`steps.${i}.title`}>
+                {str(s.title)}
+              </div>
+              <div
+                style={{ fontSize: 26, lineHeight: 1.46, color: 'var(--osd-muted)' }}
+                data-osd-text={`steps.${i}.desc`}
+              >
                 {str(s.desc)}
               </div>
               {i < steps.length - 1 && (
@@ -1205,7 +1287,10 @@ function BeaconMarket({ block }: { block: Block }) {
                     paddingBottom: 18,
                   }}
                 >
-                  <span style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, width: 64 }}>
+                  <span
+                    style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, width: 64 }}
+                    data-osd-text={`segments.${i}.label`}
+                  >
                     {str(seg.label)}
                   </span>
                   <span
@@ -1214,10 +1299,14 @@ function BeaconMarket({ block }: { block: Block }) {
                       color: 'var(--osd-text)',
                       fontVariantNumeric: 'tabular-nums',
                     }}
+                    data-osd-text={`segments.${i}.value`}
                   >
                     {str(seg.value)}
                   </span>
-                  <span style={{ fontSize: 25, color: 'var(--osd-muted)', lineHeight: 1.35 }}>
+                  <span
+                    style={{ fontSize: 25, color: 'var(--osd-muted)', lineHeight: 1.35 }}
+                    data-osd-text={`segments.${i}.note`}
+                  >
                     {str(seg.note)}
                   </span>
                 </div>
@@ -1313,6 +1402,7 @@ function BeaconTraction({ block }: { block: Block }) {
                   color: EMBER,
                   fontVariantNumeric: 'tabular-nums',
                 }}
+                data-osd-text={`metrics.${i}.value`}
               >
                 {str(m.value)}
               </div>
@@ -1323,6 +1413,7 @@ function BeaconTraction({ block }: { block: Block }) {
                   fontFamily: SURVEY_MONO,
                   letterSpacing: '0.04em',
                 }}
+                data-osd-text={`metrics.${i}.label`}
               >
                 {str(m.label)}
               </div>
@@ -1396,8 +1487,13 @@ function BeaconTeam({ block }: { block: Block }) {
                 {initials(str(m.name, '–'))}
               </div>
               <div>
-                <div style={surveyDisplay(38, 600)}>{str(m.name)}</div>
-                <div style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, marginTop: 8 }}>
+                <div style={surveyDisplay(38, 600)} data-osd-text={`members.${i}.name`}>
+                  {str(m.name)}
+                </div>
+                <div
+                  style={{ fontFamily: SURVEY_MONO, fontSize: 22, color: EMBER, marginTop: 8 }}
+                  data-osd-text={`members.${i}.role`}
+                >
                   {str(m.role)}
                 </div>
                 <div
@@ -1407,6 +1503,7 @@ function BeaconTeam({ block }: { block: Block }) {
                     marginTop: 12,
                     lineHeight: 1.42,
                   }}
+                  data-osd-text={`members.${i}.prev`}
                 >
                   {str(m.prev)}
                 </div>
@@ -1469,7 +1566,12 @@ function BeaconAsk({ block }: { block: Block }) {
                     alignItems: 'baseline',
                   }}
                 >
-                  <span style={{ fontSize: 28, color: 'var(--osd-text)' }}>{str(a.label)}</span>
+                  <span
+                    style={{ fontSize: 28, color: 'var(--osd-text)' }}
+                    data-osd-text={`allocations.${i}.label`}
+                  >
+                    {str(a.label)}
+                  </span>
                   <span
                     style={{
                       fontFamily: SURVEY_MONO,
